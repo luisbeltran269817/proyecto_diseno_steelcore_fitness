@@ -4,6 +4,9 @@
 
 package InicioAplicacion;
 
+import Controladores.ControladorAplicacion;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author luiscarlosbeltran
@@ -11,10 +14,8 @@ package InicioAplicacion;
 public class InicioAplicacion {
 
     public static void main(String[] args) {
-            //poner aqui el metodo para iniciar el sistema
-//        //broski
-//        ControlPantallas cp = new ControlPantallas();
-//        
-//        cp.mostrarPantallaInicio();
+        SwingUtilities.invokeLater(() -> {
+            ControladorAplicacion.getInstancia().iniciar();
+        });
     }
 }

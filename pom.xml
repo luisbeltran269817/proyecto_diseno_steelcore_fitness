@@ -7,6 +7,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>Presentacion</module>
+        <module>InicioSesionSubsistema</module>
+        <module>DTOs</module>
+        <module>ComprarMembresiaSubsistema</module>
+        <module>BOs</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
