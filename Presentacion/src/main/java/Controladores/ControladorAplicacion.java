@@ -8,6 +8,7 @@ import Fachada.FachadaInicioSesion;
 import Fachada.IInicioSesion;
 import PantallasComprarMembresia.PantallaBienvenida;
 import PantallasComprarMembresia.PantallaPerfilUsuario;
+import PantallasComprarMembresia.PantallaVerPerfil;
 import PantallasInicioSesion.PantallaInicioSesion;
 import dtos.InicioSesionDTO;
 import dtos.UsuarioDTO;
@@ -34,6 +35,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
     private PantallaPerfilUsuario pantallaPerfil;
+    private PantallaVerPerfil pantallaDetallesPerfil;
 
     //El dto de usuario, que utilizaremos para mantener la sesion activa
     UsuarioDTO usuarioActual;
@@ -117,6 +119,19 @@ public class ControladorAplicacion implements IControladorAplicacion {
         if (pantallaInicioSesion != null) {
             pantallaInicioSesion.dispose();
         }
+    }
+
+    /**
+     * metodo para ver los detalles del perfil del usuario actual
+     */
+    @Override
+    public void verPerfil() {
+        ocultarTodo();
+        if (pantallaDetallesPerfil == null) {
+            pantallaDetallesPerfil = new PantallaVerPerfil(this);
+        }
+
+        pantallaDetallesPerfil.setVisible(true);
     }
 
 }

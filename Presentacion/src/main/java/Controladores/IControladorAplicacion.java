@@ -26,5 +26,7 @@ public interface IControladorAplicacion {
     public UsuarioDTO obtenerPerfil();
     
     public List<VisitaDTO> obtenerHistorial();
+    
+    void verPerfil();
 
 }

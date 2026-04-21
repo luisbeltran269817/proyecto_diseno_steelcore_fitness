@@ -89,6 +89,8 @@ public class PantallaPerfilUsuario extends PantallaBase {
         btnMembresia = crearBoton("", Boton.Variante.PRIMARIO);
         actualizarBoton();
 
+        Boton btnPerfil = crearBoton("Ver perfil", Boton.Variante.PRIMARIO);
+        
         Boton btnRegresar = crearBoton("← Volver", Boton.Variante.SECUNDARIO);
         btnRegresar.addActionListener(e -> controlador.irABienvenida());
 
@@ -96,11 +98,15 @@ public class PantallaPerfilUsuario extends PantallaBase {
         acciones.add(Box.createVerticalStrut(15));
         acciones.add(btnRegistrar);
         acciones.add(Box.createVerticalStrut(15));
+        acciones.add(btnPerfil);
+        acciones.add(Box.createVerticalStrut(15));
         acciones.add(btnMembresia);
         acciones.add(Box.createVerticalStrut(15));
         acciones.add(btnRegresar); 
 
         btnMembresia.addActionListener(e -> manejarMembresia());
+        
+        btnPerfil.addActionListener(e -> controlador.verPerfil());
 
         JPanel zonaSuperior = new JPanel(new BorderLayout());
         zonaSuperior.setOpaque(false);
