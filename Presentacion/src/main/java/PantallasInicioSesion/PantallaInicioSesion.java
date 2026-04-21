@@ -5,6 +5,8 @@
 package PantallasInicioSesion;
 
 import Controladores.IControladorAplicacion;
+import Fachada.FachadaInicioSesion;
+import Fachada.IInicioSesion;
 import Utilerias.Boton;
 import Utilerias.CampoContrasena;
 import Utilerias.CampoTexto;
@@ -28,10 +30,16 @@ public class PantallaInicioSesion extends PantallaBase {
 
     private CampoTexto txtCorreo;
     private CampoContrasena txtContrasena;
+    
+    private IInicioSesion subsistema;
+    private InicioSesionDTO sesionActual;
 
     public PantallaInicioSesion(IControladorAplicacion controlador) {
         super(controlador);
-        setTitle("Inicio de Sesión");
+
+        this.subsistema = new FachadaInicioSesion(); 
+        
+        setTitle("Inicio de Sesión - SteelCore Fitness");
         inicializarComponentes();
         setVisible(true);
     }
@@ -51,10 +59,9 @@ public class PantallaInicioSesion extends PantallaBase {
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
         titulo.setAlignmentX(CENTER_ALIGNMENT);
 
-
         txtCorreo = new CampoTexto("Correo electrónico", "correo@ejemplo.com");
         txtContrasena = new CampoContrasena("Contraseña");
-
+        
         txtCorreo.setAlignmentX(CENTER_ALIGNMENT);
         txtContrasena.setAlignmentX(CENTER_ALIGNMENT);
         txtCorreo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 72));
@@ -62,7 +69,7 @@ public class PantallaInicioSesion extends PantallaBase {
 
         Boton btnIngresar = crearBoton("Ingresar", Boton.Variante.PRIMARIO);
         Boton btnRegresar = crearBoton("Regresar", Boton.Variante.SECUNDARIO);
-
+        
         btnIngresar.setAlignmentX(CENTER_ALIGNMENT);
         btnRegresar.setAlignmentX(CENTER_ALIGNMENT);
         btnIngresar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
@@ -75,7 +82,6 @@ public class PantallaInicioSesion extends PantallaBase {
         });
 
         card.add(titulo);
-        card.add(Box.createVerticalStrut(8));
         card.add(Box.createVerticalStrut(44));
         card.add(txtCorreo);
         card.add(Box.createVerticalStrut(20));
@@ -93,18 +99,26 @@ public class PantallaInicioSesion extends PantallaBase {
         String contrasena = txtContrasena.getValor();
 
         if (correo.isBlank() || contrasena.isBlank()) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor completa todos los campos.",
-                    "Campos requeridos",
-                    JOptionPane.WARNING_MESSAGE);
+            mostrarError("Por favor completa todos los campos.");
             return;
         }
 
-        InicioSesionDTO dto= new InicioSesionDTO(correo, contrasena);
-        controlador.iniciarSesion(dto);
+        InicioSesionDTO sesion = subsistema.iniciarSesion(correo, contrasena);
+
+        if (sesion != null && sesion.isActivo()) {
+            this.sesionActual = sesion;
+            JOptionPane.showMessageDialog(this, 
+                "¡Bienvenido, " + sesion.getNombre() + "!", 
+                "Acceso Exitoso", JOptionPane.INFORMATION_MESSAGE);
+            
+            setVisible(false);
+            controlador.iniciarSesion(sesion);
+        } else {
+            mostrarError("Usuario o contraseña incorrectos.");
+        }
     }
     
     public void mostrarError(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, mensaje, "Error de Validación", JOptionPane.ERROR_MESSAGE);
     }
 }

@@ -85,18 +85,6 @@ public class ControladorAplicacion implements IControladorAplicacion {
 
         pantallaPerfil.setVisible(true);
     }
-
-    @Override
-    public void iniciarSesion(InicioSesionDTO dto) {
-        UsuarioDTO usuario = inicioSesionFachada.iniciarSesion(dto);
-        usuarioActual = usuario;
-        if (usuario.getRol() == Rol.ADMIN) {
-            //Esto para cuando hagamos los casos individuales (como el mío de gestión de inventario)
-        } else {
-            irAPerfilUsuario();
-        }
-        
-    }
     
     //Estos dos son métodos de pura lógica
     @Override
@@ -132,6 +120,26 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
 
         pantallaDetallesPerfil.setVisible(true);
+    }
+    
+    
+    // mejorado
+    @Override
+    public void iniciarSesion(InicioSesionDTO dto) {
+        // El dto ya viene validado desde la pantalla
+        // Consultamos el perfil completo del usuario
+        usuarioActual = compraMembresiaFachada.obtenerPerfil(dto.getCorreo());
+ 
+        if (usuarioActual == null) {
+            irABienvenida();
+            return;
+        }
+ 
+        if (usuarioActual.getRol() == Rol.ADMIN) {
+            irABienvenida();
+        } else {
+            irAPerfilUsuario();
+        }
     }
 
 }
