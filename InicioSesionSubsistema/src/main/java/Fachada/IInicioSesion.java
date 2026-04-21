@@ -13,5 +13,7 @@ import dtos.UsuarioDTO;
  */
 public interface IInicioSesion {
     
-    public UsuarioDTO iniciarSesion(InicioSesionDTO dto);
+    public InicioSesionDTO iniciarSesion(String usuario, String password);
+    public void cerrarSesion(String token);
+    public boolean validarToken(String token);
 }

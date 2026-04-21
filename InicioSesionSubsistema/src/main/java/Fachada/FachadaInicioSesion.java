@@ -4,9 +4,8 @@
  */
 package Fachada;
 
+import Clase_Control.ClaseControlInicioSesion;
 import dtos.InicioSesionDTO;
-import dtos.UsuarioDTO;
-import dtos.UsuarioDTO.Rol;
 
 /**
  *
@@ -14,30 +13,27 @@ import dtos.UsuarioDTO.Rol;
  */
 public class FachadaInicioSesion implements IInicioSesion {
 
+    private ClaseControlInicioSesion ctrl;
+ 
     public FachadaInicioSesion() {
+        this.ctrl = new ClaseControlInicioSesion();
     }
     
-    //Los métodos de las fachadas van a ser así por ahora, retornando valores simples
-    //hmmm
     @Override
-    public UsuarioDTO iniciarSesion(InicioSesionDTO dto) {
-        if (dto.getCorreo().equals("admin@mail.com")) {
-            UsuarioDTO admin = new UsuarioDTO();
-            admin.setCorreo(dto.getCorreo());
-            admin.setNombre("Admin");
-            admin.setRol(Rol.ADMIN);
-            return admin;
-        }
-        if (dto.getCorreo().equals("cliente@mail.com")) {
-            UsuarioDTO cliente = new UsuarioDTO();
-            cliente.setCorreo(dto.getCorreo());
-            cliente.setNombre("Julian Menchaca");
-            cliente.setRol(Rol.CLIENTE);
-            cliente.setMembresiaActiva(true);
-            cliente.setNombreMembresia("ChacaYunk Deluxe");
-            return cliente;
-        }
-        return null;
+    public InicioSesionDTO iniciarSesion(String usuario, String password) {
+        return ctrl.procesarInicioSesion(usuario, password);
+        
     }
+ 
+    @Override
+    public void cerrarSesion(String token) {
+        ctrl.procesarCierreSesion(token);
+    }
+ 
+    @Override
+    public boolean validarToken(String token) {
+        return ctrl.procesarValidacionToken(token);
+    }
+
     
 }

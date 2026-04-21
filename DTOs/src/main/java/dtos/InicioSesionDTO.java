@@ -9,18 +9,21 @@ package dtos;
  * @author Tungs
  */
 public class InicioSesionDTO {
-    private String correo;
-    private String contrasena;
-    
+    private String correo; 
+    private String nombre;
+    private String token;
+    private boolean activo;
 
-    public InicioSesionDTO(String correo, String contrasena) {
-        this.correo = correo;
-        this.contrasena = contrasena;
-    }
-    
     public InicioSesionDTO() {
     }
-    
+
+    public InicioSesionDTO(String correo, String nombre, String token, boolean activo) {
+        this.correo = correo;
+        this.nombre = nombre;
+        this.token = token;
+        this.activo = activo;
+    }
+
     public String getCorreo() {
         return correo;
     }
@@ -29,13 +32,27 @@ public class InicioSesionDTO {
         this.correo = correo;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
-    
-    
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
 }
