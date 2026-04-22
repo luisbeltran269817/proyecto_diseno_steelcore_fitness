@@ -16,8 +16,7 @@ public class SucursalDTO {
     private double latitud;
     private double longitud;
  
-    public SucursalDTO(String idSucursal, String nombre, String ciudad,
-                       String colonia, double latitud, double longitud) {
+    public SucursalDTO(String idSucursal, String nombre, String ciudad, String colonia, double latitud, double longitud) {
         this.idSucursal = idSucursal;
         this.nombre = nombre;
         this.ciudad = ciudad;

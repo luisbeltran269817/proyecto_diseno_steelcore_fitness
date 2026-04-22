@@ -14,14 +14,18 @@ public class PlanDTO {
     private double precio;
     private String descripcion;
     private boolean incluyeEntrenador;
+    private int mesesVigencia;
+ 
+    public PlanDTO() {}
  
     public PlanDTO(String idPlan, String nombre, double precio,
-                   String descripcion, boolean incluyeEntrenador) {
+                   String descripcion, boolean incluyeEntrenador, int mesesVigencia) {
         this.idPlan = idPlan;
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
         this.incluyeEntrenador = incluyeEntrenador;
+        this.mesesVigencia = mesesVigencia;
     }
 
     public String getIdPlan() {
@@ -63,8 +67,12 @@ public class PlanDTO {
     public void setIncluyeEntrenador(boolean incluyeEntrenador) {
         this.incluyeEntrenador = incluyeEntrenador;
     }
-    
-    
-    
-    
+
+    public int getMesesVigencia() {
+        return mesesVigencia;
+    }
+
+    public void setMesesVigencia(int mesesVigencia) {
+        this.mesesVigencia = mesesVigencia;
+    }
 }

@@ -85,10 +85,13 @@ public class PantallaPerfilUsuario extends PantallaBase {
         acciones.setLayout(new BoxLayout(acciones, BoxLayout.Y_AXIS));
 
         Boton btnMapa = crearBoton("Ver mapa", Boton.Variante.SECUNDARIO);
+        Boton btnSeleccionSucursal = crearBoton("Elegir Sucursal", Boton.Variante.SECUNDARIO);
         Boton btnRegistrar = crearBoton("Registrar visita", Boton.Variante.PRIMARIO);
         btnMembresia = crearBoton("", Boton.Variante.PRIMARIO);
         actualizarBoton();
-
+        
+        btnSeleccionSucursal.addActionListener(e -> controlador.SeleccionSucursal());
+        
         Boton btnPerfil = crearBoton("Ver perfil", Boton.Variante.PRIMARIO);
         
         Boton btnRegresar = crearBoton("← Volver", Boton.Variante.SECUNDARIO);
@@ -96,6 +99,8 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
         acciones.add(btnMapa);
         acciones.add(Box.createVerticalStrut(15));
+        acciones.add(btnSeleccionSucursal);
+        acciones.add(Box.createHorizontalStrut(15));
         acciones.add(btnRegistrar);
         acciones.add(Box.createVerticalStrut(15));
         acciones.add(btnPerfil);

@@ -28,7 +28,11 @@ public class CompraDTO {
         this.metodoPago = metodoPago;
         this.monto = monto;
     }
-
+    
+    public CompraDTO(){
+        
+    }
+    
     public String getIdSocio() {
         return idSocio;
     }

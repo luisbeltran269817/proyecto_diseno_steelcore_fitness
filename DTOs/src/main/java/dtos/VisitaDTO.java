@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @author Tungs
  */
 public class VisitaDTO {
-    
+    // esto ya no es necesario hice esto en sucursal pero mejor
     private String gimnasio;
     private String calle;
     private String colonia;

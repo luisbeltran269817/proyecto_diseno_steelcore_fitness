@@ -26,7 +26,7 @@ public class Boton extends JButton {
     private Color colorHover;
     private Color colorPress;
     private Color colorActual;
- 
+    
     public Boton(String texto, Variante variante) {
         super(texto);
         asignarColores(variante);

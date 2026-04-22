@@ -28,5 +28,12 @@ public interface IControladorAplicacion {
     public List<VisitaDTO> obtenerHistorial();
     
     void verPerfil();
-
+    
+    public void SeleccionSucursal();
+    
+    void SeleccionPlan(dtos.SucursalDTO sucursal);
+    
+    void ResumenCompra(dtos.SucursalDTO sucursal, dtos.PlanDTO plan);
+    
+    void PantallaExito(dtos.ResultadoDTO resultado);
 }
