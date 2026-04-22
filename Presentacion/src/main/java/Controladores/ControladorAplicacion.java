@@ -7,10 +7,17 @@ package Controladores;
 import Fachada.FachadaInicioSesion;
 import Fachada.IInicioSesion;
 import PantallasComprarMembresia.PantallaBienvenida;
+import PantallasComprarMembresia.PantallaConfirmacionExito;
 import PantallasComprarMembresia.PantallaPerfilUsuario;
+import PantallasComprarMembresia.PantallaResumenCompra;
+import PantallasComprarMembresia.PantallaSeleccionPlan;
+import PantallasComprarMembresia.PantallaSeleccionSucursal;
 import PantallasComprarMembresia.PantallaVerPerfil;
 import PantallasInicioSesion.PantallaInicioSesion;
 import dtos.InicioSesionDTO;
+import dtos.PlanDTO;
+import dtos.ResultadoDTO;
+import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.UsuarioDTO.Rol;
 import dtos.VisitaDTO;
@@ -36,6 +43,11 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private PantallaInicioSesion pantallaInicioSesion;
     private PantallaPerfilUsuario pantallaPerfil;
     private PantallaVerPerfil pantallaDetallesPerfil;
+    private PantallaSeleccionSucursal pantallaSeleccionSucursal;
+    private PantallaResumenCompra pantallaResumenCompra;
+    private PantallaSeleccionPlan pantallaSeleccionPlan;
+    private PantallaConfirmacionExito pantallaConfirmacionExito;
+    
 
     //El dto de usuario, que utilizaremos para mantener la sesion activa
     UsuarioDTO usuarioActual;
@@ -142,4 +154,39 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
     }
 
+    @Override
+    public void SeleccionSucursal() {
+        ocultarTodo();
+        pantallaSeleccionSucursal = new PantallaSeleccionSucursal(this);
+        pantallaSeleccionSucursal.setVisible(true);
+    }
+
+    @Override
+    public void SeleccionPlan(SucursalDTO sucursal) {
+         ocultarTodo();
+         if (pantallaSeleccionPlan == null) {
+             pantallaSeleccionPlan = new PantallaSeleccionPlan(this, sucursal);
+         } else {
+             pantallaSeleccionPlan = new PantallaSeleccionPlan(this, sucursal); 
+         }
+         pantallaSeleccionPlan.setVisible(true);
+    }
+
+    @Override
+    public void ResumenCompra(SucursalDTO sucursal, PlanDTO plan) {
+         ocultarTodo();
+         pantallaResumenCompra = new PantallaResumenCompra(this, sucursal, plan);
+         pantallaResumenCompra.setVisible(true);
+    }
+
+    @Override
+    public void PantallaExito(ResultadoDTO resultado) {
+         ocultarTodo();
+         pantallaConfirmacionExito = new PantallaConfirmacionExito(this, resultado);
+         pantallaConfirmacionExito.setVisible(true);
+    }
+    
+    
+    
+    
 }

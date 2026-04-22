@@ -4,6 +4,10 @@
  */
 package fachada;
 
+import dtos.CompraDTO;
+import dtos.PlanDTO;
+import dtos.ResultadoDTO;
+import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
 import java.util.List;
@@ -15,11 +19,16 @@ import java.util.List;
 public interface IComprarMembresia {
     
     public UsuarioDTO obtenerPerfil(String correo);
-
-    List<VisitaDTO> obtenerHistorial(String correo);
-
-    public void cancelarMembresia(String correo);
-
-    public void adquirirMembresia(String correo);
     
+    List<VisitaDTO> obtenerHistorial(String correo);
+    
+    public List<PlanDTO> obtenerPlanes();
+    
+    public PlanDTO obtenerDetallePlan(String idPlan);
+    
+    public List<SucursalDTO> obtenerSucursales();
+    
+    public ResultadoDTO generarContrato(CompraDTO dto);
+    
+    public ResultadoDTO confirmarCompra(CompraDTO dto);
 }

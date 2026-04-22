@@ -16,6 +16,7 @@ public class UsuarioDTO {
         ADMIN,
         CLIENTE,
     }
+    
     private Rol rol;
     private boolean membresiaActiva;
     private String nombreMembresia;
