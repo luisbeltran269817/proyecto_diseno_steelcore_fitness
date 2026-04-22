@@ -47,7 +47,8 @@ public class ControlComprarMembresia {
         return sucursalBO.obtenerTodas();
     }
  
-
+    // generar qr
+    
     public ResultadoDTO generarContrato(CompraDTO dto) {
 
         if (!planBO.esPlanValido(dto.getIdPlan())) {
