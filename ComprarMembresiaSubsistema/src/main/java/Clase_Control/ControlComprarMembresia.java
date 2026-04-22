@@ -11,10 +11,14 @@ import dtos.MembresiaDTO;
 import dtos.PlanDTO;
 import dtos.ResultadoDTO;
 import dtos.SucursalDTO;
+import dtos.UsuarioDTO;
+import dtos.VisitaDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import objetosnegocios.ClienteBO;
 import objetosnegocios.SucursalBO;
+import objetosnegocios.VisitaBO;
 import patronestrategia.FabricaEstrategiasPlan;
 import patronestrategia.IEstrategiaPlan;
 
@@ -27,13 +31,26 @@ public class ControlComprarMembresia {
     private final PlanBO planBO;
     private final SucursalBO sucursalBO;
     private final MembresiaBO membresiaBO;
+    private final ClienteBO socioBO; 
+    private final VisitaBO visitaBO;
  
     public ControlComprarMembresia() {
         this.planBO      = new PlanBO();
         this.sucursalBO  = new SucursalBO();
         this.membresiaBO = new MembresiaBO();
+        this.socioBO     = new ClienteBO();
+        this.visitaBO    = new VisitaBO();
+    }
+    
+    //Ver esto Despues
+    public UsuarioDTO obtenerPerfil(String correo) {
+        return  new UsuarioDTO() {};//usuarioBO.obtenerPorCorreo(correo)
     }
 
+    public List<VisitaDTO> obtenerHistorial(String correo) {
+        List<VisitaDTO> visitas= new ArrayList<>();
+        return visitas; //visitaBO.obtenerPorCorreo(correo)
+    }
  
     public List<PlanDTO> obtenerPlanes() {
         return planBO.obtenerTodos();
@@ -95,7 +112,7 @@ public class ControlComprarMembresia {
         MembresiaDTO membresia = membresiaBO.crearMembresia(dto, plan, sucursal);
         String folioTxn = "TXN-" + UUID.randomUUID()
             .toString().substring(0, 8).toUpperCase();
- 
+        
         return ResultadoDTO.exitoso(
             procesamiento.getMensaje() + " QR generado: " + membresia.getCodigoQR(),
             folioTxn);

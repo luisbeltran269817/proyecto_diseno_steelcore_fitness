@@ -10,7 +10,6 @@ import dtos.PlanDTO;
 import dtos.ResultadoDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
-import dtos.UsuarioDTO.Rol;
 import dtos.VisitaDTO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,29 +28,12 @@ public class FachadaComprarMembresia implements IComprarMembresia {
 
     @Override
     public UsuarioDTO obtenerPerfil(String correo) {
-        UsuarioDTO u = new UsuarioDTO();
-        u.setCorreo(correo);
-        u.setNombre("Julian Menchaca");
-        u.setRol(Rol.CLIENTE);
-        u.setMembresiaActiva(true);
-        u.setNombreMembresia("ChacaYunk Deluxe");
-
-        return u;
+        return control.obtenerPerfil(correo);
     }
-    
+
     @Override
     public List<VisitaDTO> obtenerHistorial(String correo) {
-        List<VisitaDTO> lista = new ArrayList<>();
-        VisitaDTO v = new VisitaDTO();
-        v.setGimnasio("SteelCore Centro");
-        v.setCalle("Zacatecas");
-        v.setColonia("Las cortinas");
-        v.setCiudad("Obregón");
-        v.setFechaHora(LocalDateTime.now());
-
-        lista.add(v);
-
-        return lista;
+        return control.obtenerHistorial(correo);
     }
     
     @Override

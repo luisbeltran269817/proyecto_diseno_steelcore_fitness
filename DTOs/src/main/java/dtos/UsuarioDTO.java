@@ -9,43 +9,25 @@ package dtos;
  * @author Tungs
  */
 public class UsuarioDTO {
-    private String nombre;
-    private String correo;
-    
-    public enum Rol {
+    protected String correo;
+    protected String nombre;
+    protected String contraseña;
+    protected enum Rol {
         ADMIN,
         CLIENTE,
     }
-    
-    private Rol rol;
-    private boolean membresiaActiva;
-    private String nombreMembresia;
+    Rol rol;
 
-    public UsuarioDTO(String nombre, String correo, Rol rol, boolean membresiaActiva, String nombreMembresia) {
-        this.nombre = nombre;
+    public UsuarioDTO(String correo, String nombre, String contraseña, Rol rol) {
         this.correo = correo;
+        this.nombre = nombre;
+        this.contraseña = contraseña;
         this.rol = rol;
-        this.membresiaActiva = membresiaActiva;
-        this.nombreMembresia = nombreMembresia;
     }
-
+    
     public UsuarioDTO() {
     }
     
-    public UsuarioDTO(String nombre, String correo, Rol rol) {
-        this.nombre = nombre;
-        this.correo = correo;
-        this.rol = rol;
-    }
-    
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
     public String getCorreo() {
         return correo;
     }
@@ -54,28 +36,28 @@ public class UsuarioDTO {
         this.correo = correo;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
+    }
+
     public Rol getRol() {
         return rol;
     }
 
     public void setRol(Rol rol) {
         this.rol = rol;
-    }
-
-    public boolean getMembresiaActiva() {
-        return membresiaActiva;
-    }
-
-    public void setMembresiaActiva(boolean membresiaActiva) {
-        this.membresiaActiva = membresiaActiva;
-    }
-
-    public String getNombreMembresia() {
-        return nombreMembresia;
-    }
-
-    public void setNombreMembresia(String nombreMembresia) {
-        this.nombreMembresia = nombreMembresia;
     }
     
     

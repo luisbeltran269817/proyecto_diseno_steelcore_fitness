@@ -4,10 +4,17 @@
  */
 package objetosnegocios;
 
+import EstadoMembresia.EstadoMembresiaDTO;
+import dtos.ClienteDTO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
+import dtos.UsuarioDTO;
+import dtos.VisitaDTO;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,25 +23,31 @@ import java.util.Map;
  */
 public class AlmacenComprarMembresiaMock {
     private static AlmacenComprarMembresiaMock instancia;
- 
+
     public static AlmacenComprarMembresiaMock getInstancia() {
         if (instancia == null) {
             instancia = new AlmacenComprarMembresiaMock();
         }
         return instancia;
     }
- 
+
     private final Map<String, PlanDTO> planes;
     private final Map<String, SucursalDTO> sucursales;
     private final Map<String, MembresiaDTO> membresias;
- 
+
+    private final Map<String, UsuarioDTO> usuarios;
+    private final Map<String, List<VisitaDTO>> visitas;
+
     private AlmacenComprarMembresiaMock() {
         planes = new LinkedHashMap<>();
         sucursales = new LinkedHashMap<>();
         membresias = new LinkedHashMap<>();
+        usuarios = new LinkedHashMap<>();
+        visitas = new LinkedHashMap<>();
+
         poblarDatos();
     }
- 
+    
     private void poblarDatos() {
         planes.put("P001", new PlanDTO(
             "P001", "MENSUAL",   599.0,
@@ -62,6 +75,7 @@ public class AlmacenComprarMembresiaMock {
         sucursales.put("S003", new SucursalDTO(
             "S003", "SteelCore Sur",
             "Hermosillo", "Pitic", 29.0400, -110.9600));
+        
     }
  
     public Map<String, PlanDTO> getPlanes(){ 
@@ -75,6 +89,15 @@ public class AlmacenComprarMembresiaMock {
     public Map<String, MembresiaDTO> getMembresias(){ 
         return membresias; 
     }
+
+    public Map<String, UsuarioDTO> getUsuarios() {
+        return usuarios;
+    }
+    
+    public Map<String, List<VisitaDTO>> getVisitas() {
+        return visitas;
+    }
+    
     
     
 }

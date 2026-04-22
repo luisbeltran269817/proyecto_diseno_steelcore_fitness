@@ -11,28 +11,26 @@ import java.time.LocalDateTime;
  * @author Tungs
  */
 public class VisitaDTO {
-    // esto ya no es necesario hice esto en sucursal pero mejor
     private String gimnasio;
+    private LocalDateTime fechaHora;
     private String calle;
     private String colonia;
     private String ciudad;
-    private LocalDateTime fechaHora;
 
-    public VisitaDTO(String gimnasio, String calle, String colonia, String ciudad, LocalDateTime fechaHora) {
-        this.gimnasio = gimnasio;
-        this.calle = calle;
-        this.colonia = colonia;
-        this.ciudad = ciudad;
-        this.fechaHora = fechaHora;
-    }
-
-    
     public String getGimnasio() {
         return gimnasio;
     }
 
     public void setGimnasio(String gimnasio) {
         this.gimnasio = gimnasio;
+    }
+
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
+    }
+
+    public void setFechaHora(LocalDateTime fechaHora) {
+        this.fechaHora = fechaHora;
     }
 
     public String getCalle() {
@@ -59,12 +57,12 @@ public class VisitaDTO {
         this.ciudad = ciudad;
     }
 
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
-    }
-
-    public void setFechaHora(LocalDateTime fechaHora) {
+    public VisitaDTO(String gimnasio, LocalDateTime fechaHora, String calle, String colonia, String ciudad) {
+        this.gimnasio = gimnasio;
         this.fechaHora = fechaHora;
+        this.calle = calle;
+        this.colonia = colonia;
+        this.ciudad = ciudad;
     }
 
     public VisitaDTO() {

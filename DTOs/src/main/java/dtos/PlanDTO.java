@@ -4,6 +4,8 @@
  */
 package dtos;
 
+import java.util.List;
+
 /**
  *
  * @author julian izaguirre
@@ -11,21 +13,21 @@ package dtos;
 public class PlanDTO {
     private String idPlan;
     private String nombre;
-    private double precio;
+    private Double precio;
     private String descripcion;
-    private boolean incluyeEntrenador;
-    private int mesesVigencia;
- 
-    public PlanDTO() {}
- 
-    public PlanDTO(String idPlan, String nombre, double precio,
-                   String descripcion, boolean incluyeEntrenador, int mesesVigencia) {
+    private int mesesDuracion;
+    private List<AmenidadDTO> amenidades;
+
+    public PlanDTO() {
+    }
+    
+    public PlanDTO(String idPlan, String nombre, Double precio, String descripcion, int mesesDuracion, List<AmenidadDTO> amenidades) {
         this.idPlan = idPlan;
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
-        this.incluyeEntrenador = incluyeEntrenador;
-        this.mesesVigencia = mesesVigencia;
+        this.mesesDuracion = mesesDuracion;
+        this.amenidades = amenidades;
     }
 
     public String getIdPlan() {
@@ -44,11 +46,11 @@ public class PlanDTO {
         this.nombre = nombre;
     }
 
-    public double getPrecio() {
+    public Double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio(Double precio) {
         this.precio = precio;
     }
 
@@ -60,19 +62,23 @@ public class PlanDTO {
         this.descripcion = descripcion;
     }
 
-    public boolean isIncluyeEntrenador() {
-        return incluyeEntrenador;
+    public int getMesesDuracion() {
+        return mesesDuracion;
     }
 
-    public void setIncluyeEntrenador(boolean incluyeEntrenador) {
-        this.incluyeEntrenador = incluyeEntrenador;
+    public void setMesesDuracion(int mesesDuracion) {
+        this.mesesDuracion = mesesDuracion;
     }
 
-    public int getMesesVigencia() {
-        return mesesVigencia;
+    public List<AmenidadDTO> getAmenidades() {
+        return amenidades;
     }
 
-    public void setMesesVigencia(int mesesVigencia) {
-        this.mesesVigencia = mesesVigencia;
+    public void setAmenidades(List<AmenidadDTO> amenidades) {
+        this.amenidades = amenidades;
     }
+ 
+    
+ 
+    
 }
