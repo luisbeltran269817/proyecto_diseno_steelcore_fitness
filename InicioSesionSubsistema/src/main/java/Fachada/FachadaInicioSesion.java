@@ -4,7 +4,7 @@
  */
 package Fachada;
 
-import objetosnegocios.SocioBO;
+import objetosnegocios.ClienteBO;
 import dtos.InicioSesionDTO;
 import java.time.LocalDate;
 
@@ -13,11 +13,11 @@ import java.time.LocalDate;
  * @author Tungs
  */
 public class FachadaInicioSesion implements IInicioSesion {
-    private SocioBO socioBO;
+    private ClienteBO socioBO;
  
     public FachadaInicioSesion() {
         //Esto noni
-        this.socioBO = new SocioBO(
+        this.socioBO = new ClienteBO(
             "USR-001", "Administrador", "Sistema",
             "admin", "000-000-0000",
             LocalDate.of(1990, 1, 1)

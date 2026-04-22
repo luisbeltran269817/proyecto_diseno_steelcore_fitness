@@ -19,7 +19,7 @@ import dtos.PlanDTO;
 import dtos.ResultadoDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
-import dtos.UsuarioDTO.Rol;
+
 import dtos.VisitaDTO;
 import fachada.FachadaComprarMembresia;
 import fachada.IComprarMembresia;
@@ -92,10 +92,10 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public void irAPerfilUsuario() {
         ocultarTodo();
         if (pantallaPerfil == null) {
-            pantallaPerfil = new PantallaPerfilUsuario(this);
+            //pantallaPerfil = new PantallaPerfilUsuario(this);
         }
 
-        pantallaPerfil.setVisible(true);
+        //pantallaPerfil.setVisible(true);
     }
     
     //Estos dos son métodos de pura lógica
@@ -146,12 +146,9 @@ public class ControladorAplicacion implements IControladorAplicacion {
             irABienvenida();
             return;
         }
- 
-        if (usuarioActual.getRol() == Rol.ADMIN) {
             irABienvenida();
-        } else {
             irAPerfilUsuario();
-        }
+        
     }
 
     @Override

@@ -23,7 +23,7 @@ public class MembresiaBO {
     public MembresiaBO() {
         this.almacen = AlmacenComprarMembresiaMock.getInstancia();
     }
- 
+    
     /**
      * Crea y activa una nueva membresía a partir de los datos de la compra.
      * @param dto Datos de la compra.

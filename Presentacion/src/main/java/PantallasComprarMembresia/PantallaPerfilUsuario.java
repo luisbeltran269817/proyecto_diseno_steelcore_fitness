@@ -25,7 +25,8 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Tungs
  */
-public class PantallaPerfilUsuario extends PantallaBase {
+public class PantallaPerfilUsuario /**extends PantallaBase */{
+    /**
     
     private UsuarioDTO usuario;
     private Tabla tablaVisitas;
@@ -150,7 +151,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
     private void manejarMembresia() {
 
-        if (usuario.getMembresiaActiva()) {
+        //if (usuario.getMembresiaActiva()) {
             //controlador.cancelarMembresia();
             usuario.setMembresiaActiva(false);
         } else {
@@ -160,4 +161,5 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
         actualizarBoton();
     }
+    */
 }

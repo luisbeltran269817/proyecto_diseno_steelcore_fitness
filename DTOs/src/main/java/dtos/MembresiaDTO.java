@@ -4,25 +4,37 @@
  */
 package dtos;
 
+import EstadoMembresia.EstadoMembresiaDTO;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
  * @author julian izaguirre
  */
 public class MembresiaDTO {    
-    private String    idMembresia;
-    private String    idSocio;
-    private String    idPlan;
-    private String    nombrePlan;
-    private String    idSucursal;
-    private String    nombreSucursal;
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private String    estado;
-    private String    codigoQR;
-    private boolean   incluyeEntrenador;
-    
+    private String idMembresia;
+    private String idPlan;
+    private String idSucursal;
+    private List<AmenidadDTO> amenidadesContratadas;
+    private String codigoQR;
+    private Double montoPagado;
+    private LocalDateTime fechaTramite;
+    private LocalDateTime fechaCaducidad;
+    private EstadoMembresiaDTO estado;
+
+    public MembresiaDTO(String idMembresia, String idPlan, String idSucursal, List<AmenidadDTO> amenidadesContratadas, String codigoQR, Double montoPagado, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresiaDTO estado) {
+        this.idMembresia = idMembresia;
+        this.idPlan = idPlan;
+        this.idSucursal = idSucursal;
+        this.amenidadesContratadas = amenidadesContratadas;
+        this.codigoQR = codigoQR;
+        this.montoPagado = montoPagado;
+        this.fechaTramite = fechaTramite;
+        this.fechaCaducidad = fechaCaducidad;
+        this.estado = estado;
+    }
 
     public MembresiaDTO() {
     }
@@ -35,28 +47,12 @@ public class MembresiaDTO {
         this.idMembresia = idMembresia;
     }
 
-    public String getIdSocio() {
-        return idSocio;
-    }
-
-    public void setIdSocio(String idSocio) {
-        this.idSocio = idSocio;
-    }
-
     public String getIdPlan() {
         return idPlan;
     }
 
     public void setIdPlan(String idPlan) {
         this.idPlan = idPlan;
-    }
-
-    public String getNombrePlan() {
-        return nombrePlan;
-    }
-
-    public void setNombrePlan(String nombrePlan) {
-        this.nombrePlan = nombrePlan;
     }
 
     public String getIdSucursal() {
@@ -67,36 +63,12 @@ public class MembresiaDTO {
         this.idSucursal = idSucursal;
     }
 
-    public String getNombreSucursal() {
-        return nombreSucursal;
+    public List<AmenidadDTO> getAmenidadesContratadas() {
+        return amenidadesContratadas;
     }
 
-    public void setNombreSucursal(String nombreSucursal) {
-        this.nombreSucursal = nombreSucursal;
-    }
-
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDate getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDate fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setAmenidadesContratadas(List<AmenidadDTO> amenidadesContratadas) {
+        this.amenidadesContratadas = amenidadesContratadas;
     }
 
     public String getCodigoQR() {
@@ -107,11 +79,37 @@ public class MembresiaDTO {
         this.codigoQR = codigoQR;
     }
 
-    public boolean isIncluyeEntrenador() {
-        return incluyeEntrenador;
+    public Double getMontoPagado() {
+        return montoPagado;
     }
 
-    public void setIncluyeEntrenador(boolean incluyeEntrenador) {
-        this.incluyeEntrenador = incluyeEntrenador;
+    public void setMontoPagado(Double montoPagado) {
+        this.montoPagado = montoPagado;
     }
+
+    public LocalDateTime getFechaTramite() {
+        return fechaTramite;
+    }
+
+    public void setFechaTramite(LocalDateTime fechaTramite) {
+        this.fechaTramite = fechaTramite;
+    }
+
+    public LocalDateTime getFechaCaducidad() {
+        return fechaCaducidad;
+    }
+
+    public void setFechaCaducidad(LocalDateTime fechaCaducidad) {
+        this.fechaCaducidad = fechaCaducidad;
+    }
+
+    public EstadoMembresiaDTO getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoMembresiaDTO estado) {
+        this.estado = estado;
+    }
+    
+    
 }
