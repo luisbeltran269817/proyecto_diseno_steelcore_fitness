@@ -27,8 +27,8 @@ import javax.swing.border.EmptyBorder;
  *
  * @author luiscarlosbeltran
  */
-public class PantallaVerPerfil extends PantallaBase {
-
+public class PantallaVerPerfil /**extends PantallaBase*/ {
+    /**
     private UsuarioDTO usuario;
 
     public PantallaVerPerfil(IControladorAplicacion controlador) {
@@ -115,4 +115,5 @@ public class PantallaVerPerfil extends PantallaBase {
 
         fondo.add(card);
     }
+    */
 }

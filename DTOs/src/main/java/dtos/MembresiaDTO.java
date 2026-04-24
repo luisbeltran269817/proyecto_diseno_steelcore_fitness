@@ -4,8 +4,6 @@
  */
 package dtos;
 
-import EstadoMembresia.EstadoMembresiaDTO;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,25 +13,40 @@ import java.util.List;
  */
 public class MembresiaDTO {    
     private String idMembresia;
+    private String idCliente;
     private String idPlan;
     private String idSucursal;
-    private List<AmenidadDTO> amenidadesContratadas;
+
+    private List<AmenidadDTO> amenidadesExtra;
+
     private String codigoQR;
     private Double montoPagado;
+
     private LocalDateTime fechaTramite;
     private LocalDateTime fechaCaducidad;
-    private EstadoMembresiaDTO estado;
 
-    public MembresiaDTO(String idMembresia, String idPlan, String idSucursal, List<AmenidadDTO> amenidadesContratadas, String codigoQR, Double montoPagado, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresiaDTO estado) {
+    private EstadoMembresia estado;
+
+    private String idPago;
+
+    public enum EstadoMembresia {
+        ACTIVA,
+        VENCIDA,
+        CANCELADA
+    }
+
+    public MembresiaDTO(String idMembresia, String idCliente, String idPlan, String idSucursal, List<AmenidadDTO> amenidadesExtra, String codigoQR, Double montoPagado, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresia estado, String idPago) {
         this.idMembresia = idMembresia;
+        this.idCliente = idCliente;
         this.idPlan = idPlan;
         this.idSucursal = idSucursal;
-        this.amenidadesContratadas = amenidadesContratadas;
+        this.amenidadesExtra = amenidadesExtra;
         this.codigoQR = codigoQR;
         this.montoPagado = montoPagado;
         this.fechaTramite = fechaTramite;
         this.fechaCaducidad = fechaCaducidad;
         this.estado = estado;
+        this.idPago = idPago;
     }
 
     public MembresiaDTO() {
@@ -45,6 +58,14 @@ public class MembresiaDTO {
 
     public void setIdMembresia(String idMembresia) {
         this.idMembresia = idMembresia;
+    }
+
+    public String getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(String idCliente) {
+        this.idCliente = idCliente;
     }
 
     public String getIdPlan() {
@@ -63,12 +84,12 @@ public class MembresiaDTO {
         this.idSucursal = idSucursal;
     }
 
-    public List<AmenidadDTO> getAmenidadesContratadas() {
-        return amenidadesContratadas;
+    public List<AmenidadDTO> getAmenidadesExtra() {
+        return amenidadesExtra;
     }
 
-    public void setAmenidadesContratadas(List<AmenidadDTO> amenidadesContratadas) {
-        this.amenidadesContratadas = amenidadesContratadas;
+    public void setAmenidadesExtra(List<AmenidadDTO> amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
     }
 
     public String getCodigoQR() {
@@ -103,13 +124,23 @@ public class MembresiaDTO {
         this.fechaCaducidad = fechaCaducidad;
     }
 
-    public EstadoMembresiaDTO getEstado() {
+    public EstadoMembresia getEstado() {
         return estado;
     }
 
-    public void setEstado(EstadoMembresiaDTO estado) {
+    public void setEstado(EstadoMembresia estado) {
         this.estado = estado;
     }
+
+    public String getIdPago() {
+        return idPago;
+    }
+
+    public void setIdPago(String idPago) {
+        this.idPago = idPago;
+    }
+
+    
     
     
 }

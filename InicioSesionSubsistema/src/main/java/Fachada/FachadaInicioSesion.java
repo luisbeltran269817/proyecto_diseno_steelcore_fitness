@@ -4,41 +4,32 @@
  */
 package Fachada;
 
+import Clase_Control.ControlInicioSesion;
 import objetosnegocios.ClienteBO;
 import dtos.InicioSesionDTO;
+import dtos.UsuarioDTO;
 import java.time.LocalDate;
+import objetosnegocios.AlmacenComprarMembresiaMock;
+import objetosnegocios.UsuarioBO;
 
 /**
  *
  * @author Tungs
  */
 public class FachadaInicioSesion implements IInicioSesion {
-    private ClienteBO socioBO;
- 
-    public FachadaInicioSesion() {
-        //Esto noni
-        this.socioBO = new ClienteBO(
-            "USR-001", "Administrador", "Sistema",
-            "admin", "000-000-0000",
-            LocalDate.of(1990, 1, 1)
-        );
-    }
- 
-    @Override
-    public InicioSesionDTO iniciarSesion(String usuario, String password) {
-        //Aqui se manda a llamar al control, los Bos solo tienen listas staticas y metodos de acceso a esas listas.
-        return socioBO.iniciarSesion(usuario, password);
-    }
- 
-    @Override
-    public void cerrarSesion(String token) {
-        socioBO.cerrarSesion(token);
-    }
- 
-    @Override
-    public boolean validarToken(String token) {
-        return socioBO.validarToken(token);
-    }
+    
+    private final ControlInicioSesion controlInicioSesion;
 
+    public FachadaInicioSesion() {
+        AlmacenComprarMembresiaMock almacen = AlmacenComprarMembresiaMock.getInstancia();
+        UsuarioBO usuarioBO = new UsuarioBO();
+        this.controlInicioSesion = new ControlInicioSesion(usuarioBO);
+    }
+    
+    @Override
+    public UsuarioDTO iniciarSesion(String correo, String contraseña) throws Exception {
+        return controlInicioSesion.iniciarSesion(correo, contraseña);
+    }
+    
     
 }

@@ -14,18 +14,19 @@ import java.util.List;
 public class EntrenadorDTO {
     private String idEntrenador;
     private String nombre;
-    private String especialidad;
-    private List<String> idSucursalesAsignadas;
-    private List<LocalDateTime> horariosDisponibles;
+    private List<SucursalDTO> sucursales;
+    private List<HorarioDTO> horarios;
 
-    public EntrenadorDTO(String idEntrenador, String nombre, String especialidad, List<String> idSucursalesAsignadas, List<LocalDateTime> horariosDisponibles) {
+    public EntrenadorDTO(String idEntrenador, String nombre, List<SucursalDTO> sucursales, List<HorarioDTO> horarios) {
         this.idEntrenador = idEntrenador;
         this.nombre = nombre;
-        this.especialidad = especialidad;
-        this.idSucursalesAsignadas = idSucursalesAsignadas;
-        this.horariosDisponibles = horariosDisponibles;
+        this.sucursales = sucursales;
+        this.horarios = horarios;
     }
 
+    public EntrenadorDTO() {
+    }
+    
     public String getIdEntrenador() {
         return idEntrenador;
     }
@@ -42,29 +43,23 @@ public class EntrenadorDTO {
         this.nombre = nombre;
     }
 
-    public String getEspecialidad() {
-        return especialidad;
+    public List<SucursalDTO> getSucursales() {
+        return sucursales;
     }
 
-    public void setEspecialidad(String especialidad) {
-        this.especialidad = especialidad;
+    public void setSucursales(List<SucursalDTO> sucursales) {
+        this.sucursales = sucursales;
     }
 
-    public List<String> getIdSucursalesAsignadas() {
-        return idSucursalesAsignadas;
+    public List<HorarioDTO> getHorarios() {
+        return horarios;
     }
 
-    public void setIdSucursalesAsignadas(List<String> idSucursalesAsignadas) {
-        this.idSucursalesAsignadas = idSucursalesAsignadas;
+    public void setHorarios(List<HorarioDTO> horarios) {
+        this.horarios = horarios;
     }
-
-    public List<LocalDateTime> getHorariosDisponibles() {
-        return horariosDisponibles;
-    }
-
-    public void setHorariosDisponibles(List<LocalDateTime> horariosDisponibles) {
-        this.horariosDisponibles = horariosDisponibles;
-    }
+    
+    
     
     
 }

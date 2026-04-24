@@ -5,6 +5,8 @@
 package Controladores;
 
 import dtos.InicioSesionDTO;
+import dtos.MembresiaDTO;
+import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
 import java.util.List;
@@ -21,19 +23,27 @@ public interface IControladorAplicacion {
 
     void irAPerfilUsuario();
 
-    void iniciarSesion(InicioSesionDTO dto);
+    public void iniciarSesion(String correo, String contrasena) throws Exception;
     
-    public UsuarioDTO obtenerPerfil();
+    public UsuarioDTO getUsuarioActual();
     
-    public List<VisitaDTO> obtenerHistorial();
+    public void cerrarSesion();
     
-    void verPerfil();
+    public boolean tieneMembresiaActiva();
     
-    public void SeleccionSucursal();
+    public void iniciarCompraMembresia();
     
-    void SeleccionPlan(dtos.SucursalDTO sucursal);
+    public MembresiaDTO obtenerMembresiaActiva();
     
-    void ResumenCompra(dtos.SucursalDTO sucursal, dtos.PlanDTO plan);
+    List<VisitaDTO> obtenerHistorial();
     
-    void PantallaExito(dtos.ResultadoDTO resultado);
+ 
+    public void cancelarMembresia();
+    
+    public List<SucursalDTO> obtenerSucursales();
+    
+    public void seleccionarSucursal(SucursalDTO sucursal);
+    
+    public void irASeleccionSucursal();
+
 }

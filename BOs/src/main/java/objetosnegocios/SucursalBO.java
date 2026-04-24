@@ -5,6 +5,7 @@
 package objetosnegocios;
 
 import dtos.SucursalDTO;
+import interfaces.ISucursalBO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,23 +13,18 @@ import java.util.List;
  *
  * @author julian izaguirre
  */
-public class SucursalBO {
+public class SucursalBO implements ISucursalBO{
     private final AlmacenComprarMembresiaMock almacen;
- 
+
     public SucursalBO() {
         this.almacen = AlmacenComprarMembresiaMock.getInstancia();
     }
- 
+
     public List<SucursalDTO> obtenerTodas() {
         return new ArrayList<>(almacen.getSucursales().values());
     }
- 
-    public SucursalDTO buscarPorId(String idSucursal) {
-        if (idSucursal == null || idSucursal.isBlank()) return null;
-        return almacen.getSucursales().get(idSucursal);
-    }
- 
-    public boolean esSucursalValida(String idSucursal) {
-        return buscarPorId(idSucursal) != null;
+
+    public SucursalDTO buscarPorId(String id) {
+        return almacen.getSucursales().get(id);
     }
 }

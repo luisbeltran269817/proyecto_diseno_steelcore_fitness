@@ -16,11 +16,11 @@ public class PlanDTO {
     private Double precio;
     private String descripcion;
     private int mesesDuracion;
-    private List<AmenidadDTO> amenidades;
+     private List<AmenidadDTO> amenidades;
 
     public PlanDTO() {
     }
-    
+
     public PlanDTO(String idPlan, String nombre, Double precio, String descripcion, int mesesDuracion, List<AmenidadDTO> amenidades) {
         this.idPlan = idPlan;
         this.nombre = nombre;
@@ -77,7 +77,7 @@ public class PlanDTO {
     public void setAmenidades(List<AmenidadDTO> amenidades) {
         this.amenidades = amenidades;
     }
- 
+
     
  
     

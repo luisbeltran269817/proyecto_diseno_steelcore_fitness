@@ -4,17 +4,17 @@
  */
 package patronestrategia;
 
-import dtos.CompraDTO;
-import dtos.ResultadoDTO;
 
 /**
  *
  * @author julian izaguirre
  */
 public interface IEstrategiaPlan {
+    /**
     public ResultadoDTO validarCompra(CompraDTO dto);
 
     public double calcularMonto();
  
     public ResultadoDTO procesarCompra(CompraDTO dto);
+    */    
 }

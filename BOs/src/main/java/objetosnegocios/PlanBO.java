@@ -5,6 +5,8 @@
 package objetosnegocios;
 
 import dtos.PlanDTO;
+import dtos.SucursalDTO;
+import interfaces.IPlanBO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,30 +14,27 @@ import java.util.List;
  *
  * @author julian izaguirre
  */
-public class PlanBO {
+public class PlanBO implements IPlanBO{
     private final AlmacenComprarMembresiaMock almacen;
- 
+
     public PlanBO() {
         this.almacen = AlmacenComprarMembresiaMock.getInstancia();
     }
- 
-
+    @Override
     public List<PlanDTO> obtenerTodos() {
         return new ArrayList<>(almacen.getPlanes().values());
     }
- 
-
+    @Override
     public PlanDTO buscarPorId(String idPlan) {
-        if (idPlan == null || idPlan.isBlank()) return null;
         return almacen.getPlanes().get(idPlan);
     }
- 
-    public boolean esPlanValido(String idPlan) {
-        return buscarPorId(idPlan) != null;
+    @Override
+    public List<PlanDTO> obtenerPorSucursal(String idSucursal) {
+        SucursalDTO sucursal = almacen.getSucursales().get(idSucursal);
+        if (sucursal == null || sucursal.getPlanes() == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(sucursal.getPlanes());
     }
- 
-    public boolean incluyeEntrenador(String idPlan) {
-        PlanDTO plan = buscarPorId(idPlan);
-        return plan != null && plan.isIncluyeEntrenador();
-    }
+    
 }

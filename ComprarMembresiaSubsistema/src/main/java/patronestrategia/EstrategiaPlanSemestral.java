@@ -4,15 +4,14 @@
  */
 package patronestrategia;
 
-import dtos.CompraDTO;
-import dtos.ResultadoDTO;
+
 
 /**
  *
  * @author julian izaguirre
  */
-public class EstrategiaPlanSemestral implements IEstrategiaPlan {
- 
+public class EstrategiaPlanSemestral /**implements IEstrategiaPlan*/ {
+ /**
     private static final double PRECIO_BASE   = 599.0 * 6;
     private static final double PRECIO_FINAL  = 2999.0; 
     private static final double DESCUENTO_PCT = 1 - (PRECIO_FINAL / PRECIO_BASE);
@@ -40,4 +39,5 @@ public class EstrategiaPlanSemestral implements IEstrategiaPlan {
             String.format("Plan semestral activado, descuento aplicado: %.0f%%.",
                 DESCUENTO_PCT * 100), null);
     }
+    */
 }

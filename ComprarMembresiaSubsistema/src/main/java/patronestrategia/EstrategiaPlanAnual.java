@@ -4,17 +4,16 @@
  */
 package patronestrategia;
 
-import dtos.CompraDTO;
-import dtos.ResultadoDTO;
+
 
 /**
  *
  * @author julian izaguirre
  */
-public class EstrategiaPlanAnual implements IEstrategiaPlan {
+public class EstrategiaPlanAnual /**implements IEstrategiaPlan*/ {
  
     private static final double PRECIO = 4999.0;
- 
+    /**
     @Override
     public ResultadoDTO validarCompra(CompraDTO dto) {
         if (dto.getIdSocio() == null || dto.getIdSocio().isBlank()) {
@@ -43,4 +42,5 @@ public class EstrategiaPlanAnual implements IEstrategiaPlan {
             "Plan anual activado, entrenador " + dto.getIdInstructor()
             + " asignado por 12 meses", null);
     }
+    */
 }

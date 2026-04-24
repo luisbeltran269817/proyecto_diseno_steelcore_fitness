@@ -4,6 +4,8 @@
  */
 package dtos;
 
+import java.util.List;
+
 /**
  *
  * @author julian izaguirre
@@ -17,8 +19,9 @@ public class SucursalDTO {
     private String codigoPostal;
     private Double latitud;
     private Double longitud;
+    private List<PlanDTO> planes;
 
-    public SucursalDTO(String idSucursal, String nombre, String calle, String colonia, String ciudad, String codigoPostal, Double latitud, Double longitud) {
+    public SucursalDTO(String idSucursal, String nombre, String calle, String colonia, String ciudad, String codigoPostal, Double latitud, Double longitud, List<PlanDTO> planes) {
         this.idSucursal = idSucursal;
         this.nombre = nombre;
         this.calle = calle;
@@ -27,11 +30,13 @@ public class SucursalDTO {
         this.codigoPostal = codigoPostal;
         this.latitud = latitud;
         this.longitud = longitud;
+        this.planes = planes;
     }
-
+    
     public SucursalDTO() {
     }
-
+    
+    
     public String getIdSucursal() {
         return idSucursal;
     }
@@ -91,10 +96,21 @@ public class SucursalDTO {
     public Double getLongitud() {
         return longitud;
     }
-    
+
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
     }
+
+    public List<PlanDTO> getPlanes() {
+        return planes;
+    }
+
+    public void setPlanes(List<PlanDTO> planes) {
+        this.planes = planes;
+    }
+
+    
+
     
     
 }
