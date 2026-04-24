@@ -4,10 +4,12 @@
  */
 package objetosnegocios;
 
+import interfaces.IVisitaBO;
+
 /**
  *
  * @author Gael Galaviz
  */
-public class VisitaBO {
+public class VisitaBO implements IVisitaBO{
     
 }

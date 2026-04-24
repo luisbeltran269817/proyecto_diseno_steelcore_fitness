@@ -20,38 +20,11 @@ public class ClienteDTO extends UsuarioDTO {
 
     private List<MembresiaDTO> membresias;
     private List<VisitaDTO> historialVisitas;
-
-    //esto noni
-    private boolean tieneCitaBienvenidaAgendada;
     private String idCitaBienvenida;
 
-    public ClienteDTO(String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String curp, List<MembresiaDTO> membresias, List<VisitaDTO> historialVisitas, boolean tieneCitaBienvenidaAgendada, String idCitaBienvenida, String correo, String nombre, String contraseña, Rol rol) {
-        super(correo, nombre, contraseña, rol);
-        this.apellidoPaterno = apellidoPaterno;
-        this.apellidoMaterno = apellidoMaterno;
-        this.fechaNacimiento = fechaNacimiento;
-        this.curp = curp;
-        this.membresias = membresias;
-        this.historialVisitas = historialVisitas;
-        this.tieneCitaBienvenidaAgendada = tieneCitaBienvenidaAgendada;
-        this.idCitaBienvenida = idCitaBienvenida;
-    }
-
-    public ClienteDTO(String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String curp, List<MembresiaDTO> membresias, List<VisitaDTO> historialVisitas, boolean tieneCitaBienvenidaAgendada, String idCitaBienvenida) {
-        this.apellidoPaterno = apellidoPaterno;
-        this.apellidoMaterno = apellidoMaterno;
-        this.fechaNacimiento = fechaNacimiento;
-        this.curp = curp;
-        this.membresias = membresias;
-        this.historialVisitas = historialVisitas;
-        this.tieneCitaBienvenidaAgendada = tieneCitaBienvenidaAgendada;
-        this.idCitaBienvenida = idCitaBienvenida;
-    }
-
     public ClienteDTO() {
-        
     }
-
+    
     public String getApellidoPaterno() {
         return apellidoPaterno;
     }
@@ -100,14 +73,6 @@ public class ClienteDTO extends UsuarioDTO {
         this.historialVisitas = historialVisitas;
     }
 
-    public boolean isTieneCitaBienvenidaAgendada() {
-        return tieneCitaBienvenidaAgendada;
-    }
-
-    public void setTieneCitaBienvenidaAgendada(boolean tieneCitaBienvenidaAgendada) {
-        this.tieneCitaBienvenidaAgendada = tieneCitaBienvenidaAgendada;
-    }
-
     public String getIdCitaBienvenida() {
         return idCitaBienvenida;
     }
@@ -143,11 +108,11 @@ public class ClienteDTO extends UsuarioDTO {
     public Rol getRol() {
         return rol;
     }
-    
+
     public void setRol(Rol rol) {
         this.rol = rol;
     }
     
-    
+        
 
 }

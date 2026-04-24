@@ -2,16 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package Fachada;
-
-import dtos.InicioSesionDTO;
-import dtos.UsuarioDTO;
+package interfaces;
 
 /**
  *
  * @author Tungs
  */
-public interface IInicioSesion {
+public interface IPagoBO {
     
-    public UsuarioDTO iniciarSesion(String correo, String contraseña) throws Exception;
 }

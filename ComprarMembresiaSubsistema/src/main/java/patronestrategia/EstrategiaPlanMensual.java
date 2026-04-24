@@ -4,17 +4,16 @@
  */
 package patronestrategia;
 
-import dtos.CompraDTO;
-import dtos.ResultadoDTO;
 
 /**
  *
  * @author julian izaguirre
  */
-public class EstrategiaPlanMensual implements IEstrategiaPlan {
+public class EstrategiaPlanMensual /**implements IEstrategiaPlan*/{
     
     private static final double PRECIO = 599.0;
- 
+    
+    /**
     @Override
     public ResultadoDTO validarCompra(CompraDTO dto) {
         if (dto.getIdSocio() == null || dto.getIdSocio().isBlank()) {
@@ -37,5 +36,6 @@ public class EstrategiaPlanMensual implements IEstrategiaPlan {
         return ResultadoDTO.exitoso(
             "Plan mensual activado tienes acceso por un mes", null);
     }
+    */ 
     
 }

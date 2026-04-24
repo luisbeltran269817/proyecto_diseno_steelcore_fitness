@@ -4,9 +4,14 @@
  */
 package fachada;
 
-import dtos.CompraDTO;
+
+import dtos.AmenidadDTO;
+import dtos.CitaDTO;
+import dtos.EntrenadorDTO;
+import dtos.HorarioDTO;
+import dtos.MembresiaDTO;
 import dtos.PlanDTO;
-import dtos.ResultadoDTO;
+
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
@@ -18,17 +23,18 @@ import java.util.List;
  */
 public interface IComprarMembresia {
     
-    public UsuarioDTO obtenerPerfil(String correo);
-    
-    List<VisitaDTO> obtenerHistorial(String correo);
-    
-    public List<PlanDTO> obtenerPlanes();
-    
-    public PlanDTO obtenerDetallePlan(String idPlan);
-    
-    public List<SucursalDTO> obtenerSucursales();
-    
-    public ResultadoDTO generarContrato(CompraDTO dto);
-    
-    public ResultadoDTO confirmarCompra(CompraDTO dto);
+  public List<SucursalDTO> obtenerSucursales();
+  public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal);
+  public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan);
+  public List<AmenidadDTO> obtenerAmenidadesExtra();
+  public double calcularTotal(PlanDTO plan, List<AmenidadDTO> extras);
+  public MembresiaDTO crearMembresia(MembresiaDTO dto);
+  public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal);
+  public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador);
+  public CitaDTO agendarCita(CitaDTO dto);
+  public boolean hayHorarios(EntrenadorDTO entrenador);
+  public boolean tieneMembresiaActiva(String idCliente);
+  public MembresiaDTO obtenerMembresiaActiva(String idCliente);
+  public List<VisitaDTO> obtenerHistorial(String idCliente);
+   public void cancelarMembresia(String idCliente);
 }

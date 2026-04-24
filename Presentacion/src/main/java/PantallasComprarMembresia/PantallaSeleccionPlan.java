@@ -28,7 +28,8 @@ import javax.swing.border.EmptyBorder;
  *
  * @author julian izaguirre
  */
-public class PantallaSeleccionPlan extends PantallaBase {
+public class PantallaSeleccionPlan /**extends PantallaBase**/ {
+    /**
     private Tabla tablaPlanes;
     private List<PlanDTO> planes;
     private IComprarMembresia subsistema;
@@ -124,5 +125,5 @@ public class PantallaSeleccionPlan extends PantallaBase {
         
         controlador.ResumenCompra(sucursalPrevia, planSeleccionado);
     }
-    
+    */
 }

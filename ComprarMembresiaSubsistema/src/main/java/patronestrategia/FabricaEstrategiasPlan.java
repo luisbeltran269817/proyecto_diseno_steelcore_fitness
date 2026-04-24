@@ -9,10 +9,12 @@ package patronestrategia;
  * @author julian izaguirre
  */
 public class FabricaEstrategiasPlan {
+    
     /**
      * @param idPlan ID del plan: "P001" = Mensual, "P002" = Semestral, "P003" = Anual.
      * @return Devuelve la estrategia correspondiente al plan indicado
      */
+    /**
     public static IEstrategiaPlan obtener(String idPlan) {
         if (idPlan == null) {
             throw new IllegalArgumentException("El ID del plan no puede ser nulo");
@@ -36,5 +38,6 @@ public class FabricaEstrategiasPlan {
                     "Plan no reconocido: " + idPlan);
         }
     }
+    */
     
 }

@@ -12,20 +12,24 @@ public class AmenidadDTO {
     private String idAmenidad;
     private String nombre;
     private String descripcion;
-    private String tipo;      
+    private TipoAmenidad tipo;      
     private Double costo;
-
+    
+    public enum TipoAmenidad {
+        BASICA,
+        EXTRA
+    }
     public AmenidadDTO() {
     }
 
-    public AmenidadDTO(String idAmenidad, String nombre, String descripcion, String tipo, Double costo) {
+    public AmenidadDTO(String idAmenidad, String nombre, String descripcion, TipoAmenidad tipo, Double costo) {
         this.idAmenidad = idAmenidad;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.tipo = tipo;
         this.costo = costo;
     }
-    
+
     public String getIdAmenidad() {
         return idAmenidad;
     }
@@ -50,11 +54,11 @@ public class AmenidadDTO {
         this.descripcion = descripcion;
     }
 
-    public String getTipo() {
+    public TipoAmenidad getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoAmenidad tipo) {
         this.tipo = tipo;
     }
 
@@ -65,6 +69,6 @@ public class AmenidadDTO {
     public void setCosto(Double costo) {
         this.costo = costo;
     }
-    
+
     
 }

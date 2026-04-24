@@ -12,23 +12,24 @@ import java.time.LocalDateTime;
  */
 public class CitaDTO {
     private String idCita;
-    private String idCliente;    
-    private String idEntrenador; 
+
+    private String idCliente;
+    private String idEntrenador;
     private String idSucursal;
+
+    private String idHorario;
+
     private LocalDateTime fechaHora;
-    private String estado;       
-    private String tipoCita;    
+
+    private EstadoCita estado;
+
     private String notas;
 
-    public CitaDTO(String idCita, String idCliente, String idEntrenador, String idSucursal, LocalDateTime fechaHora, String estado, String tipoCita, String notas) {
-        this.idCita = idCita;
-        this.idCliente = idCliente;
-        this.idEntrenador = idEntrenador;
-        this.idSucursal = idSucursal;
-        this.fechaHora = fechaHora;
-        this.estado = estado;
-        this.tipoCita = tipoCita;
-        this.notas = notas;
+    public enum EstadoCita {
+        PENDIENTE,
+        CONFIRMADA,
+        CANCELADA,
+        COMPLETADA
     }
 
     public String getIdCita() {
@@ -63,6 +64,14 @@ public class CitaDTO {
         this.idSucursal = idSucursal;
     }
 
+    public String getIdHorario() {
+        return idHorario;
+    }
+
+    public void setIdHorario(String idHorario) {
+        this.idHorario = idHorario;
+    }
+
     public LocalDateTime getFechaHora() {
         return fechaHora;
     }
@@ -71,20 +80,12 @@ public class CitaDTO {
         this.fechaHora = fechaHora;
     }
 
-    public String getEstado() {
+    public EstadoCita getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoCita estado) {
         this.estado = estado;
-    }
-
-    public String getTipoCita() {
-        return tipoCita;
-    }
-
-    public void setTipoCita(String tipoCita) {
-        this.tipoCita = tipoCita;
     }
 
     public String getNotas() {
@@ -94,7 +95,19 @@ public class CitaDTO {
     public void setNotas(String notas) {
         this.notas = notas;
     }
-    
-    
+
+    public CitaDTO() {
+    }
+
+    public CitaDTO(String idCita, String idCliente, String idEntrenador, String idSucursal, String idHorario, LocalDateTime fechaHora, EstadoCita estado, String notas) {
+        this.idCita = idCita;
+        this.idCliente = idCliente;
+        this.idEntrenador = idEntrenador;
+        this.idSucursal = idSucursal;
+        this.idHorario = idHorario;
+        this.fechaHora = fechaHora;
+        this.estado = estado;
+        this.notas = notas;
+    }
     
 }

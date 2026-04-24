@@ -14,15 +14,17 @@ import PantallasComprarMembresia.PantallaSeleccionPlan;
 import PantallasComprarMembresia.PantallaSeleccionSucursal;
 import PantallasComprarMembresia.PantallaVerPerfil;
 import PantallasInicioSesion.PantallaInicioSesion;
+import dtos.AmenidadDTO;
 import dtos.InicioSesionDTO;
+import dtos.MembresiaDTO;
 import dtos.PlanDTO;
-import dtos.ResultadoDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 
 import dtos.VisitaDTO;
 import fachada.FachadaComprarMembresia;
 import fachada.IComprarMembresia;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -34,31 +36,32 @@ import javax.swing.JOptionPane;
 public class ControladorAplicacion implements IControladorAplicacion {
     
     private static ControladorAplicacion instancia;
-    //Las interfaces de los subsistemas
+
+    // Fachadas
     private final IInicioSesion inicioSesionFachada;
-    private  final IComprarMembresia compraMembresiaFachada;
-    
-    //Las pantallas
+    private final IComprarMembresia compraFachada;
+
+    // Pantallas
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
     private PantallaPerfilUsuario pantallaPerfil;
-    private PantallaVerPerfil pantallaDetallesPerfil;
-    private PantallaSeleccionSucursal pantallaSeleccionSucursal;
-    private PantallaResumenCompra pantallaResumenCompra;
-    private PantallaSeleccionPlan pantallaSeleccionPlan;
-    private PantallaConfirmacionExito pantallaConfirmacionExito;
-    
 
-    //El dto de usuario, que utilizaremos para mantener la sesion activa
-    UsuarioDTO usuarioActual;
-    
-    //Aquí inicializamos las fachadas declaradas arriba
+    private PantallaSeleccionSucursal pantallaSucursal;
+    private PantallaSeleccionPlan pantallaPlan;
+    private PantallaResumenCompra pantallaResumen;
+    private PantallaConfirmacionExito pantallaExito;
+
+    //Estas variables se utilizarán para guardar estados entre pantallas
+    private UsuarioDTO usuarioActual;
+    private SucursalDTO sucursalSeleccionada;
+    private PlanDTO planSeleccionado;
+    private List<AmenidadDTO> extrasSeleccionados;
+
     private ControladorAplicacion() {
         this.inicioSesionFachada = new FachadaInicioSesion();
-        this.compraMembresiaFachada= new FachadaComprarMembresia();
+        this.compraFachada = new FachadaComprarMembresia();
     }
-    
-    //Singleton
+
     public static ControladorAplicacion getInstancia() {
         if (instancia == null) {
             instancia = new ControladorAplicacion();
@@ -69,119 +72,130 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public void iniciar() {
         irABienvenida();
     }
-
+    
     @Override
     public void irABienvenida() {
-        ocultarTodo();
-        if (pantallaBienvenida == null) {
-            pantallaBienvenida = new PantallaBienvenida(this);
-        }
+        cerrarPantallas();
+        pantallaBienvenida = new PantallaBienvenida(this);
         pantallaBienvenida.setVisible(true);
     }
 
     @Override
     public void irAInicioSesion() {
-        ocultarTodo();
-        if (pantallaInicioSesion == null) {
-            pantallaInicioSesion = new PantallaInicioSesion(this);
-        }
+        cerrarPantallas();
+        pantallaInicioSesion = new PantallaInicioSesion(this);
         pantallaInicioSesion.setVisible(true);
     }
-
+    
     @Override
     public void irAPerfilUsuario() {
-        ocultarTodo();
+        cerrarPantallas();
         if (pantallaPerfil == null) {
-            //pantallaPerfil = new PantallaPerfilUsuario(this);
+            pantallaPerfil = new PantallaPerfilUsuario(this);
+        } else {
+            pantallaPerfil.cargarDatos(); 
         }
+        pantallaPerfil.setVisible(true);
+    }
+    @Override
+    public void irASeleccionSucursal() {
+        cerrarPantallas();
 
-        //pantallaPerfil.setVisible(true);
+        if (pantallaSucursal == null) {
+            pantallaSucursal = new PantallaSeleccionSucursal(this);
+        }
+        pantallaSucursal.setVisible(true);
     }
     
-    //Estos dos son métodos de pura lógica
+    
+    //Cosas de negocio
+    
     @Override
-    public UsuarioDTO obtenerPerfil() {
-        return compraMembresiaFachada.obtenerPerfil(usuarioActual.getCorreo());
+    public void iniciarSesion(String correo, String contrasena) throws Exception {
+        this.usuarioActual = inicioSesionFachada.iniciarSesion(correo, contrasena);
+
+        if (usuarioActual.getRol() == UsuarioDTO.Rol.ADMIN) {
+            // Más al rato
+        } else {
+            irAPerfilUsuario();
+        }
     }
     
     @Override
-    public List<VisitaDTO> obtenerHistorial() {
-        return compraMembresiaFachada.obtenerHistorial(usuarioActual.getCorreo());
+    public boolean tieneMembresiaActiva() {
+        if (usuarioActual == null) return false;
+        return compraFachada.tieneMembresiaActiva(usuarioActual.getCorreo());
+    }
+    
+    @Override
+    public void iniciarCompraMembresia() {
+        cerrarPantallas();
+        pantallaSucursal = new PantallaSeleccionSucursal(this);
+        pantallaSucursal.setVisible(true);
+    }
+    
+    @Override
+    public void cerrarSesion() {
+        usuarioActual = null;
+        sucursalSeleccionada = null;
+        planSeleccionado = null;
+        extrasSeleccionados = null;
+        irABienvenida();
     }
 
-    /**
-     * Método que oculta todo, no pos si
-     */
-    private void ocultarTodo() {
+    private void cerrarPantallas() {
         if (pantallaBienvenida != null) {
-            pantallaBienvenida.setVisible(false);
+            pantallaBienvenida.dispose();
         }
         if (pantallaInicioSesion != null) {
             pantallaInicioSesion.dispose();
         }
-    }
-
-    /**
-     * metodo para ver los detalles del perfil del usuario actual
-     */
-    @Override
-    public void verPerfil() {
-        ocultarTodo();
-        if (pantallaDetallesPerfil == null) {
-            pantallaDetallesPerfil = new PantallaVerPerfil(this);
+        if (pantallaPerfil != null) {
+            pantallaPerfil.dispose();
         }
 
-        pantallaDetallesPerfil.setVisible(true);
+    }
+
+    
+    @Override
+    public UsuarioDTO getUsuarioActual() {
+        return usuarioActual;
+    }
+
+    @Override
+    public MembresiaDTO obtenerMembresiaActiva() {
+        if (usuarioActual == null) {
+            return null;
+        }
+        return compraFachada.obtenerMembresiaActiva(usuarioActual.getCorreo());
     }
     
-    
-    // mejorado
     @Override
-    public void iniciarSesion(InicioSesionDTO dto) {
-        // El dto ya viene validado desde la pantalla
-        // Consultamos el perfil completo del usuario
-        usuarioActual = compraMembresiaFachada.obtenerPerfil(dto.getCorreo());
- 
+    public List<VisitaDTO> obtenerHistorial() {
         if (usuarioActual == null) {
-            irABienvenida();
+            return new ArrayList<>();
+        }
+        return compraFachada.obtenerHistorial(usuarioActual.getCorreo());
+    }
+    
+    @Override
+    public void cancelarMembresia() {
+        if (usuarioActual == null) {
             return;
         }
-            irABienvenida();
-            irAPerfilUsuario();
-        
+        compraFachada.cancelarMembresia(usuarioActual.getCorreo());
+    }
+    
+    @Override
+    public List<SucursalDTO> obtenerSucursales() {
+        return compraFachada.obtenerSucursales();
+    }
+    
+    @Override
+    public void seleccionarSucursal(SucursalDTO sucursal) {
+        this.sucursalSeleccionada = sucursal;
     }
 
-    @Override
-    public void SeleccionSucursal() {
-        ocultarTodo();
-        pantallaSeleccionSucursal = new PantallaSeleccionSucursal(this);
-        pantallaSeleccionSucursal.setVisible(true);
-    }
-
-    @Override
-    public void SeleccionPlan(SucursalDTO sucursal) {
-         ocultarTodo();
-         if (pantallaSeleccionPlan == null) {
-             pantallaSeleccionPlan = new PantallaSeleccionPlan(this, sucursal);
-         } else {
-             pantallaSeleccionPlan = new PantallaSeleccionPlan(this, sucursal); 
-         }
-         pantallaSeleccionPlan.setVisible(true);
-    }
-
-    @Override
-    public void ResumenCompra(SucursalDTO sucursal, PlanDTO plan) {
-         ocultarTodo();
-         pantallaResumenCompra = new PantallaResumenCompra(this, sucursal, plan);
-         pantallaResumenCompra.setVisible(true);
-    }
-
-    @Override
-    public void PantallaExito(ResultadoDTO resultado) {
-         ocultarTodo();
-         pantallaConfirmacionExito = new PantallaConfirmacionExito(this, resultado);
-         pantallaConfirmacionExito.setVisible(true);
-    }
     
     
     

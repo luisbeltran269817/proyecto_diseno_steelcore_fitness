@@ -9,9 +9,9 @@ import Utilerias.Boton;
 import Utilerias.CampoTexto;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
-import dtos.CompraDTO;
+
 import dtos.PlanDTO;
-import dtos.ResultadoDTO;
+
 import dtos.SucursalDTO;
 import fachada.FachadaComprarMembresia;
 import fachada.IComprarMembresia;
@@ -28,8 +28,8 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author julian izaguirre
  */
-public class PantallaResumenCompra extends PantallaBase{
-    
+public class PantallaResumenCompra /**extends PantallaBase*/{
+    /**
     private IComprarMembresia subsistema;
     private CompraDTO compraActual;
     
@@ -129,4 +129,5 @@ public class PantallaResumenCompra extends PantallaBase{
             JOptionPane.showMessageDialog(this, resultadoFinal.getMensaje(), "Error de Pago", JOptionPane.ERROR_MESSAGE);
         }
     }
+    */
 }

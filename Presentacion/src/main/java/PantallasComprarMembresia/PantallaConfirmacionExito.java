@@ -8,7 +8,6 @@ import Controladores.IControladorAplicacion;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
-import dtos.ResultadoDTO;
 import java.awt.GridBagLayout;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,8 +19,8 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author julian izaguirre 
  */
-public class PantallaConfirmacionExito extends PantallaBase {
-    private ResultadoDTO resultado;
+public class PantallaConfirmacionExito /**extends PantallaBase*/ {
+    /**private ResultadoDTO resultado;
 
     public PantallaConfirmacionExito(IControladorAplicacion controlador, ResultadoDTO resultado) {
         super(controlador);
@@ -71,4 +70,5 @@ public class PantallaConfirmacionExito extends PantallaBase {
 
         fondo.add(card);
     }
+    */
 }

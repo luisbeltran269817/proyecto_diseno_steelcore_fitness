@@ -12,7 +12,7 @@ public class UsuarioDTO {
     protected String correo;
     protected String nombre;
     protected String contraseña;
-    protected enum Rol {
+    public enum Rol {
         ADMIN,
         CLIENTE,
     }
