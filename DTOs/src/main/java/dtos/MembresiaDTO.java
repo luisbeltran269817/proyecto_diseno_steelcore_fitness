@@ -18,6 +18,10 @@ public class MembresiaDTO {
     private String idSucursal;
 
     private List<AmenidadDTO> amenidadesExtra;
+    
+    private String idEntrenador;
+    private String idHorario;
+    private String metodoPago;
 
     private String codigoQR;
     private Double montoPagado;
@@ -35,12 +39,16 @@ public class MembresiaDTO {
         CANCELADA
     }
 
-    public MembresiaDTO(String idMembresia, String idCliente, String idPlan, String idSucursal, List<AmenidadDTO> amenidadesExtra, String codigoQR, Double montoPagado, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresia estado, String idPago) {
+    //con el patron builder nos evitamos constructores monstruosos como este :PPPP
+    public MembresiaDTO(String idMembresia, String idCliente, String idPlan, String idSucursal, List<AmenidadDTO> amenidadesExtra, String idEntrenador, String idHorario, String metodoPago, String codigoQR, Double montoPagado, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresia estado, String idPago) {
         this.idMembresia = idMembresia;
         this.idCliente = idCliente;
         this.idPlan = idPlan;
         this.idSucursal = idSucursal;
         this.amenidadesExtra = amenidadesExtra;
+        this.idEntrenador = idEntrenador;
+        this.idHorario = idHorario;
+        this.metodoPago = metodoPago;
         this.codigoQR = codigoQR;
         this.montoPagado = montoPagado;
         this.fechaTramite = fechaTramite;
@@ -91,7 +99,31 @@ public class MembresiaDTO {
     public void setAmenidadesExtra(List<AmenidadDTO> amenidadesExtra) {
         this.amenidadesExtra = amenidadesExtra;
     }
+    
+    public String getIdEntrenador() {
+        return idEntrenador;
+    }
 
+    public void setIdEntrenador(String idEntrenador) {
+        this.idEntrenador = idEntrenador;
+    }
+
+    public String getIdHorario() {
+        return idHorario;
+    }
+
+    public void setIdHorario(String idHorario) {
+        this.idHorario = idHorario;
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
+    
     public String getCodigoQR() {
         return codigoQR;
     }
