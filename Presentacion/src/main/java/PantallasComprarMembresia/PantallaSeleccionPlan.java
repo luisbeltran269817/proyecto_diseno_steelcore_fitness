@@ -8,122 +8,177 @@ import Controladores.IControladorAplicacion;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
-import Utilerias.Tabla;
+import dtos.AmenidadDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
-import fachada.FachadaComprarMembresia;
-import fachada.IComprarMembresia;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.util.List;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
 
 /**
  *
  * @author julian izaguirre
  */
-public class PantallaSeleccionPlan /**extends PantallaBase**/ {
-    /**
-    private Tabla tablaPlanes;
-    private List<PlanDTO> planes;
-    private IComprarMembresia subsistema;
-    
-    // Guardamos la sucursal que viene de la pantalla anterior
-    private SucursalDTO sucursalPrevia;
-
-    public PantallaSeleccionPlan(IControladorAplicacion controlador, SucursalDTO sucursalSeleccionada) {
+public class PantallaSeleccionPlan extends PantallaBase {
+    private PlanDTO planSeleccionado;
+    private ButtonGroup grupoBotones;
+    private JPanel panelPlanes;
+ 
+    public PantallaSeleccionPlan(IControladorAplicacion controlador) {
         super(controlador);
-        this.sucursalPrevia = sucursalSeleccionada;
-        this.subsistema = new FachadaComprarMembresia();
-        
         setTitle("Seleccionar Plan - SteelCore Fitness");
         inicializarComponentes();
         cargarPlanes();
         setVisible(true);
     }
-
+ 
     @Override
     protected void inicializarComponentes() {
+        SucursalDTO sucursal = controlador.getSucursalSeleccionada();
+ 
         JPanel fondo = new JPanel(new GridBagLayout());
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
-
+ 
         JPanel contenedor = new JPanel();
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
         contenedor.setOpaque(false);
-        contenedor.setPreferredSize(new Dimension(860, 500));
+        contenedor.setPreferredSize(new Dimension(900, 620));
         contenedor.setBorder(new EmptyBorder(40, 0, 40, 0));
-
-        JLabel titulo = new JLabel("Elige tu Plan");
+ 
+        JLabel titulo = new JLabel("Planes de Membresía");
         titulo.setFont(Colores.FUENTE_TITULO);
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
         titulo.setAlignmentX(CENTER_ALIGNMENT);
-
-        JLabel subtitulo = new JLabel("Gimnasio seleccionado: " + sucursalPrevia.getNombre());
-        subtitulo.setFont(Colores.FUENTE_SUBTITULO);
-        subtitulo.setForeground(Colores.TEXTO_SECUNDARIO);
-        subtitulo.setAlignmentX(CENTER_ALIGNMENT);
-
-        tablaPlanes = new Tabla("Catálogo de Planes", new String[]{"ID", "Plan", "Precio Base", "Descripción"});
-        tablaPlanes.setAlignmentX(CENTER_ALIGNMENT);
-        tablaPlanes.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
-
-        JPanel panelBotones = new JPanel();
-        panelBotones.setOpaque(false);
-        panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.X_AXIS));
-
-        Boton btnRegresar = new Boton("Atrás", Boton.Variante.SECUNDARIO);
-        Boton btnSeleccionar = new Boton("Ir a Pagar", Boton.Variante.PRIMARIO);
-
-        btnRegresar.addActionListener(e -> {
-            setVisible(false);
-            controlador.SeleccionSucursal();
+ 
+        String infoSucursal = sucursal != null
+            ? "Sucursal: " + sucursal.getNombre() + " — " + sucursal.getCiudad()
+            : "Sucursal no seleccionada";
+        JLabel sub = new JLabel(infoSucursal);
+        sub.setFont(Colores.FUENTE_SUBTITULO);
+        sub.setForeground(Colores.ACENTO);
+        sub.setAlignmentX(CENTER_ALIGNMENT);
+ 
+        panelPlanes = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 10));
+        panelPlanes.setOpaque(false);
+        panelPlanes.setAlignmentX(CENTER_ALIGNMENT);
+        grupoBotones = new ButtonGroup();
+ 
+        JPanel panelBtns = new JPanel();
+        panelBtns.setOpaque(false);
+        panelBtns.setLayout(new BoxLayout(panelBtns, BoxLayout.X_AXIS));
+        panelBtns.setAlignmentX(CENTER_ALIGNMENT);
+ 
+        Boton btnAtras = crearBoton("Atrás", Boton.Variante.SECUNDARIO);
+        Boton btnContinuar = crearBoton("Continuar", Boton.Variante.PRIMARIO);
+ 
+        btnAtras.addActionListener(e -> controlador.irASeleccionSucursal());
+ 
+        btnContinuar.addActionListener(e -> {
+            if (planSeleccionado == null) {
+                JOptionPane.showMessageDialog(this, "Selecciona un plan.", "Aviso",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            controlador.setPlanSeleccionado(planSeleccionado);
+            controlador.irADetallePlan();
         });
-
-        btnSeleccionar.addActionListener(e -> onSeleccionar());
-
-        panelBotones.add(btnRegresar);
-        panelBotones.add(Box.createHorizontalStrut(16));
-        panelBotones.add(btnSeleccionar);
-        panelBotones.setAlignmentX(CENTER_ALIGNMENT);
-
+ 
+        panelBtns.add(btnAtras);
+        panelBtns.add(Box.createHorizontalStrut(16));
+        panelBtns.add(btnContinuar);
+ 
         contenedor.add(titulo);
         contenedor.add(Box.createVerticalStrut(8));
-        contenedor.add(subtitulo);
-        contenedor.add(Box.createVerticalStrut(32));
-        contenedor.add(tablaPlanes);
-        contenedor.add(Box.createVerticalStrut(24));
-        contenedor.add(panelBotones);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 40, 0, 40);
-        fondo.add(contenedor, gbc);
+        contenedor.add(sub);
+        contenedor.add(Box.createVerticalStrut(28));
+        contenedor.add(panelPlanes);
+        contenedor.add(Box.createVerticalStrut(28));
+        contenedor.add(panelBtns);
+ 
+        fondo.add(contenedor);
     }
-
+ 
     private void cargarPlanes() {
-        planes = subsistema.obtenerPlanes();
-        tablaPlanes.limpiar();
-        for (PlanDTO p : planes) {
-            tablaPlanes.agregarFila(new Object[]{ p.getIdPlan(), p.getNombre(), "$" + p.getPrecio(), p.getDescripcion() });
-        }
-    }
-
-    private void onSeleccionar() {
-        int fila = tablaPlanes.getFilaSeleccionada();
-        if (fila == -1) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Por favor selecciona un plan.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        SucursalDTO sucursal = controlador.getSucursalSeleccionada();
+        if (sucursal == null) {
             return;
         }
-        PlanDTO planSeleccionado = planes.get(fila);
-        setVisible(false);
-        
-        controlador.ResumenCompra(sucursalPrevia, planSeleccionado);
+ 
+        List<PlanDTO> planes = controlador.obtenerPlanesDeSucursal(sucursal.getIdSucursal());
+        panelPlanes.removeAll();
+        for (PlanDTO p : planes) {
+            panelPlanes.add(crearCardPlan(p));
+        }
+        panelPlanes.revalidate();
+        panelPlanes.repaint();
     }
-    */
+ 
+    private JPanel crearCardPlan(PlanDTO plan) {
+        JPanel card = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Colores.FONDO_CARD);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.setColor(Colores.BORDE_CARD);
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                g2.dispose();
+            }
+        };
+        card.setOpaque(false);
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBorder(new EmptyBorder(24, 24, 24, 24));
+        card.setPreferredSize(new Dimension(240, 320));
+ 
+        JLabel lblNombre = new JLabel(plan.getNombre());
+        lblNombre.setFont(Colores.FUENTE_TITULO);
+        lblNombre.setForeground(Colores.TEXTO_PRINCIPAL);
+        lblNombre.setAlignmentX(CENTER_ALIGNMENT);
+ 
+        JLabel lblPrecio = new JLabel(String.format("$%.0f", plan.getPrecio()));
+        lblPrecio.setFont(new Font("Segoe UI", Font.BOLD, 38));
+        lblPrecio.setForeground(Colores.ACENTO);
+        lblPrecio.setAlignmentX(CENTER_ALIGNMENT);
+ 
+        JLabel lblMeses = new JLabel(plan.getMesesDuracion() + " mes(es)");
+        lblMeses.setFont(Colores.FUENTE_LABEL);
+        lblMeses.setForeground(Colores.TEXTO_SECUNDARIO);
+        lblMeses.setAlignmentX(CENTER_ALIGNMENT);
+ 
+        card.add(lblNombre);
+        card.add(Box.createVerticalStrut(6));
+        card.add(lblPrecio);
+        card.add(Box.createVerticalStrut(4));
+        card.add(lblMeses);
+        card.add(Box.createVerticalStrut(10));
+ 
+        if (plan.getAmenidades() != null) {
+            for (AmenidadDTO a : plan.getAmenidades()) {
+                JLabel lblAm = new JLabel("✓ " + a.getNombre());
+                lblAm.setFont(Colores.FUENTE_LABEL);
+                lblAm.setForeground(new Color(100, 220, 140));
+                lblAm.setAlignmentX(CENTER_ALIGNMENT);
+                card.add(lblAm);
+                card.add(Box.createVerticalStrut(2));
+            }
+        }
+ 
+        card.add(Box.createVerticalStrut(14));
+ 
+        JRadioButton radio = new JRadioButton("Seleccionar");
+        radio.setFont(Colores.FUENTE_BOTON_SM);
+        radio.setForeground(Colores.TEXTO_PRINCIPAL);
+        radio.setOpaque(false);
+        radio.setAlignmentX(CENTER_ALIGNMENT);
+        radio.addActionListener(e -> planSeleccionado = plan);
+        grupoBotones.add(radio);
+        card.add(radio);
+ 
+        return card;
+    }
 }

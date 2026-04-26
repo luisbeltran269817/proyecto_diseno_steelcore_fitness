@@ -27,7 +27,6 @@ public interface IComprarMembresia {
   public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal);
   public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan);
   public List<AmenidadDTO> obtenerAmenidadesExtra();
-  public double calcularTotal(PlanDTO plan, List<AmenidadDTO> extras);
   public MembresiaDTO crearMembresia(MembresiaDTO dto);
   public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal);
   public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador);
