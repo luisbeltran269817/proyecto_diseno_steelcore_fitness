@@ -34,6 +34,7 @@ import objetosnegocios.ClienteBO;
 import objetosnegocios.EntrenadorBO;
 import objetosnegocios.HorarioBO;
 import objetosnegocios.SucursalBO;
+import patronBuilder.MembresiaBuilder;
 
 
 /**
@@ -81,35 +82,16 @@ public class ControlComprarMembresia {
         return amenidadBO.obtenerTodas().stream().filter(a -> a.getTipo() == AmenidadDTO.TipoAmenidad.EXTRA).toList();
     }
     
-    public double calcularTotal(String idPlan, List<AmenidadDTO> amenidadesExtras) {
-        PlanDTO plan = planBO.buscarPorId(idPlan);
-        double total = plan.getPrecio();
-        List<AmenidadDTO> extras = amenidadBO.obtenerTodas();
-        for (AmenidadDTO a : extras) {
-            total += a.getCosto();
-        }
-        return total;
-    }
-    
     public MembresiaDTO crearMembresia(String idCliente, String idPlan, String idSucursal, List<AmenidadDTO> extras) {
+        PlanDTO plan         = planBO.buscarPorId(idPlan);
+        SucursalDTO sucursal = sucursalBO.buscarPorId(idSucursal);
 
-        MembresiaDTO m = new MembresiaDTO();
+        MembresiaDTO m = new MembresiaBuilder().setCliente(idCliente).setPlan(plan).setSucursal(sucursal)
+            .setExtras(extras).setMetodoPago("Tarjeta").build();
 
         m.setIdMembresia(UUID.randomUUID().toString());
-        m.setIdCliente(idCliente);
-        m.setIdPlan(idPlan);
-        m.setIdSucursal(idSucursal);
-        m.setAmenidadesExtra(extras);
-
-        double total = calcularTotal(idPlan, extras);
-        m.setMontoPagado(total);
-
-        LocalDateTime ahora = LocalDateTime.now();
-        m.setFechaTramite(ahora);
-
-        PlanDTO plan = planBO.buscarPorId(idPlan);
-        m.setFechaCaducidad(ahora.plusMonths(plan.getMesesDuracion()));
-
+        m.setFechaTramite(LocalDateTime.now());
+        m.setFechaCaducidad(LocalDateTime.now().plusMonths(plan.getMesesDuracion()));
         m.setEstado(MembresiaDTO.EstadoMembresia.ACTIVA);
         m.setCodigoQR("QR-" + UUID.randomUUID());
 
@@ -118,6 +100,7 @@ public class ControlComprarMembresia {
         ClienteDTO cliente = clienteBO.buscarPorCorreo(idCliente);
         cliente.getMembresias().add(m);
         clienteBO.actualizar(cliente);
+
         return m;
     }
     
@@ -194,7 +177,5 @@ public class ControlComprarMembresia {
             membresiaBO.actualizar(m);
         }
     }
-    
-    
     
 }

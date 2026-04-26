@@ -50,10 +50,6 @@ public class FachadaComprarMembresia implements IComprarMembresia {
         return control.obtenerAmenidadesExtra();
     }
     @Override
-    public double calcularTotal(PlanDTO plan, List<AmenidadDTO> extras) {
-        return control.calcularTotal(plan.getIdPlan(), extras);
-    }
-    @Override
     public MembresiaDTO crearMembresia(MembresiaDTO dto) {
         return control.crearMembresia(dto.getIdCliente(),dto.getIdPlan(),dto.getIdSucursal(),dto.getAmenidadesExtra());
     }
