@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -123,7 +124,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
         lblPlan.setForeground(Colores.TEXTO_SECUNDARIO);
         lblVencimiento.setForeground(Colores.TEXTO_SECUNDARIO);
 
-        JPanel metricas = new JPanel(new GridLayout(2, 1, 0, 6));
+        JPanel metricas = new JPanel(new GridLayout(1, 2, 20, 6));
         metricas.setOpaque(false);
         metricas.add(crearMiniCard("Plan", lblPlan));
         metricas.add(crearMiniCard("Vencimiento", lblVencimiento));
@@ -265,6 +266,8 @@ public class PantallaPerfilUsuario extends PantallaBase {
     private void cargarVisitas() {
 
         tablaVisitas.limpiar();
+        //formato para que se vea bonita la fecha
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<VisitaDTO> visitas = controlador.obtenerHistorial();
         for (VisitaDTO v : visitas) {
@@ -273,7 +276,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
                 v.getCalle(),
                 v.getColonia(),
                 v.getCiudad(),
-                v.getFechaHora().toString()
+                v.getFechaHora().format(formato)
             });
         }
     }
