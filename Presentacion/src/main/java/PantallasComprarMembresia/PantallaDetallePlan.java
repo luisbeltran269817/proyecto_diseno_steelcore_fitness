@@ -183,7 +183,7 @@ public class PantallaDetallePlan extends PantallaBase {
                 card.add(Box.createVerticalStrut(10));
             }
         }
- 
+        card.add(Box.createVerticalGlue());
         return card;
     }
 }

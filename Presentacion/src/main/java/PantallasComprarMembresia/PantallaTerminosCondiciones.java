@@ -49,7 +49,7 @@ public class PantallaTerminosCondiciones extends PantallaBase {
         titulo.setAlignmentX(CENTER_ALIGNMENT);
  
         JTextArea txtTerminos = new JTextArea(generarTextoTerminos());
-        txtTerminos.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        txtTerminos.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         txtTerminos.setForeground(Colores.TEXTO_SECUNDARIO);
         txtTerminos.setBackground(Colores.FONDO_CAMPO);
         txtTerminos.setEditable(false);
