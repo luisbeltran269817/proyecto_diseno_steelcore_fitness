@@ -4,6 +4,8 @@
  */
 package objetosnegocios;
 
+import DAOs.AlmacenComprarMembresiaMock;
+import DAOs.ClienteDAO;
 import dtos.ClienteDTO;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -11,6 +13,7 @@ import dtos.InicioSesionDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
 import interfaces.IClienteBO;
+import interfaces.IClienteDAO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,42 +22,29 @@ import java.util.List;
  * @author julian izaguirre
  */
 public class ClienteBO implements IClienteBO {
-    private final AlmacenComprarMembresiaMock almacen;
+    private final IClienteDAO clienteDAO;
 
     public ClienteBO() {
-        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.clienteDAO = new ClienteDAO();
     }
 
     @Override
     public List<ClienteDTO> obtenerClientes() {
-        List<ClienteDTO> clientes = new ArrayList<>();
-
-        for (UsuarioDTO u : almacen.getUsuarios().values()) {
-            if (u instanceof ClienteDTO) {
-                clientes.add((ClienteDTO) u);
-            }
-        }
-
-        return clientes;
+        return clienteDAO.obtenerClientes();
     }
+    
     @Override
     public ClienteDTO buscarPorCorreo(String correo) {
-        UsuarioDTO u = almacen.getUsuarios().get(correo);
-        if (u instanceof ClienteDTO) {
-            return (ClienteDTO) u;
-        }
-        return null;
+        return clienteDAO.buscarPorCorreo(correo);
     }
+    
     @Override
     public void actualizar(ClienteDTO cliente) {
-        almacen.getUsuarios().put(cliente.getCorreo(), cliente);
+        clienteDAO.actualizar(cliente);
     }
+    
     @Override
     public List<VisitaDTO> obtenerHistorial(String idCliente) {
-        List<VisitaDTO> lista = almacen.getVisitas().get(idCliente);
-        if (lista == null) {
-            return new ArrayList<>();
-        }
-        return lista;
+        return clienteDAO.obtenerHistorial(idCliente);
     }
 }

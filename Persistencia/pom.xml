@@ -6,7 +6,7 @@
         <artifactId>GimnasioSTEELCORE_DisenoSW</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>BOs</artifactId>
+    <artifactId>Persistencia</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -14,14 +14,9 @@
             <artifactId>DTOs</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>Persistencia</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.release>23</maven.compiler.release>
-        <exec.mainClass>com.mycompany.bos.BOs</exec.mainClass>
+        <exec.mainClass>com.mycompany.persistencia.Persistencia</exec.mainClass>
     </properties>
 </project>

@@ -2,26 +2,24 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package objetosnegocios;
+package DAOs;
 
-import DAOs.AlmacenComprarMembresiaMock;
-import DAOs.UsuarioDAO;
 import dtos.UsuarioDTO;
-import interfaces.IUsuarioBO;
 import interfaces.IUsuarioDAO;
 
 /**
  *
- * @author Tungs
+ * @author luiscarlosbeltran
  */
-public class UsuarioBO implements IUsuarioBO {
-    private final IUsuarioDAO usuarioDAO;
+public class UsuarioDAO implements IUsuarioDAO{
+    private final AlmacenComprarMembresiaMock almacen;
 
-    public UsuarioBO() {
-        this.usuarioDAO = new UsuarioDAO();
+    public UsuarioDAO() {
+        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
     }
+    
     @Override
     public UsuarioDTO obtenerUsuarioPorCorreo(String correo) {
-        return usuarioDAO.obtenerUsuarioPorCorreo(correo);
+        return almacen.getUsuarios().get(correo);
     }
 }
