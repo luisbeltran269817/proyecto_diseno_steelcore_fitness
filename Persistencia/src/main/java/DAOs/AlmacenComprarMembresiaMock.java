@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package objetosnegocios;
+package DAOs;
 
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * almacen temporal, antes en BO y ahroa en DAO
  * @author julian izaguirre
  */
 public class AlmacenComprarMembresiaMock {

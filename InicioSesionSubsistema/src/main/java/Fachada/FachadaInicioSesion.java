@@ -9,7 +9,7 @@ import objetosnegocios.ClienteBO;
 import dtos.InicioSesionDTO;
 import dtos.UsuarioDTO;
 import java.time.LocalDate;
-import objetosnegocios.AlmacenComprarMembresiaMock;
+import DAOs.AlmacenComprarMembresiaMock;
 import objetosnegocios.UsuarioBO;
 
 /**

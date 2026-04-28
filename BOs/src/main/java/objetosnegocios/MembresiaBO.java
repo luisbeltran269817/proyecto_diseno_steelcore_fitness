@@ -4,10 +4,13 @@
  */
 package objetosnegocios;
 
+import DAOs.AlmacenComprarMembresiaMock;
+import DAOs.MembresiaDAO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import interfaces.IMembresiaBO;
+import interfaces.IMembresiaDAO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,38 +21,29 @@ import java.util.UUID;
  * @author julian izaguirre
  */
 public class MembresiaBO implements IMembresiaBO {
-    private final AlmacenComprarMembresiaMock almacen;
+    private final IMembresiaDAO membresiaDAO;
 
     public MembresiaBO() {
-        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.membresiaDAO = new MembresiaDAO();
     }
+    
     @Override
     public void guardar(MembresiaDTO m) {
-        almacen.getMembresias().put(m.getIdMembresia(), m);
+        membresiaDAO.guardar(m);
     }
+    
     @Override
     public MembresiaDTO buscarPorId(String id) {
-        return almacen.getMembresias().get(id);
+        return membresiaDAO.buscarPorId(id);
     }
+    
     @Override
     public List<MembresiaDTO> obtenerPorCliente(String idCliente) {
-        List<MembresiaDTO> lista = new ArrayList<>();
-
-        for (MembresiaDTO m : almacen.getMembresias().values()) {
-            if (m.getIdCliente().equals(idCliente)) {
-                lista.add(m);
-            }
-        }
-        return lista;
+        return membresiaDAO.obtenerPorCliente(idCliente);
     }
+    
     @Override
     public void actualizar(MembresiaDTO membresia) {
-        if (membresia == null || membresia.getIdMembresia() == null) {
-            return;
-        }
-        almacen.getMembresias().put(membresia.getIdMembresia(),membresia
-        );
+        membresiaDAO.actualizar(membresia);
     }
-    
-    
 }

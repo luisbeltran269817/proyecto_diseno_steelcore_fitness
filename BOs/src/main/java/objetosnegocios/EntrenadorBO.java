@@ -4,10 +4,10 @@
  */
 package objetosnegocios;
 
+import DAOs.EntrenadorDAO;
 import dtos.EntrenadorDTO;
-import dtos.SucursalDTO;
 import interfaces.IEntrenadorBO;
-import java.util.ArrayList;
+import interfaces.IEntrenadorDAO;
 import java.util.List;
 
 /**
@@ -15,34 +15,25 @@ import java.util.List;
  * @author Tungs
  */
 public class EntrenadorBO implements IEntrenadorBO {
-    private final AlmacenComprarMembresiaMock almacen;
+    private final IEntrenadorDAO entrenadorDAO;
 
     public EntrenadorBO() {
-        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.entrenadorDAO = new EntrenadorDAO();
     }
+    
     @Override
     public List<EntrenadorDTO> obtenerTodos() {
-        return new ArrayList<>(almacen.getEntrenadores().values());
+        return entrenadorDAO.obtenerTodos();
     }
+    
     @Override
     public EntrenadorDTO buscarPorId(String id) {
-        return almacen.getEntrenadores().get(id);
+        return entrenadorDAO.buscarPorId(id);
     }
 
     @Override
     public List<EntrenadorDTO> obtenerPorSucursal(String idSucursal) {
-        List<EntrenadorDTO> lista = new ArrayList<>();
-        for (EntrenadorDTO e : almacen.getEntrenadores().values()) {
-            if (e.getSucursales() != null) {
-                for (SucursalDTO s : e.getSucursales()) {
-                    if (s.getIdSucursal().equals(idSucursal)) {
-                        lista.add(e);
-                        break;
-                    }
-                }
-            }
-        }
-        return lista;
+        return entrenadorDAO.obtenerPorSucursal(idSucursal);
     }
     
 }

@@ -4,8 +4,11 @@
  */
 package objetosnegocios;
 
+import DAOs.AlmacenComprarMembresiaMock;
+import DAOs.AmenidadDAO;
 import dtos.AmenidadDTO;
 import interfaces.IAmenidadBO;
+import interfaces.IAmenidadDAO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,29 +17,22 @@ import java.util.List;
  * @author Tungs
  */
 public class AmenidadBO implements IAmenidadBO {
-    private final AlmacenComprarMembresiaMock almacen;
+    private final IAmenidadDAO amenidadDAO;
 
     public AmenidadBO() {
-        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.amenidadDAO = new AmenidadDAO();
     }
     
     @Override
     public List<AmenidadDTO> obtenerTodas() {
-        return new ArrayList<>(almacen.getAmenidades().values());
+        return amenidadDAO.obtenerTodas();
     }
     @Override
     public AmenidadDTO buscarPorId(String id) {
-        return almacen.getAmenidades().get(id);
+        return amenidadDAO.buscarPorId(id);
     }
     @Override
     public List<AmenidadDTO> buscarPorIds(List<String> ids) {
-        List<AmenidadDTO> lista = new ArrayList<>();
-        for (String id : ids) {
-            AmenidadDTO a = almacen.getAmenidades().get(id);
-            if (a != null) {
-                lista.add(a);
-            }
-        }
-        return lista;
+        return amenidadDAO.buscarPorIds(ids);
     }
 }

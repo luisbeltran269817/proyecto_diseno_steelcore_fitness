@@ -2,32 +2,29 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package objetosnegocios;
+package DAOs;
 
-import DAOs.AlmacenComprarMembresiaMock;
-import DAOs.SucursalDAO;
 import dtos.SucursalDTO;
-import interfaces.ISucursalBO;
 import interfaces.ISucursalDAO;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author julian izaguirre
+ * @author luiscarlosbeltran
  */
-public class SucursalBO implements ISucursalBO{
-    private final ISucursalDAO sucursalDAO;
+public class SucursalDAO implements ISucursalDAO{
+    private final AlmacenComprarMembresiaMock almacen;
 
-    public SucursalBO() {
-        this.sucursalDAO = new SucursalDAO();
+    public SucursalDAO() {
+        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
     }
 
     public List<SucursalDTO> obtenerTodas() {
-        return sucursalDAO.obtenerTodas();
+        return new ArrayList<>(almacen.getSucursales().values());
     }
 
     public SucursalDTO buscarPorId(String id) {
-        return sucursalDAO.buscarPorId(id);
+        return almacen.getSucursales().get(id);
     }
 }
