@@ -11,6 +11,7 @@ import dtos.PeticionPagoGenDTO;
 import dtos.RespuestaPagoGenDTO;
 import dtosInfraestructura.PeticionPagoDTO;
 import dtosInfraestructura.RespuestaPagoDTO;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +22,9 @@ import java.util.Map;
 public class ControlPagoMembresiaStripe {
 
     public ControlPagoMembresiaStripe() {
-        //Esta clave es secreta, más tarde veremos como guardarla en un archivo .env
-        Stripe.apiKey = "STRIPE_SECRET_KEY)51TS5h2JJJ5Z3Cz295Mj0Wf3SBaS5drTjCq0zgzQu0ywfDOUNia88Ccmu9z0Jp2MtHEjWVrl4c0n0MdodOHfXRQFS00NetZW2O4";
+       //Guardamos la clave en un archivo de variables de entorno .env, más tarde pondré el archivo en un gitIgnore
+       Dotenv dotenv = Dotenv.configure().directory("C:/NetBeans/proyecto_diseno_steelcore_fitness/PagoMembresiaStripeSubsistema").load();
+       Stripe.apiKey = dotenv.get("STRIPE_SECRET_KEY");
     }
     
     /**

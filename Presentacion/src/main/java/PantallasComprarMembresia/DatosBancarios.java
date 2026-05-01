@@ -165,9 +165,6 @@ public class DatosBancarios extends PantallaBase {
         });
     }
 
-    /**
-     * 🔥 MÉTODO CLAVE CORREGIDO
-     */
     private void procesarPago() {
         if (txtTitular.getText().trim().isEmpty()) {
             mostrarError("Ingresa el nombre del titular");
