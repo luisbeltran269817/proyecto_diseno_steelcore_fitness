@@ -6,37 +6,27 @@
         <artifactId>GimnasioSTEELCORE_DisenoSW</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>Presentacion</artifactId>
+    <artifactId>PagoMembresiaStripeSubsistema</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>InicioSesionSubsistema</artifactId>
+            <artifactId>DTOInfraestructura</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>24.22.0</version> 
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>DTOs</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ComprarMembresiaSubsistema</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>PagoMembresiaStripeSubsistema</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>DTOInfraestructura</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.release>23</maven.compiler.release>
-        <exec.mainClass>com.mycompany.presentacion.Presentacion</exec.mainClass>
+        <exec.mainClass>com.mycompany.pagomembresiastripesubsistema.PagoMembresiaStripeSubsistema</exec.mainClass>
     </properties>
 </project>

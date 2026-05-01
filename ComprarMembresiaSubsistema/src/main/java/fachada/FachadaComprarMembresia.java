@@ -10,9 +10,7 @@ import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.MembresiaDTO;
-
 import dtos.PlanDTO;
-
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
@@ -50,8 +48,8 @@ public class FachadaComprarMembresia implements IComprarMembresia {
         return control.obtenerAmenidadesExtra();
     }
     @Override
-    public MembresiaDTO crearMembresia(MembresiaDTO dto) {
-        return control.crearMembresia(dto.getIdCliente(),dto.getIdPlan(),dto.getIdSucursal(),dto.getAmenidadesExtra());
+    public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token) {
+        return control.comprarMembresia(dto.getIdCliente(),dto.getIdPlan(),dto.getIdSucursal(),dto.getAmenidadesExtra(), token);
     }
     @Override
     public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal) {
@@ -85,4 +83,10 @@ public class FachadaComprarMembresia implements IComprarMembresia {
     public void cancelarMembresia(String idCliente) {
         control.cancelarMembresia(idCliente);
     }
+    @Override
+    public double calcularTotal(String idPlan, List<AmenidadDTO> extras){
+        return control.calcularTotal(idPlan, extras);
+    }
+    
+   
 }

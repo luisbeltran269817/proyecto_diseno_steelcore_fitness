@@ -15,6 +15,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>24.22.0</version> 
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>BOs</artifactId>
             <version>${project.version}</version>
@@ -22,6 +27,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>Persistencia</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>PagoMembresiaStripeSubsistema</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

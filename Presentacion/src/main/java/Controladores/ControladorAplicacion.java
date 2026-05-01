@@ -30,8 +30,12 @@ import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 
 import dtos.VisitaDTO;
+import dtosInfraestructura.PeticionPagoDTO;
+import dtosInfraestructura.RespuestaPagoDTO;
 import fachada.FachadaComprarMembresia;
+import fachada.FachadaPagoMembresiaStripe;
 import fachada.IComprarMembresia;
+import fachada.IPagoMembresiaStripe;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -46,7 +50,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
 
     private final IInicioSesion inicioSesionFachada;
     private final IComprarMembresia compraFachada;
- 
+    private final IPagoMembresiaStripe pagoFachada;
     // pantallas
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
@@ -69,10 +73,12 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private EntrenadorDTO entrenadorSeleccionado;
     private HorarioDTO horarioSeleccionado;
     private MembresiaDTO membresiaRecienCreada;
+    private String tokenTarjeta;
  
     private ControladorAplicacion() {
         this.inicioSesionFachada = new FachadaInicioSesion();
         this.compraFachada = new FachadaComprarMembresia();
+        this.pagoFachada= new FachadaPagoMembresiaStripe();
         this.extrasSeleccionados = new ArrayList<>();
     }
  
@@ -267,7 +273,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         temp.setIdSucursal(idSucursal);
         return compraFachada.obtenerEntrenadores(temp);
     }
- 
+    
     @Override
     public List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador) {
         EntrenadorDTO temp = new EntrenadorDTO();
@@ -276,16 +282,39 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
  
     @Override
-    public MembresiaDTO confirmarCompra() {
-        MembresiaDTO dto = new MembresiaDTO();
-        dto.setIdCliente(usuarioActual.getCorreo());
-        dto.setIdPlan(planSeleccionado.getIdPlan());
-        dto.setIdSucursal(sucursalSeleccionada.getIdSucursal());
-        dto.setAmenidadesExtra(extrasSeleccionados);
-        this.membresiaRecienCreada = compraFachada.crearMembresia(dto);
-        return membresiaRecienCreada;
+    public void confirmarCompra() {
+         try {
+            MembresiaDTO dto = new MembresiaDTO();
+            dto.setIdCliente(usuarioActual.getCorreo());
+            dto.setIdPlan(planSeleccionado.getIdPlan());
+            dto.setIdSucursal(sucursalSeleccionada.getIdSucursal());
+            dto.setAmenidadesExtra(extrasSeleccionados);
+            this.membresiaRecienCreada = compraFachada.comprarMembresia(
+                dto,
+                tokenTarjeta
+            );
+            irAQR();
+            tokenTarjeta = null;
+        } catch (Exception e) {
+            irATransaccionFallida(e.getMessage());
+        }
     }
- 
+    
+    //Cosas del Stripe
+    @Override
+    public void setTokenTarjeta(String token) {
+        this.tokenTarjeta = token;
+    }
+    @Override
+    public String getTokenTarjeta() {
+        return tokenTarjeta;
+    }
+    @Override
+    public double calcularTotal() {
+        if (planSeleccionado == null) return 0.0;
+        return compraFachada.calcularTotal(planSeleccionado.getIdPlan(),extrasSeleccionados);
+    }
+    
     @Override
     public void confirmarCitaBienvenida() {
         if (entrenadorSeleccionado == null || horarioSeleccionado == null) return;
@@ -296,8 +325,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         dto.setIdHorario(horarioSeleccionado.getIdHorario());
         compraFachada.agendarCita(dto);
     }
- 
- 
+
     private void cerrarPantallas() {
         if (pantallaBienvenida  != null) { 
             pantallaBienvenida.dispose();  

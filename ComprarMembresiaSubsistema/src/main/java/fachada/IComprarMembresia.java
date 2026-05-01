@@ -27,7 +27,7 @@ public interface IComprarMembresia {
   public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal);
   public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan);
   public List<AmenidadDTO> obtenerAmenidadesExtra();
-  public MembresiaDTO crearMembresia(MembresiaDTO dto);
+  public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token);
   public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal);
   public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador);
   public CitaDTO agendarCita(CitaDTO dto);
@@ -35,5 +35,6 @@ public interface IComprarMembresia {
   public boolean tieneMembresiaActiva(String idCliente);
   public MembresiaDTO obtenerMembresiaActiva(String idCliente);
   public List<VisitaDTO> obtenerHistorial(String idCliente);
-   public void cancelarMembresia(String idCliente);
+  public void cancelarMembresia(String idCliente);
+   public double calcularTotal(String idPlan, List<AmenidadDTO> extras);
 }

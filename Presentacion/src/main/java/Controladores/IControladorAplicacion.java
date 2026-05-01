@@ -68,9 +68,9 @@ public interface IControladorAplicacion {
     List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal);
     List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador);
  
-    /** Ejecuta el flujo completo de compra con los datos acumulados en el estado */
-    MembresiaDTO confirmarCompra();
- 
-    /** Agenda la cita de bienvenida con los datos acumulados */
+    public void confirmarCompra();
+    public double calcularTotal();
     void confirmarCitaBienvenida();
+    public void setTokenTarjeta(String token);
+    public String getTokenTarjeta();
 }

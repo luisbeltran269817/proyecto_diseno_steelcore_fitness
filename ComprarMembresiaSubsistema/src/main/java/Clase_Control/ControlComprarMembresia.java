@@ -13,9 +13,13 @@ import objetosnegocios.MembresiaBO;
 import objetosnegocios.PlanBO;
 import dtos.MembresiaDTO;
 import dtos.MembresiaDTO.EstadoMembresia;
+import dtos.PeticionPagoGenDTO;
 import dtos.PlanDTO;
+import dtos.RespuestaPagoGenDTO;
 import dtos.SucursalDTO;
 import dtos.VisitaDTO;
+import fachada.FachadaPagoMembresiaStripe;
+import fachada.IPagoMembresiaStripe;
 import interfaces.IAmenidadBO;
 import interfaces.ICitaBO;
 import interfaces.IClienteBO;
@@ -50,6 +54,8 @@ public class ControlComprarMembresia {
     private final IEntrenadorBO entrenadorBO;
     private final IHorarioBO horarioBO;
     private final ICitaBO citaBO;
+    //Se conecta con el subsistema de el pago de membresia
+    private final IPagoMembresiaStripe pagoFachada;
     
     public ControlComprarMembresia() {
         this.planBO = new PlanBO();
@@ -60,6 +66,7 @@ public class ControlComprarMembresia {
         this.entrenadorBO = new EntrenadorBO();
         this.horarioBO = new HorarioBO();
         this.citaBO = new CitaBO();
+        this.pagoFachada= new FachadaPagoMembresiaStripe();
     }
     
     public List<SucursalDTO> obtenerSucursales() {
@@ -102,6 +109,38 @@ public class ControlComprarMembresia {
         clienteBO.actualizar(cliente);
 
         return m;
+    }
+    /**
+     * Método que termina el flujo completo de compra de mebresia, conectandose con la API de Stripe y al final persisteiendo la membresia
+     * @param idCliente el id del cliente que compra
+     * @param idPlan el id del plan a contratar
+     * @param idSucursal el id de la sucursal donde compras la membresia
+     * @param extras las amenidades extra si es que se incluyen
+     * @param tokenTarjeta el token de la tarjeta
+     * @return la membresiaDTO creada
+     */
+    public MembresiaDTO comprarMembresia(String idCliente,String idPlan,String idSucursal,List<AmenidadDTO> extras,String tokenTarjeta) {
+        //Se valida que el cleinte no cuente con una membresia activa
+        if (tieneMembresiaActiva(idCliente)) {
+            throw new RuntimeException("El cliente ya tiene una membresía activa");
+        }
+        //Calcula el total de la compra de membresia usando los extras
+        double total = calcularTotal(idPlan, extras);
+        //Creamos el DTO del pago (no el de infraestructura)
+        PeticionPagoGenDTO peticion = new PeticionPagoGenDTO();
+        peticion.setMonto(total);
+        peticion.setDescripcion("Compra de membresía");
+        peticion.setTokenTarjeta(tokenTarjeta);
+        //manda a llamar a la fachada del pago para procesar el pago con Stripe
+        RespuestaPagoGenDTO respuesta = pagoFachada.procesarPago(peticion);
+        //Se valida si todo salió bien
+        if (!respuesta.isExitoso()) {
+            throw new RuntimeException("Pago rechazado: " + respuesta.getMensaje());
+        }
+        //Si fue exitoso se guarda
+        MembresiaDTO membresia = crearMembresia(idCliente, idPlan, idSucursal, extras);
+        //Regresamos la membresia agregada
+        return membresia;
     }
     
     public List<EntrenadorDTO> obtenerEntrenadores(String idSucursal) {
@@ -177,5 +216,28 @@ public class ControlComprarMembresia {
             membresiaBO.actualizar(m);
         }
     }
+    
+    /**
+     * Método que calcula el total de una compra de membresia
+     * @param idPlan el plan que se va a comprar
+     * @param extras los extras que se agregarán al precio de la compra de membresía
+     * @return el total de la compra
+     */
+    public double calcularTotal(String idPlan, List<AmenidadDTO> extras) {
+        PlanDTO plan = planBO.buscarPorId(idPlan);
+        double base = 0.0;
+        if (plan != null && plan.getPrecio() != null) {
+            base = plan.getPrecio();
+        }
+        double extra = 0.0;
+        if (extras != null) {
+            //Streams de la clase del profe Quiñonez
+            extra = extras.stream().mapToDouble(AmenidadDTO::getCosto).sum();
+        }
+        return base + extra;
+    }
+    
+    
+    
     
 }
