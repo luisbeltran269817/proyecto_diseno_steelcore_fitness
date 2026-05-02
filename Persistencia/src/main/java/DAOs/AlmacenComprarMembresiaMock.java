@@ -61,6 +61,7 @@ public class AlmacenComprarMembresiaMock {
 
         poblarDatos();
     }
+    
     private void poblarDatos() {
         AmenidadDTO pesas = new AmenidadDTO();
         pesas.setIdAmenidad("A001");
@@ -92,11 +93,27 @@ public class AlmacenComprarMembresiaMock {
         sucursal.setNombre("Centro");
         sucursal.setCiudad("Hermosillo");
         sucursal.setColonia("Centro");
-
+        sucursal.setCalle("Solidaridad");
+        sucursal.setLatitud(29.0729);
+        sucursal.setLongitud(-110.9559);
         sucursal.setPlanes(List.of(mensual));
-
+        
         sucursales.put(sucursal.getIdSucursal(), sucursal);
-
+        
+        // segunda sucursal de prueba julian 
+        // lo hice para que lo agarre el mapa
+        SucursalDTO sucursal2 = new SucursalDTO();
+        sucursal2.setIdSucursal("S002");
+        sucursal2.setNombre("Plaza Sur");
+        sucursal2.setCiudad("Ciudad Obregón");
+        sucursal2.setColonia("Centro");
+        sucursal2.setCalle("Miguel Alemán");
+        sucursal2.setLatitud(27.4863);
+        sucursal2.setLongitud(-109.9306);
+        sucursal2.setPlanes(List.of(mensual));
+        
+        sucursales.put(sucursal2.getIdSucursal(), sucursal2);
+        
         HorarioDTO h1 = new HorarioDTO();
         h1.setIdHorario("H001");
         h1.setIdEntrenador("E001"); 
@@ -110,7 +127,7 @@ public class AlmacenComprarMembresiaMock {
         entrenador.setIdEntrenador("E001");
         entrenador.setNombre("Carlos");
 
-        entrenador.setSucursales(List.of(sucursal));
+        entrenador.setSucursales(List.of(sucursal, sucursal2));
         entrenador.setHorarios(List.of(h1));
 
         entrenadores.put(entrenador.getIdEntrenador(), entrenador);
@@ -125,7 +142,6 @@ public class AlmacenComprarMembresiaMock {
 
         usuarios.put(cliente.getCorreo(), cliente);
 
- 
         MembresiaDTO m = new MembresiaDTO();
         m.setIdMembresia("M001");
         m.setIdCliente(cliente.getCorreo());
@@ -200,9 +216,4 @@ public class AlmacenComprarMembresiaMock {
     public Map<String, HorarioDTO> getHorarios() {
         return horarios;
     }
-
-    
-    
-    
-    
 }

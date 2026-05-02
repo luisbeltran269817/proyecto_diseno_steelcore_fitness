@@ -4,80 +4,154 @@
  */
 package PantallasComprarMembresia;
 
-
 import Controladores.IControladorAplicacion;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
+import control.ControlMapaSucursal;
 import dtos.SucursalDTO;
+
 import java.awt.*;
+import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.viewer.GeoPosition;
 
 /**
  *
  * @author julian izaguirre
  */
-public class PantallaSeleccionSucursal extends PantallaBase{
+public class PantallaSeleccionSucursal extends PantallaBase {
+    private final ControlMapaSucursal controlMapa = ControlMapaSucursal.getInstancia();
+
     private ButtonGroup grupoBotones;
-    private SucursalDTO sucursalSeleccionada;
     private JPanel panelSucursales;
- 
+    private SucursalDTO sucursalSeleccionada = null;
+    
+    private JWindow popupWindow;
+    private JLabel popupNombre, popupDireccion;
+    private JButton popupBtn;
+
     public PantallaSeleccionSucursal(IControladorAplicacion controlador) {
         super(controlador);
         setTitle("Seleccionar Sucursal - SteelCore Fitness");
         inicializarComponentes();
         cargarSucursales();
+        registrarListenerMarcadores();
+        obtenerUbicacionEnSegundoPlano();
         setVisible(true);
     }
- 
+
     @Override
     protected void inicializarComponentes() {
-        JPanel fondo = new JPanel(new GridBagLayout());
+        JPanel fondo = new JPanel(new BorderLayout());
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
- 
-        JPanel contenedor = new JPanel();
-        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
-        contenedor.setOpaque(false);
-        contenedor.setPreferredSize(new Dimension(780, 600));
-        contenedor.setBorder(new EmptyBorder(40, 0, 40, 0));
- 
-        JLabel titulo = new JLabel("Selecciona tu Sucursal");
+
+        fondo.add(crearPanelIzquierdo(),          BorderLayout.WEST);
+        fondo.add(controlMapa.getComponenteMapa(), BorderLayout.CENTER);
+        crearPopup();
+    }
+
+    /** 
+     * Cuando el usuario hace clic en un marcador del mapa 
+     */
+    private void registrarListenerMarcadores() {
+        controlMapa.setOnMarcadorClickListener(idSucursal -> {
+            SucursalDTO s = controlMapa.onMarcadorClickeado(idSucursal);
+            if (s != null) SwingUtilities.invokeLater(() -> {
+                sucursalSeleccionada = s;
+                mostrarPopup(s);
+                sincronizarRadio(s);
+            });
+        });
+    }
+
+    private void cargarSucursales() {
+        List<SucursalDTO> lista = controlMapa.iniciarMapa();
+        panelSucursales.removeAll();
+        grupoBotones = new ButtonGroup();
+        for (SucursalDTO s : lista) {
+            panelSucursales.add(crearCard(s));
+            panelSucursales.add(Box.createVerticalStrut(10));
+        }
+        panelSucursales.revalidate();
+        panelSucursales.repaint();
+    }
+
+    private void obtenerUbicacionEnSegundoPlano() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://ip-api.com/json/?fields=lat,lon");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setConnectTimeout(4000);
+                con.setReadTimeout(4000);
+                Scanner sc = new Scanner(con.getInputStream());
+                StringBuilder sb = new StringBuilder();
+                while (sc.hasNextLine()) sb.append(sc.nextLine());
+                sc.close();
+                double lat = extraerDouble(sb.toString(), "lat");
+                double lng = extraerDouble(sb.toString(), "lon");
+                if (lat != 0) SwingUtilities.invokeLater(
+                    () -> controlMapa.actualizarUbicacion(lat, lng));
+            } catch (Exception e) {
+                System.out.println("[Geo] " + e.getMessage());
+            }
+        }, "hilo-geo").start();
+    }
+
+    private double extraerDouble(String json, String clave) {
+        try {
+            int idx = json.indexOf("\"" + clave + "\":");
+            if (idx < 0) return 0;
+            int s = idx + clave.length() + 3;
+            int e = json.indexOf(",", s);
+            if (e < 0) e = json.indexOf("}", s);
+            return Double.parseDouble(json.substring(s, e).trim());
+        } catch (Exception e) { return 0; }
+    }
+
+    private JPanel crearPanelIzquierdo() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(36, 32, 36, 20));
+        panel.setPreferredSize(new Dimension(300, 0));
+
+        JLabel titulo = new JLabel("<html>Selecciona<br>tu Sucursal</html>");
         titulo.setFont(Colores.FUENTE_TITULO);
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
-        titulo.setAlignmentX(CENTER_ALIGNMENT);
- 
-        JLabel sub = new JLabel("Elige el gimnasio más cercano a ti");
+        titulo.setAlignmentX(LEFT_ALIGNMENT);
+
+        JLabel sub = new JLabel("Elige el gimnasio más cercano");
         sub.setFont(Colores.FUENTE_SUBTITULO);
         sub.setForeground(Colores.TEXTO_SECUNDARIO);
-        sub.setAlignmentX(CENTER_ALIGNMENT);
- 
+        sub.setAlignmentX(LEFT_ALIGNMENT);
+
         panelSucursales = new JPanel();
         panelSucursales.setLayout(new BoxLayout(panelSucursales, BoxLayout.Y_AXIS));
         panelSucursales.setOpaque(false);
-        panelSucursales.setAlignmentX(CENTER_ALIGNMENT);
-        grupoBotones = new ButtonGroup();
- 
+        panelSucursales.setAlignmentX(LEFT_ALIGNMENT);
+
         JScrollPane scroll = new JScrollPane(panelSucursales);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
-        scroll.setPreferredSize(new Dimension(740, 360));
-        scroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 360));
-        scroll.setAlignmentX(CENTER_ALIGNMENT);
- 
-        JPanel panelBtns = new JPanel();
-        panelBtns.setOpaque(false);
-        panelBtns.setLayout(new BoxLayout(panelBtns, BoxLayout.X_AXIS));
-        panelBtns.setAlignmentX(CENTER_ALIGNMENT);
- 
-        Boton btnRegresar = crearBoton("Regresar", Boton.Variante.SECUNDARIO);
+        scroll.setAlignmentX(LEFT_ALIGNMENT);
+
         Boton btnContinuar = crearBoton("Continuar", Boton.Variante.PRIMARIO);
- 
+        Boton btnRegresar  = crearBoton("Regresar",  Boton.Variante.SECUNDARIO);
+        btnContinuar.setAlignmentX(LEFT_ALIGNMENT);
+        btnRegresar.setAlignmentX(LEFT_ALIGNMENT);
+        btnContinuar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        btnRegresar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+
         btnRegresar.addActionListener(e -> controlador.irAPerfilUsuario());
- 
         btnContinuar.addActionListener(e -> {
             if (sucursalSeleccionada == null) {
                 JOptionPane.showMessageDialog(this,
@@ -88,76 +162,172 @@ public class PantallaSeleccionSucursal extends PantallaBase{
             controlador.setSucursalSeleccionada(sucursalSeleccionada);
             controlador.irASeleccionPlan();
         });
- 
-        panelBtns.add(btnRegresar);
-        panelBtns.add(Box.createHorizontalStrut(16));
-        panelBtns.add(btnContinuar);
- 
-        contenedor.add(titulo);
-        contenedor.add(Box.createVerticalStrut(8));
-        contenedor.add(sub);
-        contenedor.add(Box.createVerticalStrut(28));
-        contenedor.add(scroll);
-        contenedor.add(Box.createVerticalStrut(24));
-        contenedor.add(panelBtns);
- 
-        fondo.add(contenedor);
+
+        panel.add(titulo); panel.add(Box.createVerticalStrut(6));
+        panel.add(sub);    panel.add(Box.createVerticalStrut(24));
+        panel.add(scroll); panel.add(Box.createVerticalStrut(24));
+        panel.add(btnContinuar); panel.add(Box.createVerticalStrut(10));
+        panel.add(btnRegresar);
+        return panel;
     }
- 
-    private void cargarSucursales() {
-        List<SucursalDTO> sucursales = controlador.obtenerSucursales();
-        panelSucursales.removeAll();
-        for (SucursalDTO s : sucursales) {
-            panelSucursales.add(crearFilaSucursal(s));
-            panelSucursales.add(Box.createVerticalStrut(10));
-        }
-        panelSucursales.revalidate();
-        panelSucursales.repaint();
-    }
- 
-    private JPanel crearFilaSucursal(SucursalDTO s) {
+
+    private JPanel crearCard(SucursalDTO s) {
         JPanel card = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
+            @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Colores.FONDO_CARD);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
                 g2.setColor(Colores.BORDE_CARD);
                 g2.setStroke(new BasicStroke(1f));
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 16, 16);
+                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 16, 16);
                 g2.dispose();
             }
         };
         card.setOpaque(false);
-        card.setLayout(new BorderLayout(14, 0));
-        card.setBorder(new EmptyBorder(16, 20, 16, 20));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
- 
+        card.setLayout(new BorderLayout(10, 0));
+        card.setBorder(new EmptyBorder(12, 14, 12, 14));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 72));
+        card.setAlignmentX(LEFT_ALIGNMENT);
+
         JLabel nombre = new JLabel(s.getNombre());
-        nombre.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        nombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
         nombre.setForeground(Colores.TEXTO_PRINCIPAL);
- 
-        JLabel direccion = new JLabel(s.getColonia() + ", " + s.getCiudad());
-        direccion.setFont(Colores.FUENTE_LABEL);
-        direccion.setForeground(Colores.TEXTO_SECUNDARIO);
- 
+
+        JLabel dir = new JLabel(s.getColonia() + ", " + s.getCiudad());
+        dir.setFont(Colores.FUENTE_LABEL);
+        dir.setForeground(Colores.TEXTO_SECUNDARIO);
+
         JPanel info = new JPanel();
         info.setOpaque(false);
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-        info.add(nombre);
-        info.add(Box.createVerticalStrut(4));
-        info.add(direccion);
- 
-        JRadioButton radio = new JRadioButton("Seleccionar");
+        info.add(nombre); info.add(Box.createVerticalStrut(3)); info.add(dir);
+
+        JRadioButton radio = new JRadioButton("Elegir");
         radio.setFont(Colores.FUENTE_BOTON_SM);
         radio.setForeground(Colores.TEXTO_PRINCIPAL);
         radio.setOpaque(false);
-        radio.addActionListener(e -> sucursalSeleccionada = s);
+        radio.addActionListener(e -> {
+            sucursalSeleccionada = s; 
+            controlMapa.onMarcadorClickeado(s.getIdSucursal());
+
+            JXMapViewer mapa = (JXMapViewer) controlMapa.getComponenteMapa();
+            mapa.setCenterPosition(new GeoPosition(s.getLatitud(), s.getLongitud()));
+        });
+        
         grupoBotones.add(radio);
- 
+
         card.add(info, BorderLayout.CENTER);
         card.add(radio, BorderLayout.EAST);
         return card;
+    }
+
+    private void crearPopup() {
+        popupWindow = new JWindow(this);
+        popupWindow.setAlwaysOnTop(true);
+
+        JPanel card = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                    RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(22, 33, 62));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
+                g2.setColor(new Color(106, 13, 173));
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 14, 14);
+                g2.dispose();
+            }
+        };
+        card.setOpaque(false);
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBorder(new EmptyBorder(12, 14, 12, 14));
+
+        popupNombre = new JLabel();
+        popupNombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        popupNombre.setForeground(new Color(255, 215, 0));
+        popupNombre.setAlignmentX(LEFT_ALIGNMENT);
+
+        popupDireccion = new JLabel();
+        popupDireccion.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        popupDireccion.setForeground(new Color(170, 170, 204));
+        popupDireccion.setAlignmentX(LEFT_ALIGNMENT);
+
+        popupBtn = new JButton("✓ Seleccionar");
+        popupBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        popupBtn.setForeground(Color.WHITE);
+        popupBtn.setBackground(new Color(106, 13, 173));
+        popupBtn.setBorder(new EmptyBorder(6, 10, 6, 10));
+        popupBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        popupBtn.setOpaque(true);
+        popupBtn.setFocusPainted(false);
+        popupBtn.setAlignmentX(LEFT_ALIGNMENT);
+        popupBtn.addMouseListener(new MouseAdapter() {
+            @Override public void mouseEntered(MouseEvent e) {
+                popupBtn.setBackground(new Color(139, 47, 201));
+            }
+            @Override public void mouseExited(MouseEvent e) {
+                popupBtn.setBackground(new Color(106, 13, 173));
+            }
+        });
+
+        card.add(popupNombre); card.add(Box.createVerticalStrut(3));
+        card.add(popupDireccion); card.add(Box.createVerticalStrut(8));
+        card.add(popupBtn);
+        popupWindow.setContentPane(card);
+
+        controlMapa.getComponenteMapa().addMouseListener(new MouseAdapter() {
+            @Override public void mousePressed(MouseEvent e) {
+                popupWindow.setVisible(false);
+            }
+        });
+    }
+
+    private void mostrarPopup(SucursalDTO s) {
+        popupNombre.setText(s.getNombre());
+        StringBuilder dir = new StringBuilder("<html>");
+        if (s.getCalle()   != null && !s.getCalle().isBlank())
+            dir.append(s.getCalle()).append(", ");
+        if (s.getColonia() != null && !s.getColonia().isBlank())
+            dir.append(s.getColonia());
+        dir.append("<br>");
+        if (s.getCiudad()  != null && !s.getCiudad().isBlank())
+            dir.append(s.getCiudad());
+        dir.append("</html>");
+        popupDireccion.setText(dir.toString());
+
+        for (ActionListener al : popupBtn.getActionListeners())
+            popupBtn.removeActionListener(al);
+        popupBtn.addActionListener(e -> {
+            sucursalSeleccionada = s; 
+            controlMapa.onMarcadorClickeado(s.getIdSucursal());
+            popupWindow.setVisible(false);
+            sincronizarRadio(s);
+            
+            JXMapViewer mapa = (JXMapViewer) controlMapa.getComponenteMapa();
+            mapa.setCenterPosition(new GeoPosition(s.getLatitud(), s.getLongitud()));
+        });
+
+        JComponent mv = controlMapa.getComponenteMapa();
+        Point p = mv.getLocationOnScreen();
+        popupWindow.setLocation(p.x + mv.getWidth()/2 - 105,
+                                p.y + mv.getHeight()/2 - 60);
+        popupWindow.pack();
+        popupWindow.setVisible(true);
+    }
+
+    private void sincronizarRadio(SucursalDTO s) {
+        for (Component comp : panelSucursales.getComponents()) {
+            if (!(comp instanceof JPanel card)) continue;
+            BorderLayout bl = (BorderLayout) card.getLayout();
+            Component east   = bl.getLayoutComponent(BorderLayout.EAST);
+            Component center = bl.getLayoutComponent(BorderLayout.CENTER);
+            if (!(east   instanceof JRadioButton radio)) continue;
+            if (!(center instanceof JPanel info))        continue;
+            for (Component c : info.getComponents())
+                if (c instanceof JLabel lbl && lbl.getText().equals(s.getNombre()))
+                    radio.setSelected(true);
+        }
     }
 }

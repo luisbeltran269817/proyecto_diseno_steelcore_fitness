@@ -73,4 +73,5 @@ public interface IControladorAplicacion {
     void confirmarCitaBienvenida();
     public void setTokenTarjeta(String token);
     public String getTokenTarjeta();
+    
 }

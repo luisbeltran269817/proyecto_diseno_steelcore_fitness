@@ -23,7 +23,8 @@ public class ControlPagoMembresiaStripe {
 
     public ControlPagoMembresiaStripe() {
        //Guardamos la clave en un archivo de variables de entorno .env, más tarde pondré el archivo en un gitIgnore
-       Dotenv dotenv = Dotenv.configure().directory("C:/NetBeans/proyecto_diseno_steelcore_fitness/PagoMembresiaStripeSubsistema").load();
+       
+       Dotenv dotenv = Dotenv.configure().directory("C:/Users/julia/Documents/NetBeansProjects/proyecto_diseno_steelcore_fitness/PagoMembresiaStripeSubsistema").load();
        Stripe.apiKey = dotenv.get("STRIPE_SECRET_KEY");
     }
     

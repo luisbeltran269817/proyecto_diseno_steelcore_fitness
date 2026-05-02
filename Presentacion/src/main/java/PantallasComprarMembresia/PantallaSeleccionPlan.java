@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-
 /**
  *
  * @author julian izaguirre
