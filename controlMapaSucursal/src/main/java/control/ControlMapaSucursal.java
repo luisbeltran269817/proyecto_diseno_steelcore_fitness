@@ -6,6 +6,7 @@ package control;
 
 import dtos.SucursalDTO;
 import fachada.IMapaSucursal;
+import fachada.IMapaSucursal.OnMarcadorClickListener;
 import fachada.MapaSucursal;
 import java.util.List;
 import org.jxmapviewer.JXMapViewer;
@@ -59,7 +60,7 @@ public class ControlMapaSucursal {
         return mapaSucursal.getSucursalSeleccionada();
     }
 
-    public void setOnMarcadorClickListener(IMapaSucursal.OnMarcadorClickListener l) {
-        mapaSucursal.setOnMarcadorClickListener(l);
+    public void setOnMarcadorClickListener(OnMarcadorClickListener listener) {
+        mapaSucursal.setOnMarcadorClickListener(listener);
     }
 }
