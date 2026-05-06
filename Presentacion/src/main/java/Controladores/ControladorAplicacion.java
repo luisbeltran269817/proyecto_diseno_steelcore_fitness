@@ -17,28 +17,27 @@ import PantallasComprarMembresia.PantallaSeleccionPlan;
 import PantallasComprarMembresia.PantallaSeleccionSucursal;
 import PantallasComprarMembresia.PantallaTerminosCondiciones;
 import PantallasComprarMembresia.PantallaTransaccionFallida;
-import PantallasComprarMembresia.PantallaVerPerfil;
 import PantallasInicioSesion.PantallaInicioSesion;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
-import dtos.InicioSesionDTO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 
 import dtos.VisitaDTO;
-import dtosInfraestructura.PeticionPagoDTO;
-import dtosInfraestructura.RespuestaPagoDTO;
 import fachada.FachadaComprarMembresia;
 import fachada.FachadaPagoMembresiaStripe;
 import fachada.IComprarMembresia;
+import fachada.IMapa.OnMarcadorClickListener;
+import fachada.IMapaSucursal;
 import fachada.IPagoMembresiaStripe;
+import fachada.MapaSucursal;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
+import javax.swing.JComponent;
 
 
 /**
@@ -47,10 +46,13 @@ import javax.swing.JOptionPane;
  */
 public class ControladorAplicacion implements IControladorAplicacion {
     private static ControladorAplicacion instancia;
-
+    // ocupo al de control sucursal aqui
     private final IInicioSesion inicioSesionFachada;
     private final IComprarMembresia compraFachada;
     private final IPagoMembresiaStripe pagoFachada;
+    private final IMapaSucursal controlMapa;
+    
+    
     // pantallas
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
@@ -80,6 +82,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         this.compraFachada = new FachadaComprarMembresia();
         this.pagoFachada= new FachadaPagoMembresiaStripe();
         this.extrasSeleccionados = new ArrayList<>();
+        this.controlMapa = MapaSucursal.getInstancia();
     }
  
     public static ControladorAplicacion getInstancia() {
@@ -325,7 +328,47 @@ public class ControladorAplicacion implements IControladorAplicacion {
         dto.setIdHorario(horarioSeleccionado.getIdHorario());
         compraFachada.agendarCita(dto);
     }
+    // nuevo de mapa
+    @Override
+    public JComponent getComponenteMapa() {
+        return controlMapa.getComponenteMapa();
+    }
+ 
+    @Override
+    public List<SucursalDTO> iniciarMapa() {
+        return controlMapa.iniciarMapa();
+    }
+ 
+    @Override
+    public SucursalDTO onMarcadorClickeado(String idSucursal) {
+        return controlMapa.onMarcadorClickeado(idSucursal);
+    }
+ 
+    @Override
+    public void actualizarUbicacion(double lat, double lng) {
+        controlMapa.actualizarUbicacion(lat, lng);
+    }
+ 
+    @Override
+    public void centrarMapaEn(double lat, double lng) {
+        controlMapa.centrarMapaEn(lat, lng);
+    }
+ 
+    @Override
+    public void setOnMarcadorClickListener(OnMarcadorClickListener listener) {
+        controlMapa.setOnMarcadorClickListener(listener);
+    }
 
+    @Override
+    public byte[] generarQRMembresia(String idMembresia) {
+        return compraFachada.generarQRMembresia(idMembresia);
+    }
+    
+    @Override
+    public void ubicarUsuarioAutomaticamente() {
+        controlMapa.ubicarUsuarioAutomaticamente();
+    }
+    
     private void cerrarPantallas() {
         if (pantallaBienvenida  != null) { 
             pantallaBienvenida.dispose();  

@@ -11,7 +11,6 @@ import fachada.TileManager;
 import fachada.VisorMapa;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -21,17 +20,17 @@ import java.util.List;
  * 
  * @author julian izaguirre
  */
-public class ControlMapa {private final VisorMapa visor;
+public class ControlMapa {
+    private final VisorMapa visor;
     private final PainterMapa painter;
     private IMapa.OnMarcadorClickListener clickListener;
-
+ 
     public ControlMapa() {
         TileManager tileManager = new TileManager();
         visor   = new VisorMapa();
         painter = new PainterMapa();
-
         visor.getWidget().setTileFactory(tileManager.getFactory());
-
+ 
         visor.getWidget().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -45,37 +44,40 @@ public class ControlMapa {private final VisorMapa visor;
                 if (id != null) {
                     painter.setActivo(id);
                     painter.aplicar(mv);
-                    if (clickListener != null)
+                    if (clickListener != null) {
                         clickListener.onMarcadorClick(id);
+                    }
                 }
             }
         });
     }
-
-    public JXMapViewer getComponente() { return visor.getWidget(); }
-
+ 
+    public JXMapViewer getComponente() {
+        return visor.getWidget();
+    }
+ 
     public void colocarMarcadores(List<SucursalDTO> sucursales) {
         painter.setMarcadores(sucursales);
         visor.ajustarZoomATodos(painter.getPosiciones());
         painter.aplicar(visor.getWidget());
     }
-
+ 
     public void resaltarMarcador(String idSucursal) {
         painter.setActivo(idSucursal);
         GeoPosition pos = painter.getPosicion(idSucursal);
         if (pos != null) visor.centrarEn(pos);
         painter.aplicar(visor.getWidget());
     }
-
+ 
     public void centrarEn(double lat, double lng) {
         visor.centrarEn(new GeoPosition(lat, lng));
     }
-
+ 
     public void mostrarUbicacionUsuario(double lat, double lng) {
         painter.setUbicacionUsuario(lat, lng);
         painter.aplicar(visor.getWidget());
     }
-
+ 
     public void setOnMarcadorClickListener(IMapa.OnMarcadorClickListener listener) {
         this.clickListener = listener;
     }

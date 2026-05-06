@@ -5,12 +5,7 @@
 package Fachada;
 
 import Clase_Control.ControlInicioSesion;
-import objetosnegocios.ClienteBO;
-import dtos.InicioSesionDTO;
 import dtos.UsuarioDTO;
-import java.time.LocalDate;
-import DAOs.AlmacenComprarMembresiaMock;
-import objetosnegocios.UsuarioBO;
 
 /**
  *
@@ -21,9 +16,8 @@ public class FachadaInicioSesion implements IInicioSesion {
     private final ControlInicioSesion controlInicioSesion;
 
     public FachadaInicioSesion() {
-        AlmacenComprarMembresiaMock almacen = AlmacenComprarMembresiaMock.getInstancia();
-        UsuarioBO usuarioBO = new UsuarioBO();
-        this.controlInicioSesion = new ControlInicioSesion(usuarioBO);
+//      AlmacenComprarMembresiaMock almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.controlInicioSesion = new ControlInicioSesion();
     }
     
     @Override

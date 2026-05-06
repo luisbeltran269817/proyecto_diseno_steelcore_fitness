@@ -37,4 +37,8 @@ public interface IComprarMembresia {
   public List<VisitaDTO> obtenerHistorial(String idCliente);
   public void cancelarMembresia(String idCliente);
    public double calcularTotal(String idPlan, List<AmenidadDTO> extras);
+   
+   
+   byte[] generarQRMembresia(String idMembresia);
+   
 }

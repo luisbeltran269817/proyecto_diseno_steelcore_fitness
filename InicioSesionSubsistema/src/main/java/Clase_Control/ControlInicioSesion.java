@@ -14,8 +14,8 @@ import objetosnegocios.UsuarioBO;
 public class ControlInicioSesion {
     private final UsuarioBO usuarioBO;
 
-    public ControlInicioSesion(UsuarioBO usuarioBO) {
-        this.usuarioBO = usuarioBO;
+    public ControlInicioSesion() {
+        this.usuarioBO = new UsuarioBO();
     }
     
     public UsuarioDTO iniciarSesion(String correo, String contraseña) throws Exception {

@@ -1,14 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
-import control.ControlMapaSucursal;
 import dtos.SucursalDTO;
 
 import java.awt.*;
@@ -23,47 +18,59 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 
 /**
+ * Pantalla para que el usuario seleccione una sucursal del gimnasio.
+ * Se comunica únicamente con IControladorAplicacion — no conoce
+ * ControlMapaSucursal ni ningún componente de infraestructura directamente.
  *
  * @author julian izaguirre
  */
 public class PantallaSeleccionSucursal extends PantallaBase {
-    private final ControlMapaSucursal controlMapa = ControlMapaSucursal.getInstancia();
 
     private ButtonGroup grupoBotones;
     private JPanel panelSucursales;
     private SucursalDTO sucursalSeleccionada = null;
-    
+ 
     private JWindow popupWindow;
-    private JLabel popupNombre, popupDireccion;
+    private JLabel  popupNombre, popupDireccion;
     private JButton popupBtn;
-
+ 
     public PantallaSeleccionSucursal(IControladorAplicacion controlador) {
         super(controlador);
         setTitle("Seleccionar Sucursal - SteelCore Fitness");
         inicializarComponentes();
         cargarSucursales();
         registrarListenerMarcadores();
-        obtenerUbicacionEnSegundoPlano();
+        // La geolocalización ya arrancó en ControlMapaSucursal al construirse.
+        // No hay nada que hacer aquí.
+        controlador.ubicarUsuarioAutomaticamente();
         setVisible(true);
     }
-
+ 
     @Override
     protected void inicializarComponentes() {
         JPanel fondo = new JPanel(new BorderLayout());
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
-
-        fondo.add(crearPanelIzquierdo(),          BorderLayout.WEST);
-        fondo.add(controlMapa.getComponenteMapa(), BorderLayout.CENTER);
+ 
+        fondo.add(crearPanelIzquierdo(), BorderLayout.WEST);
+ 
+        /*
+         * getComponenteMapa() devuelve JComponent — la pantalla no sabe
+         * que por debajo hay un JXMapViewer. Así se rompe el acoplamiento
+         * con la infraestructura de tiles.
+         */
+        fondo.add(controlador.getComponenteMapa(), BorderLayout.CENTER);
         crearPopup();
     }
-
-    /** 
-     * Cuando el usuario hace clic en un marcador del mapa 
+ 
+    /**
+     * Registra el listener de clics en marcadores del mapa a través del
+     * coordinador. Cuando el usuario hace clic en un marcador, el control
+     * resuelve la sucursal y se la devuelve a la pantalla.
      */
     private void registrarListenerMarcadores() {
-        controlMapa.setOnMarcadorClickListener(idSucursal -> {
-            SucursalDTO s = controlMapa.onMarcadorClickeado(idSucursal);
+        controlador.setOnMarcadorClickListener(idSucursal -> {
+            SucursalDTO s = controlador.onMarcadorClickeado(idSucursal);
             if (s != null) SwingUtilities.invokeLater(() -> {
                 sucursalSeleccionada = s;
                 mostrarPopup(s);
@@ -71,9 +78,9 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             });
         });
     }
-
+ 
     private void cargarSucursales() {
-        List<SucursalDTO> lista = controlMapa.iniciarMapa();
+        List<SucursalDTO> lista = controlador.iniciarMapa();
         panelSucursales.removeAll();
         grupoBotones = new ButtonGroup();
         for (SucursalDTO s : lista) {
@@ -83,74 +90,44 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         panelSucursales.revalidate();
         panelSucursales.repaint();
     }
-
-    private void obtenerUbicacionEnSegundoPlano() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://ip-api.com/json/?fields=lat,lon");
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setConnectTimeout(4000);
-                con.setReadTimeout(4000);
-                Scanner sc = new Scanner(con.getInputStream());
-                StringBuilder sb = new StringBuilder();
-                while (sc.hasNextLine()) sb.append(sc.nextLine());
-                sc.close();
-                double lat = extraerDouble(sb.toString(), "lat");
-                double lng = extraerDouble(sb.toString(), "lon");
-                if (lat != 0) SwingUtilities.invokeLater(
-                    () -> controlMapa.actualizarUbicacion(lat, lng));
-            } catch (Exception e) {
-                System.out.println("[Geo] " + e.getMessage());
-            }
-        }, "hilo-geo").start();
-    }
-
-    private double extraerDouble(String json, String clave) {
-        try {
-            int idx = json.indexOf("\"" + clave + "\":");
-            if (idx < 0) return 0;
-            int s = idx + clave.length() + 3;
-            int e = json.indexOf(",", s);
-            if (e < 0) e = json.indexOf("}", s);
-            return Double.parseDouble(json.substring(s, e).trim());
-        } catch (Exception e) { return 0; }
-    }
-
+ 
+    // ── Panel lateral izquierdo ───────────────────────────────────────────────
+ 
     private JPanel crearPanelIzquierdo() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(36, 32, 36, 20));
         panel.setPreferredSize(new Dimension(300, 0));
-
+ 
         JLabel titulo = new JLabel("<html>Selecciona<br>tu Sucursal</html>");
         titulo.setFont(Colores.FUENTE_TITULO);
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
         titulo.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         JLabel sub = new JLabel("Elige el gimnasio más cercano");
         sub.setFont(Colores.FUENTE_SUBTITULO);
         sub.setForeground(Colores.TEXTO_SECUNDARIO);
         sub.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         panelSucursales = new JPanel();
         panelSucursales.setLayout(new BoxLayout(panelSucursales, BoxLayout.Y_AXIS));
         panelSucursales.setOpaque(false);
         panelSucursales.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         JScrollPane scroll = new JScrollPane(panelSucursales);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
         scroll.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         Boton btnContinuar = crearBoton("Continuar", Boton.Variante.PRIMARIO);
         Boton btnRegresar  = crearBoton("Regresar",  Boton.Variante.SECUNDARIO);
         btnContinuar.setAlignmentX(LEFT_ALIGNMENT);
         btnRegresar.setAlignmentX(LEFT_ALIGNMENT);
         btnContinuar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
         btnRegresar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
-
+ 
         btnRegresar.addActionListener(e -> controlador.irAPerfilUsuario());
         btnContinuar.addActionListener(e -> {
             if (sucursalSeleccionada == null) {
@@ -162,15 +139,17 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             controlador.setSucursalSeleccionada(sucursalSeleccionada);
             controlador.irASeleccionPlan();
         });
-
-        panel.add(titulo); panel.add(Box.createVerticalStrut(6));
-        panel.add(sub);    panel.add(Box.createVerticalStrut(24));
-        panel.add(scroll); panel.add(Box.createVerticalStrut(24));
+ 
+        panel.add(titulo);       panel.add(Box.createVerticalStrut(6));
+        panel.add(sub);          panel.add(Box.createVerticalStrut(24));
+        panel.add(scroll);       panel.add(Box.createVerticalStrut(24));
         panel.add(btnContinuar); panel.add(Box.createVerticalStrut(10));
         panel.add(btnRegresar);
         return panel;
     }
-
+ 
+    // ── Card de sucursal ──────────────────────────────────────────────────────
+ 
     private JPanel crearCard(SucursalDTO s) {
         JPanel card = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
@@ -190,43 +169,44 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         card.setBorder(new EmptyBorder(12, 14, 12, 14));
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 72));
         card.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         JLabel nombre = new JLabel(s.getNombre());
         nombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
         nombre.setForeground(Colores.TEXTO_PRINCIPAL);
-
+ 
         JLabel dir = new JLabel(s.getColonia() + ", " + s.getCiudad());
         dir.setFont(Colores.FUENTE_LABEL);
         dir.setForeground(Colores.TEXTO_SECUNDARIO);
-
+ 
         JPanel info = new JPanel();
         info.setOpaque(false);
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-        info.add(nombre); info.add(Box.createVerticalStrut(3)); info.add(dir);
-
+        info.add(nombre);
+        info.add(Box.createVerticalStrut(3));
+        info.add(dir);
+ 
         JRadioButton radio = new JRadioButton("Elegir");
         radio.setFont(Colores.FUENTE_BOTON_SM);
         radio.setForeground(Colores.TEXTO_PRINCIPAL);
         radio.setOpaque(false);
         radio.addActionListener(e -> {
-            sucursalSeleccionada = s; 
-            controlMapa.onMarcadorClickeado(s.getIdSucursal());
-
-            JXMapViewer mapa = (JXMapViewer) controlMapa.getComponenteMapa();
-            mapa.setCenterPosition(new GeoPosition(s.getLatitud(), s.getLongitud()));
+            sucursalSeleccionada = s;
+            controlador.onMarcadorClickeado(s.getIdSucursal());
+            controlador.centrarMapaEn(s.getLatitud(), s.getLongitud());
         });
-        
+ 
         grupoBotones.add(radio);
-
-        card.add(info, BorderLayout.CENTER);
+        card.add(info,  BorderLayout.CENTER);
         card.add(radio, BorderLayout.EAST);
         return card;
     }
-
+ 
+    // ── Popup de marcador ─────────────────────────────────────────────────────
+ 
     private void crearPopup() {
         popupWindow = new JWindow(this);
         popupWindow.setAlwaysOnTop(true);
-
+ 
         JPanel card = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -243,17 +223,17 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         card.setOpaque(false);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(12, 14, 12, 14));
-
+ 
         popupNombre = new JLabel();
         popupNombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
         popupNombre.setForeground(new Color(255, 215, 0));
         popupNombre.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         popupDireccion = new JLabel();
         popupDireccion.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         popupDireccion.setForeground(new Color(170, 170, 204));
         popupDireccion.setAlignmentX(LEFT_ALIGNMENT);
-
+ 
         popupBtn = new JButton("✓ Seleccionar");
         popupBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         popupBtn.setForeground(Color.WHITE);
@@ -264,59 +244,56 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         popupBtn.setFocusPainted(false);
         popupBtn.setAlignmentX(LEFT_ALIGNMENT);
         popupBtn.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) {
-                popupBtn.setBackground(new Color(139, 47, 201));
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                popupBtn.setBackground(new Color(106, 13, 173));
-            }
+            @Override public void mouseEntered(MouseEvent e) { popupBtn.setBackground(new Color(139, 47, 201)); }
+            @Override public void mouseExited (MouseEvent e) { popupBtn.setBackground(new Color(106, 13, 173)); }
         });
-
-        card.add(popupNombre); card.add(Box.createVerticalStrut(3));
-        card.add(popupDireccion); card.add(Box.createVerticalStrut(8));
+ 
+        card.add(popupNombre);
+        card.add(Box.createVerticalStrut(3));
+        card.add(popupDireccion);
+        card.add(Box.createVerticalStrut(8));
         card.add(popupBtn);
         popupWindow.setContentPane(card);
-
-        controlMapa.getComponenteMapa().addMouseListener(new MouseAdapter() {
-            @Override public void mousePressed(MouseEvent e) {
-                popupWindow.setVisible(false);
-            }
+ 
+        // Cerrar popup al hacer clic en cualquier parte del mapa
+        controlador.getComponenteMapa().addMouseListener(new MouseAdapter() {
+            @Override public void mousePressed(MouseEvent e) { popupWindow.setVisible(false); }
         });
     }
-
+ 
     private void mostrarPopup(SucursalDTO s) {
         popupNombre.setText(s.getNombre());
+ 
         StringBuilder dir = new StringBuilder("<html>");
-        if (s.getCalle()   != null && !s.getCalle().isBlank())
-            dir.append(s.getCalle()).append(", ");
-        if (s.getColonia() != null && !s.getColonia().isBlank())
-            dir.append(s.getColonia());
+        if (s.getCalle()   != null && !s.getCalle().isBlank())   dir.append(s.getCalle()).append(", ");
+        if (s.getColonia() != null && !s.getColonia().isBlank()) dir.append(s.getColonia());
         dir.append("<br>");
-        if (s.getCiudad()  != null && !s.getCiudad().isBlank())
-            dir.append(s.getCiudad());
+        if (s.getCiudad()  != null && !s.getCiudad().isBlank())  dir.append(s.getCiudad());
         dir.append("</html>");
         popupDireccion.setText(dir.toString());
-
+ 
+        // Limpiar listeners anteriores antes de añadir el nuevo
         for (ActionListener al : popupBtn.getActionListeners())
             popupBtn.removeActionListener(al);
+ 
         popupBtn.addActionListener(e -> {
-            sucursalSeleccionada = s; 
-            controlMapa.onMarcadorClickeado(s.getIdSucursal());
+            sucursalSeleccionada = s;
+            controlador.onMarcadorClickeado(s.getIdSucursal());
+            controlador.centrarMapaEn(s.getLatitud(), s.getLongitud());
             popupWindow.setVisible(false);
             sincronizarRadio(s);
-            
-            JXMapViewer mapa = (JXMapViewer) controlMapa.getComponenteMapa();
-            mapa.setCenterPosition(new GeoPosition(s.getLatitud(), s.getLongitud()));
         });
-
-        JComponent mv = controlMapa.getComponenteMapa();
+ 
+        JComponent mv = controlador.getComponenteMapa();
         Point p = mv.getLocationOnScreen();
-        popupWindow.setLocation(p.x + mv.getWidth()/2 - 105,
-                                p.y + mv.getHeight()/2 - 60);
+        popupWindow.setLocation(
+            p.x + mv.getWidth()  / 2 - 105,
+            p.y + mv.getHeight() / 2 - 60
+        );
         popupWindow.pack();
         popupWindow.setVisible(true);
     }
-
+ 
     private void sincronizarRadio(SucursalDTO s) {
         for (Component comp : panelSucursales.getComponents()) {
             if (!(comp instanceof JPanel card)) continue;

@@ -11,11 +11,6 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>InicioSesionSubsistema</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>DTOs</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -23,6 +18,35 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ComprarMembresiaSubsistema</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mycompany</groupId>
+                    <artifactId>Persistencia</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mycompany</groupId>
+                    <artifactId>BOs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mycompany</groupId>
+                    <artifactId>PagoMembresiaStripeSubsistema</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>controlMapaSucursal</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mycompany</groupId>
+                    <artifactId>BOs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mycompany</groupId>
+                    <artifactId>Mapa</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -31,12 +55,23 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>DTOInfraestructura</artifactId>
+            <artifactId>InicioSesionSubsistema</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mycompany</groupId>
+                    <artifactId>BOs</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Mapa</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>controlMapaSucursal</artifactId>
+            <artifactId>BOs</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

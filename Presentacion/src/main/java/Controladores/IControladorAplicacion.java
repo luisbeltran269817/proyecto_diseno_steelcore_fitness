@@ -13,7 +13,10 @@ import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
+import fachada.IMapa.OnMarcadorClickListener;
+import fachada.IMapaSucursal;
 import java.util.List;
+import javax.swing.JComponent;
 
 /**
  *
@@ -73,5 +76,20 @@ public interface IControladorAplicacion {
     void confirmarCitaBienvenida();
     public void setTokenTarjeta(String token);
     public String getTokenTarjeta();
+    // esto pal mapa
+    JComponent getComponenteMapa();
+ 
+    List<SucursalDTO> iniciarMapa();
+ 
+    SucursalDTO onMarcadorClickeado(String idSucursal);
+ 
+    void actualizarUbicacion(double lat, double lng);
+
+    void centrarMapaEn(double lat, double lng);
+ 
+    void setOnMarcadorClickListener(OnMarcadorClickListener listener);
+ 
+    byte[] generarQRMembresia(String idMembresia);
     
+    void ubicarUsuarioAutomaticamente();
 }

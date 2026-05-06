@@ -5,7 +5,9 @@
 package fachada;
 
 import dtos.SucursalDTO;
+import fachada.IMapa.OnMarcadorClickListener;
 import java.util.List;
+import javax.swing.JComponent;
 import org.jxmapviewer.JXMapViewer;
 
 /**
@@ -13,24 +15,24 @@ import org.jxmapviewer.JXMapViewer;
  * @author julian izaguirre
  */
 public interface IMapaSucursal {
-    JXMapViewer getComponenteMapa();
 
-    List<SucursalDTO> obtenerSucursales();
-
-    List<SucursalDTO> filtrarPorCiudad(String ciudad);
-    List<SucursalDTO> filtrarPorColonia(String colonia);
-
-    SucursalDTO seleccionarSucursal(String idSucursal);
-
-    SucursalDTO getSucursalSeleccionada();
-    SucursalDTO encontrarMasCercana(double lat, double lng);
-
-    void actualizarUbicacionUsuario(double lat, double lng);
-
+    JComponent getComponenteMapa();
+ 
+    List<SucursalDTO> iniciarMapa();
+ 
+    SucursalDTO onMarcadorClickeado(String idSucursal);
+    
+    void actualizarUbicacion(double lat, double lng);
+ 
     void setOnMarcadorClickListener(OnMarcadorClickListener listener);
-
-    @FunctionalInterface
-    interface OnMarcadorClickListener {
-        void onMarcadorClick(String idSucursal);
-    }
+ 
+    void centrarMapaEn(double lat, double lng);
+ 
+    List<SucursalDTO> filtrarPorCiudad(String ciudad);
+ 
+    List<SucursalDTO> filtrarPorColonia(String colonia);
+ 
+    SucursalDTO verSucursalMasCercana(double lat, double lng);
+    
+    void ubicarUsuarioAutomaticamente();
 }
