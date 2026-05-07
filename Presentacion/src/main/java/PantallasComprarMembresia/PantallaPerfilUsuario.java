@@ -9,6 +9,7 @@ import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
 import Utilerias.Tabla;
+import dtos.CitaDTO;
 import dtos.MembresiaDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
@@ -40,8 +41,11 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @author Tungs
  */
 public class PantallaPerfilUsuario extends PantallaBase {
+
     private Tabla tablaVisitas;
     private Boton btnMembresia;
+    private Boton btnQr;
+    private Boton btnCita;
 
     private JLabel lblNombre;
     private JLabel lblEstado;
@@ -80,7 +84,6 @@ public class PantallaPerfilUsuario extends PantallaBase {
         card.setLayout(new BorderLayout(20, 0));
         card.setBorder(new EmptyBorder(20, 24, 20, 24));
 
-
         JPanel avatar = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -93,7 +96,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
                 super.paintComponent(g);
             }
         };
-        
+
         avatar.setOpaque(false);
         avatar.setPreferredSize(new Dimension(56, 56));
         avatar.setLayout(new GridBagLayout());
@@ -108,7 +111,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
         lblEstado = new JLabel();
         lblEstado.setFont(Colores.FUENTE_BOTON_SM);
-        lblEstado.setForeground(new Color(94, 220, 153));  
+        lblEstado.setForeground(new Color(94, 220, 153));
 
         JPanel nombreEstado = new JPanel();
         nombreEstado.setOpaque(false);
@@ -129,7 +132,6 @@ public class PantallaPerfilUsuario extends PantallaBase {
         metricas.add(crearMiniCard("Plan", lblPlan));
         metricas.add(crearMiniCard("Vencimiento", lblVencimiento));
 
- 
         JPanel izquierda = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         izquierda.setOpaque(false);
         izquierda.add(avatar);
@@ -142,6 +144,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
         return card;
     }
+
     private JPanel crearMiniCard(String etiqueta, JLabel lblValor) {
 
         JPanel p = new JPanel() {
@@ -150,7 +153,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                         RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(Colores.FONDO_CAMPO);          
+                g2.setColor(Colores.FONDO_CAMPO);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
                 g2.dispose();
             }
@@ -189,8 +192,8 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
                 if (!isSelected) {
                     c.setBackground(row % 2 == 0
-                            ? Colores.FONDO_CAMPO 
-                            : new Color(58, 40, 130));     
+                            ? Colores.FONDO_CAMPO
+                            : new Color(58, 40, 130));
                 }
                 c.setForeground(isSelected ? Color.WHITE : Colores.TEXTO_PRINCIPAL);
                 return c;
@@ -211,21 +214,38 @@ public class PantallaPerfilUsuario extends PantallaBase {
         panel.setBorder(new EmptyBorder(0, 12, 0, 0));
         panel.setPreferredSize(new Dimension(220, 0));
 
-        Boton btnSucursal = crearBoton("Elegir Sucursal", Boton.Variante.SECUNDARIO);
-        btnSucursal.addActionListener(e -> controlador.iniciarCompraMembresia());
+//        Boton btnSucursal = crearBoton("Elegir Sucursal", Boton.Variante.SECUNDARIO);
+//        btnSucursal.addActionListener(e -> controlador.iniciarCompraMembresia());
+        btnQr = crearBoton("Código QR", Boton.Variante.SECUNDARIO);
+        btnQr.addActionListener(e -> controlador.irAQR());
 
         btnMembresia = crearBoton("", Boton.Variante.PRIMARIO);
         btnMembresia.addActionListener(e -> manejarMembresia());
 
+        btnCita = crearBoton("", Boton.Variante.SECUNDARIO);
+        btnCita.addActionListener(e -> manejarCita());
+
         Boton btnRefrescar = crearBoton("Actualizar", Boton.Variante.SECUNDARIO);
         btnRefrescar.addActionListener(e -> cargarDatos());
 
+        Boton btnSalir = crearBoton("Cerrar Sesión", Boton.Variante.SECUNDARIO);
+
+        btnSalir.addActionListener(e -> {
+            dispose();
+            controlador.irAInicioSesion();
+        });
+
         panel.add(Box.createVerticalGlue());
-        panel.add(btnSucursal);
+        panel.add(btnQr);
+        //panel.add(btnSucursal);
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnMembresia);
         panel.add(Box.createVerticalStrut(14));
+        panel.add(btnCita);
+        panel.add(Box.createVerticalStrut(14));
         panel.add(btnRefrescar);
+        panel.add(Box.createVerticalStrut(14));
+        panel.add(btnSalir);
         panel.add(Box.createVerticalGlue());
 
         return panel;
@@ -245,6 +265,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
         lblIniciales.setText(iniciales.toUpperCase());
 
         boolean activa = controlador.tieneMembresiaActiva();
+        btnQr.setVisible(activa);
 
         if (activa) {
             MembresiaDTO m = controlador.obtenerMembresiaActiva();
@@ -260,6 +281,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
         }
 
         actualizarBoton();
+        actualizarBotonCita();
         cargarVisitas();
     }
 
@@ -282,7 +304,24 @@ public class PantallaPerfilUsuario extends PantallaBase {
     }
 
     private void actualizarBoton() {
-        btnMembresia.setText(controlador.tieneMembresiaActiva()? "Cancelar Membresía" : "Adquirir Membresía");
+        btnMembresia.setText(controlador.tieneMembresiaActiva() ? "Cancelar Membresía" : "Adquirir Membresía");
+    }
+
+    private void actualizarBotonCita() {
+        boolean tieneMembresia = controlador.tieneMembresiaActiva();
+        // Si no tiene membresía, ocultar botón
+        btnCita.setVisible(tieneMembresia);
+
+        // Si no tiene membresía ya no seguimos
+        if (!tieneMembresia) {
+            return;
+        }
+        boolean tieneCita = controlador.tieneCitaBienvenida();
+        btnCita.setText(
+                tieneCita
+                        ? "Consultar Cita"
+                        : "Agendar Cita"
+        );
     }
 
     private void manejarMembresia() {
@@ -297,6 +336,37 @@ public class PantallaPerfilUsuario extends PantallaBase {
             }
         } else {
             controlador.irASeleccionSucursal();
+        }
+    }
+
+    private void manejarCita() {
+        if (controlador.tieneCitaBienvenida()) {
+            CitaDTO cita = controlador.obtenerCitaBienvenida();
+            String mensaje
+                    = "Ya tienes una cita agendada.\n\n"
+                    + "ID cita: " + cita.getIdCita() + "\n"
+                    + "Entrenador: " + cita.getIdEntrenador() + "\n"
+                    + "Sucursal: " + cita.getIdSucursal() + "\n"
+                    + "Fecha y hora: " + cita.getFechaHora();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    mensaje,
+                    "Cita de Bienvenida",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } else {
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    "No tienes una cita de bienvenida.\n\n¿Deseas agendar una?",
+                    "Agendar cita",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            if (opcion == JOptionPane.YES_OPTION) {
+                controlador.irASeleccionInstructor();
+            }
         }
     }
 

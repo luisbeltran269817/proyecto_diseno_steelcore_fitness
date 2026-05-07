@@ -34,6 +34,7 @@ public interface IComprarMembresia {
   public boolean hayHorarios(EntrenadorDTO entrenador);
   public boolean tieneMembresiaActiva(String idCliente);
   public MembresiaDTO obtenerMembresiaActiva(String idCliente);
+  public CitaDTO obtenerCitaBienvenida(String idCliente);
   public List<VisitaDTO> obtenerHistorial(String idCliente);
   public void cancelarMembresia(String idCliente);
    public double calcularTotal(String idPlan, List<AmenidadDTO> extras);

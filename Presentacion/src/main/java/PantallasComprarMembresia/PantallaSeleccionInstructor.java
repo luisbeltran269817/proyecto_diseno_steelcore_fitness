@@ -78,7 +78,7 @@ public class PantallaSeleccionInstructor extends PantallaBase {
         Boton btnOmitir    = crearBoton("En otro momento", Boton.Variante.SECUNDARIO);
         Boton btnContinuar = crearBoton("Continuar",       Boton.Variante.PRIMARIO);
  
-        btnOmitir.addActionListener(e -> controlador.irAQR());
+        btnOmitir.addActionListener(e -> controlador.irAPerfilUsuario());
  
         btnContinuar.addActionListener(e -> {
             if (entrenadorSeleccionado == null) {

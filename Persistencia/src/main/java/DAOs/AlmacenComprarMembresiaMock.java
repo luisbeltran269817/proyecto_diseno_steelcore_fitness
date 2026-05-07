@@ -159,17 +159,17 @@ public class AlmacenComprarMembresiaMock {
 
         cliente.getMembresias().add(m);
 
-        CitaDTO cita = new CitaDTO();
-        cita.setIdCita("C001");
-        cita.setIdCliente(cliente.getCorreo());
-        cita.setIdEntrenador("E001");
-        cita.setIdSucursal("S001");
-        cita.setIdHorario("H001");
-        cita.setEstado(CitaDTO.EstadoCita.COMPLETADA);
-
-        citas.put(cita.getIdCita(), cita);
-
-        cliente.setIdCitaBienvenida("C001");
+//        CitaDTO cita = new CitaDTO();
+//        cita.setIdCita("C001");
+//        cita.setIdCliente(cliente.getCorreo());
+//        cita.setIdEntrenador("E001");
+//        cita.setIdSucursal("S001");
+//        cita.setIdHorario("H001");
+//        cita.setEstado(CitaDTO.EstadoCita.COMPLETADA);
+//
+//        citas.put(cita.getIdCita(), cita);
+//
+//        cliente.setIdCitaBienvenida("C001");
 
         VisitaDTO v1 = new VisitaDTO();
         v1.setGimnasio(sucursal.getNombre());

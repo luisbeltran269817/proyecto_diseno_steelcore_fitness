@@ -73,7 +73,7 @@ public class PantallaQR extends PantallaBase {
  
         Boton btnVolver = crearBoton("Volver al inicio", Boton.Variante.PRIMARIO);
         btnVolver.setAlignmentX(CENTER_ALIGNMENT);
-        btnVolver.addActionListener(e -> controlador.irABienvenida());
+        btnVolver.addActionListener(e -> controlador.irAPerfilUsuario());
  
         card.add(titulo);
         card.add(Box.createVerticalStrut(4));

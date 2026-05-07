@@ -70,8 +70,7 @@ public class PantallaTransaccionFallida extends PantallaBase {
         Boton btnCancelar  = crearBoton("Cancelar",        Boton.Variante.SECUNDARIO);
         Boton btnReintentar= crearBoton("Intentar otra vez", Boton.Variante.PRIMARIO);
  
-        btnCancelar.addActionListener(e -> controlador.irABienvenida());
-
+        btnCancelar.addActionListener(e -> controlador.irAPerfilUsuario());
         btnReintentar.addActionListener(e -> controlador.irADatosBancarios());
  
         panelBtns.add(btnCancelar);

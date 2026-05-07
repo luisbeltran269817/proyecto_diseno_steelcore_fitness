@@ -5,6 +5,7 @@
 package Controladores;
 
 import dtos.AmenidadDTO;
+import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.InicioSesionDTO;
@@ -23,73 +24,108 @@ import javax.swing.JComponent;
  * @author Tungs
  */
 public interface IControladorAplicacion {
+
     UsuarioDTO getUsuarioActual();
- 
+
     void setSucursalSeleccionada(SucursalDTO sucursal);
+
     SucursalDTO getSucursalSeleccionada();
- 
+
     void setPlanSeleccionado(PlanDTO plan);
+
     PlanDTO getPlanSeleccionado();
- 
+
     void setExtrasSeleccionados(List<AmenidadDTO> extras);
+
     List<AmenidadDTO> getExtrasSeleccionados();
- 
+
     void setEntrenadorSeleccionado(EntrenadorDTO entrenador);
+
     EntrenadorDTO getEntrenadorSeleccionado();
- 
+
     void setHorarioSeleccionado(HorarioDTO horario);
+
     HorarioDTO getHorarioSeleccionado();
-    
+
     void irABienvenida();
+
     void irAInicioSesion();
+
     void irAPerfilUsuario();
- 
+
     // Flujo de compra
     void iniciarCompraMembresia();
+
     void irASeleccionSucursal();
+
     void irASeleccionPlan();
+
     void irADetallePlan();
+
     void irATerminosCondiciones();
+
     void irADatosBancarios();
+
     void irASeleccionInstructor();
+
     void irASeleccionHorario();
+
     void irAQR();
+
     void irATransaccionFallida(String causa);
 
+    void irATransaccionExitosa();
+
     void iniciarSesion(String correo, String contrasena) throws Exception;
+
     void cerrarSesion();
 
+    boolean tieneCitaBienvenida();
+
     boolean tieneMembresiaActiva();
+
     MembresiaDTO obtenerMembresiaActiva();
+
     List<VisitaDTO> obtenerHistorial();
+
     void cancelarMembresia();
- 
+
     List<SucursalDTO> obtenerSucursales();
+
     List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal);
+
     List<AmenidadDTO> obtenerAmenidadesExtra();
- 
+
     List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal);
+
     List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador);
- 
+
     public void confirmarCompra();
+
     public double calcularTotal();
+
     void confirmarCitaBienvenida();
+
     public void setTokenTarjeta(String token);
+
     public String getTokenTarjeta();
+
     // esto pal mapa
     JComponent getComponenteMapa();
- 
+
     List<SucursalDTO> iniciarMapa();
- 
+
     SucursalDTO onMarcadorClickeado(String idSucursal);
- 
+
+    CitaDTO obtenerCitaBienvenida();
+
     void actualizarUbicacion(double lat, double lng);
 
     void centrarMapaEn(double lat, double lng);
- 
+
     void setOnMarcadorClickListener(OnMarcadorClickListener listener);
- 
+
     byte[] generarQRMembresia(String idMembresia);
-    
+
     void ubicarUsuarioAutomaticamente();
 }
