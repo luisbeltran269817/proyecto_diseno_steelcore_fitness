@@ -32,8 +32,8 @@ import dtos.VisitaDTO;
 import fachada.FachadaComprarMembresia;
 import fachada.FachadaPagoMembresiaStripe;
 import fachada.IComprarMembresia;
-import fachada.IMapa.OnMarcadorClickListener;
 import fachada.IMapaSucursal;
+import fachada.IMapaSucursal.OnMarcadorSucursalClickListener;
 import fachada.IPagoMembresiaStripe;
 import fachada.MapaSucursal;
 import java.util.ArrayList;
@@ -291,9 +291,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         if (usuarioActual == null) {
             return false;
         }
-        return compraFachada.obtenerCitaBienvenida(
-                usuarioActual.getCorreo()
-        ) != null;
+        return compraFachada.obtenerCitaBienvenida(usuarioActual.getCorreo()) != null;
     }
 
     @Override
@@ -436,7 +434,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public void setOnMarcadorClickListener(OnMarcadorClickListener listener) {
+    public void setOnMarcadorClickListener(OnMarcadorSucursalClickListener listener) {
         controlMapa.setOnMarcadorClickListener(listener);
     }
 

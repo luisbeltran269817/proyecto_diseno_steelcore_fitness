@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
@@ -5,17 +9,11 @@ import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
 import dtos.SucursalDTO;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.viewer.GeoPosition;
 
 /**
  * Pantalla para que el usuario seleccione una sucursal del gimnasio.
@@ -40,8 +38,6 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         inicializarComponentes();
         cargarSucursales();
         registrarListenerMarcadores();
-        // La geolocalización ya arrancó en ControlMapaSucursal al construirse.
-        // No hay nada que hacer aquí.
         controlador.ubicarUsuarioAutomaticamente();
         setVisible(true);
     }
@@ -53,21 +49,11 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         setContentPane(fondo);
  
         fondo.add(crearPanelIzquierdo(), BorderLayout.WEST);
- 
-        /*
-         * getComponenteMapa() devuelve JComponent — la pantalla no sabe
-         * que por debajo hay un JXMapViewer. Así se rompe el acoplamiento
-         * con la infraestructura de tiles.
-         */
+
         fondo.add(controlador.getComponenteMapa(), BorderLayout.CENTER);
         crearPopup();
     }
  
-    /**
-     * Registra el listener de clics en marcadores del mapa a través del
-     * coordinador. Cuando el usuario hace clic en un marcador, el control
-     * resuelve la sucursal y se la devuelve a la pantalla.
-     */
     private void registrarListenerMarcadores() {
         controlador.setOnMarcadorClickListener(idSucursal -> {
             SucursalDTO s = controlador.onMarcadorClickeado(idSucursal);
@@ -90,8 +76,7 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         panelSucursales.revalidate();
         panelSucursales.repaint();
     }
- 
-    // ── Panel lateral izquierdo ───────────────────────────────────────────────
+
  
     private JPanel crearPanelIzquierdo() {
         JPanel panel = new JPanel();

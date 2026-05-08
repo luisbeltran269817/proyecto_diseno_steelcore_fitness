@@ -14,7 +14,7 @@ import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
-import fachada.IMapa.OnMarcadorClickListener;
+
 import fachada.IMapaSucursal;
 import java.util.List;
 import javax.swing.JComponent;
@@ -82,6 +82,8 @@ public interface IControladorAplicacion {
 
     boolean tieneCitaBienvenida();
 
+    CitaDTO obtenerCitaBienvenida();
+
     boolean tieneMembresiaActiva();
 
     MembresiaDTO obtenerMembresiaActiva();
@@ -110,22 +112,13 @@ public interface IControladorAplicacion {
 
     public String getTokenTarjeta();
 
-    // esto pal mapa
+    // Mapa — Presentación solo ve JComponent y el listener propio de controlMapaSucursal
     JComponent getComponenteMapa();
-
     List<SucursalDTO> iniciarMapa();
-
     SucursalDTO onMarcadorClickeado(String idSucursal);
-
-    CitaDTO obtenerCitaBienvenida();
-
     void actualizarUbicacion(double lat, double lng);
-
     void centrarMapaEn(double lat, double lng);
-
-    void setOnMarcadorClickListener(OnMarcadorClickListener listener);
-
+    void setOnMarcadorClickListener(IMapaSucursal.OnMarcadorSucursalClickListener listener);
     byte[] generarQRMembresia(String idMembresia);
-
     void ubicarUsuarioAutomaticamente();
 }

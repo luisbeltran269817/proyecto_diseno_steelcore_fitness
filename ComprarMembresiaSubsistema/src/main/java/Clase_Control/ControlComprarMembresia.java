@@ -5,10 +5,13 @@
 package Clase_Control;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
 import dtos.ClienteDTO;
@@ -35,8 +38,11 @@ import interfaces.IPlanBO;
 import interfaces.ISucursalBO;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import objetosnegocios.AmenidadBO;
 import objetosnegocios.CitaBO;
@@ -136,7 +142,16 @@ public class ControlComprarMembresia {
         m.setFechaTramite(LocalDateTime.now());
         m.setFechaCaducidad(LocalDateTime.now().plusMonths(plan.getMesesDuracion()));
         m.setEstado(MembresiaDTO.EstadoMembresia.ACTIVA);
-        m.setCodigoQR("steelcore://acceso/" + m.getIdMembresia());
+
+        String fechaVigencia = m.getFechaCaducidad()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String urlQR = "https://steelcorefitness.com/acceso"
+                + "?id="       + m.getIdMembresia()
+                + "&cliente="  + idCliente
+                + "&plan="     + idPlan
+                + "&sucursal=" + idSucursal
+                + "&vigencia=" + fechaVigencia;
+        m.setCodigoQR(urlQR);
 
         membresiaBO.guardar(m);
 
@@ -150,27 +165,52 @@ public class ControlComprarMembresia {
     /**
      * Genera los bytes PNG del código QR para una membresía.
      *
-     * El contenido del QR es el token de acceso almacenado en la membresía
-     * (campo codigoQR), con el esquema "steelcore://acceso/{idMembresia}". El
-     * empleado escanea este QR con la misma app de escritorio para validar el
-     * acceso del cliente.
+     * El contenido del QR es la URL real almacenada en m.getCodigoQR(),
+     * con formato https://steelcorefitness.com/acceso?id=...
+     * Cualquier escáner de celular (Google Lens, cámara nativa) puede
+     * abrirla directamente en el navegador.
+     *
+     * Mejoras aplicadas vs la versión anterior:
+     *  - ErrorCorrectionLevel.H (30%): el QR sigue siendo legible aunque
+     *    esté parcialmente tapado o sucio.
+     *  - Margen 2 (antes era el default de 4): QR más grande en el mismo espacio.
+     *  - Fondo blanco forzado: MatrixToImageConfig garantiza contraste máximo.
+     *  - 400x400 px en lugar de 300x300: mejor resolución para escanear.
      *
      * @param idMembresia identificador de la membresía a codificar
-     * @return bytes PNG listos para ser convertidos en ImageIcon, o null si
-     * falla
+     * @return bytes PNG listos para convertir en ImageIcon, o null si falla
      */
     public byte[] generarQRMembresia(String idMembresia) {
+        // 1. Recuperar la URL almacenada en la membresía
         MembresiaDTO m = membresiaBO.buscarPorId(idMembresia);
         String contenido = (m != null && m.getCodigoQR() != null)
                 ? m.getCodigoQR()
-                : "steelcore://acceso/" + idMembresia;
+                : "https://steelcorefitness.com/acceso?id=" + idMembresia;
 
         try {
+            // 2. Configurar hints para QR de máxima calidad
+            Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+            // H = 30% de corrección de errores: sigue siendo legible parcialmente tapado
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+            // Margen reducido a 2 para que el QR ocupe más espacio en el panel
+            hints.put(EncodeHintType.MARGIN, 2);
+            // Codificación UTF-8 explícita
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+
+            // 3. Generar la matriz
             QRCodeWriter writer = new QRCodeWriter();
-            BitMatrix matrix = writer.encode(contenido, BarcodeFormat.QR_CODE, 300, 300);
+            // 400x400 en lugar de 300x300 para mejor resolución al escanear
+            BitMatrix matrix = writer.encode(contenido, BarcodeFormat.QR_CODE, 400, 400, hints);
+
+            // 4. Renderizar: negro sobre fondo BLANCO (contraste máximo)
+            //    MatrixToImageConfig(onColor, offColor) — ARGB
+            MatrixToImageConfig config = new MatrixToImageConfig(
+                    0xFF000000,  // módulos negros
+                    0xFFFFFFFF   // fondo blanco
+            );
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(matrix, "PNG", out);
+            MatrixToImageWriter.writeToStream(matrix, "PNG", out, config);
             return out.toByteArray();
 
         } catch (WriterException | java.io.IOException e) {
@@ -268,5 +308,4 @@ public class ControlComprarMembresia {
                 : 0.0;
         return base + extra;
     }
-
 }

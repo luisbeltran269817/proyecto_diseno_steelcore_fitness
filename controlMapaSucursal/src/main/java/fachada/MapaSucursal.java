@@ -2,13 +2,12 @@ package fachada;
 
 import control.ControlMapaSucursal;
 import dtos.SucursalDTO;
-import fachada.IMapa.OnMarcadorClickListener;
 import java.util.List;
 import javax.swing.JComponent;
 
 public class MapaSucursal implements IMapaSucursal {
     private static MapaSucursal instancia;
-    
+
     private final ControlMapaSucursal control;
 
     private MapaSucursal() {
@@ -43,8 +42,9 @@ public class MapaSucursal implements IMapaSucursal {
     }
 
     @Override
-    public void setOnMarcadorClickListener(OnMarcadorClickListener listener) {
-        control.setOnMarcadorClickListener(listener);
+    public void setOnMarcadorClickListener(IMapaSucursal.OnMarcadorSucursalClickListener listener) {
+        // Adapta el listener de alto nivel al listener interno del módulo Mapa
+        control.setOnMarcadorClickListener(listener::onMarcadorClick);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class MapaSucursal implements IMapaSucursal {
     public SucursalDTO verSucursalMasCercana(double lat, double lng) {
         return control.verSucursalMasCercana(lat, lng);
     }
-    
+
     @Override
     public void ubicarUsuarioAutomaticamente() {
         control.ubicarUsuarioAutomaticamente();
