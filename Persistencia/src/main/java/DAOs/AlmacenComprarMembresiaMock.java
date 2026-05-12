@@ -152,8 +152,22 @@ public class AlmacenComprarMembresiaMock {
         m.setAmenidadesExtra(List.of(alberca));
 
         m.setEstado(EstadoMembresia.ACTIVA);
-        m.setFechaTramite(LocalDateTime.now().minusDays(2));
+        // Fecha muy antigua: cualquier membresia comprada via el flujo real
+        // sera mas reciente y ganara en obtenerMembresiaActiva().
+        m.setFechaTramite(LocalDateTime.of(2020, 1, 1, 0, 0));
         m.setFechaCaducidad(LocalDateTime.now().plusMonths(1));
+
+        // Mismo formato que ControlComprarMembresia.comprarMembresia()
+        // El QR codifica esta URL; ControlAcceso la busca por este campo.
+        String fechaVigencia = m.getFechaCaducidad()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String urlQR = "https://steelcorefitness.com/acceso"
+                + "?id="       + m.getIdMembresia()
+                + "&cliente="  + m.getIdCliente()
+                + "&plan="     + m.getIdPlan()
+                + "&sucursal=" + m.getIdSucursal()
+                + "&vigencia=" + fechaVigencia;
+        m.setCodigoQR(urlQR);
 
         membresias.put(m.getIdMembresia(), m);
 

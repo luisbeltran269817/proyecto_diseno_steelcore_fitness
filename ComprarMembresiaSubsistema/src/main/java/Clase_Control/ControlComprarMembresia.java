@@ -279,12 +279,20 @@ public class ControlComprarMembresia {
     }
 
     public MembresiaDTO obtenerMembresiaActiva(String idCliente) {
+        // Devuelve la membresia ACTIVA con la fechaTramite mas reciente.
+        // Antes devolvía la primera del LinkedHashMap (siempre M001 del mock).
+        MembresiaDTO resultado = null;
         for (MembresiaDTO m : membresiaBO.obtenerPorCliente(idCliente)) {
-            if (m.getEstado() == EstadoMembresia.ACTIVA) {
-                return m;
+            if (m.getEstado() != EstadoMembresia.ACTIVA) continue;
+            if (resultado == null) {
+                resultado = m;
+            } else if (m.getFechaTramite() != null
+                    && resultado.getFechaTramite() != null
+                    && m.getFechaTramite().isAfter(resultado.getFechaTramite())) {
+                resultado = m;
             }
         }
-        return null;
+        return resultado;
     }
 
     public List<VisitaDTO> obtenerHistorial(String idCliente) {

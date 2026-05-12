@@ -4,6 +4,8 @@
  */
 package Controladores;
 
+import Fachada.FachadaControlAcceso;
+import ControlDeAcceso.BC_PantallaEspera;
 import Fachada.FachadaInicioSesion;
 import Fachada.IInicioSesion;
 import PantallasComprarMembresia.DatosBancarios;
@@ -64,7 +66,8 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private DatosBancarios pantallaBancarios;
     private PantallaSeleccionInstructor pantallaInstructor;
     private PantallaSeleccionHorario pantallaHorario;
-    private PantallaQR pantallaQR;
+    private BC_PantallaEspera pantallaRecepcion;  // módulo de recepción (escanea QRs)
+    private PantallaQR        pantallaQRSocio;     // pantalla del socio (muestra su QR)
     private PantallaTransaccionFallida pantallaFallida;
     private PantallaTransaccionExitosa pantallaExitosa;
 
@@ -240,9 +243,18 @@ public class ControladorAplicacion implements IControladorAplicacion {
 
     @Override
     public void irAQR() {
+        // El socio quiere ver su propio código QR para mostrarlo en recepción
         cerrarPantallas();
-        pantallaQR = new PantallaQR(this);
-        pantallaQR.setVisible(true);
+        pantallaQRSocio = new PantallaQR(this);
+        pantallaQRSocio.setVisible(true);
+    }
+
+    @Override
+    public void irAModuloRecepcion() {
+        // Recepción escanea el QR del socio
+        cerrarPantallas();
+        pantallaRecepcion = new BC_PantallaEspera(this);
+        pantallaRecepcion.setVisible(true);
     }
 
     @Override
@@ -444,6 +456,16 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
+    public String iniciarServidorQR(byte[] qrPng) {
+        return FachadaControlAcceso.getInstancia().iniciarServidorQR(qrPng);
+    }
+
+    @Override
+    public void detenerServidorQR() {
+        FachadaControlAcceso.getInstancia().detenerServidorQR();
+    }
+
+    @Override
     public void ubicarUsuarioAutomaticamente() {
         controlMapa.ubicarUsuarioAutomaticamente();
     }
@@ -489,9 +511,13 @@ public class ControladorAplicacion implements IControladorAplicacion {
             pantallaHorario.dispose();
             pantallaHorario = null;
         }
-        if (pantallaQR != null) {
-            pantallaQR.dispose();
-            pantallaQR = null;
+        if (pantallaQRSocio != null) {
+            pantallaQRSocio.dispose();
+            pantallaQRSocio = null;
+        }
+        if (pantallaRecepcion != null) {
+            pantallaRecepcion.dispose();
+            pantallaRecepcion = null;
         }
         if (pantallaFallida != null) {
             pantallaFallida.dispose();

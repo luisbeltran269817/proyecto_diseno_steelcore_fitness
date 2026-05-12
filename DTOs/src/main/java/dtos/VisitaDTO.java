@@ -26,6 +26,14 @@ public class VisitaDTO {
         this.colonia = colonia;
         this.ciudad = ciudad;
     }
+
+    public String getIdVisita() {
+        return idVisita;
+    }
+
+    public void setIdVisita(String idVisita) {
+        this.idVisita = idVisita;
+    }
     
     public String getGimnasio() {
         return gimnasio;

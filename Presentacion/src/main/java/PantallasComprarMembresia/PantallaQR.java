@@ -18,13 +18,14 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
+ * Pantalla que muestra el código QR de la membresía activa del socio.
+ * El socio la abre y pone la pantalla frente al scanner de recepción.
  *
  * @author julian izaguirre
  */
 public class PantallaQR extends PantallaBase {
 
-    private static final DateTimeFormatter FMT =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public PantallaQR(IControladorAplicacion controlador) {
         super(controlador);
@@ -58,9 +59,7 @@ public class PantallaQR extends PantallaBase {
         JPanel qrPanel = crearQRPanel(m);
         qrPanel.setAlignmentX(CENTER_ALIGNMENT);
 
-        String urlTexto = (m != null && m.getCodigoQR() != null)
-                ? acortarUrl(m.getCodigoQR())
-                : "—";
+        String urlTexto = (m != null && m.getCodigoQR() != null) ? acortarUrl(m.getCodigoQR()) : "—";
         JLabel lblCodigo = new JLabel(urlTexto, SwingConstants.CENTER);
         lblCodigo.setFont(new Font("Monospaced", Font.PLAIN, 10));
         lblCodigo.setForeground(Colores.TEXTO_SECUNDARIO);
@@ -75,7 +74,10 @@ public class PantallaQR extends PantallaBase {
 
         Boton btnVolver = crearBoton("Volver al inicio", Boton.Variante.PRIMARIO);
         btnVolver.setAlignmentX(CENTER_ALIGNMENT);
-        btnVolver.addActionListener(e -> controlador.irAPerfilUsuario());
+        btnVolver.addActionListener(e -> {
+            controlador.detenerServidorQR();
+            controlador.irAPerfilUsuario();
+        });
 
         card.add(titulo);
         card.add(Box.createVerticalStrut(4));
@@ -110,30 +112,31 @@ public class PantallaQR extends PantallaBase {
         panel.setMaximumSize(new Dimension(tam, tam));
         panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        if (m != null && m.getIdMembresia() != null) {
-            byte[] qrBytes = controlador.generarQRMembresia(m.getIdMembresia());
-
-            if (qrBytes != null) {
-                try {
-                    BufferedImage img = ImageIO.read(new ByteArrayInputStream(qrBytes));
-                    if (img != null) {
-                        int interior = tam - 16;
-                        Image scaled = img.getScaledInstance(
-                                interior, interior, Image.SCALE_SMOOTH);
-                        panel.add(new JLabel(new ImageIcon(scaled)), BorderLayout.CENTER);
-                    } else {
-                        panel.add(etiquetaError("No se pudo leer el QR"), BorderLayout.CENTER);
-                    }
-                } catch (Exception ex) {
-                    System.err.println("[PantallaQR] Error al leer imagen: " + ex.getMessage());
-                    panel.add(etiquetaError("Error al mostrar el QR"), BorderLayout.CENTER);
-                }
-            } else {
-                panel.add(etiquetaError("Error al generar el QR"), BorderLayout.CENTER);
-            }
-        } else {
+        if (m == null || m.getIdMembresia() == null) {
             panel.add(etiquetaError("Membresía no disponible"), BorderLayout.CENTER);
+            return panel;
         }
+
+        byte[] qrBytes = controlador.generarQRMembresia(m.getIdMembresia());
+        if (qrBytes == null) {
+            panel.add(etiquetaError("Error al generar el QR"), BorderLayout.CENTER);
+            return panel;
+        }
+
+        try {
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(qrBytes));
+            if (img != null) {
+                int interior = tam - 16;
+                Image scaled = img.getScaledInstance(interior, interior, Image.SCALE_SMOOTH);
+                panel.add(new JLabel(new ImageIcon(scaled)), BorderLayout.CENTER);
+            } else {
+                panel.add(etiquetaError("No se pudo leer el QR"), BorderLayout.CENTER);
+            }
+        } catch (Exception ex) {
+            panel.add(etiquetaError("Error al mostrar el QR"), BorderLayout.CENTER);
+        }
+
+        controlador.iniciarServidorQR(qrBytes);
 
         return panel;
     }
@@ -147,10 +150,9 @@ public class PantallaQR extends PantallaBase {
 
     private String acortarUrl(String url) {
         try {
-            int idIdx = url.indexOf("?id=");
-            if (idIdx < 0) return url;
-            String idPart = url.substring(idIdx + 4, Math.min(idIdx + 12, url.length()));
-            return "steelcorefitness.com/acceso?id=" + idPart + "...";
+            int idx = url.indexOf("?id=");
+            if (idx < 0) return url;
+            return "steelcorefitness.com/acceso?id=" + url.substring(idx + 4, Math.min(idx + 12, url.length())) + "...";
         } catch (Exception e) {
             return url;
         }
@@ -162,11 +164,9 @@ public class PantallaQR extends PantallaBase {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
         if (m != null) {
-            String vigencia = (m.getFechaCaducidad() != null)
-                    ? m.getFechaCaducidad().format(FMT)
-                    : "—";
-            agregarFila(p, "Plan:", m.getIdPlan() != null ? m.getIdPlan(): "—");
-            agregarFila(p, "Sucursal:", m.getIdSucursal() != null ? m.getIdSucursal(): "—");
+            String vigencia = m.getFechaCaducidad() != null ? m.getFechaCaducidad().format(FMT) : "—";
+            agregarFila(p, "Plan:", m.getIdPlan() != null ? m.getIdPlan() : "—");
+            agregarFila(p, "Sucursal:", m.getIdSucursal() != null ? m.getIdSucursal() : "—");
             agregarFila(p, "Vigencia:", vigencia);
         } else {
             JLabel lbl = new JLabel("Tu membresía ha sido activada correctamente");
@@ -198,6 +198,8 @@ public class PantallaQR extends PantallaBase {
 
     private MembresiaDTO obtenerMembresia() {
         try {
+            MembresiaDTO reciente = controlador.getMembresiaRecienCreada();
+            if (reciente != null) return reciente;
             return controlador.obtenerMembresiaActiva();
         } catch (Exception e) {
             return null;

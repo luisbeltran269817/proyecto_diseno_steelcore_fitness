@@ -214,10 +214,12 @@ public class PantallaPerfilUsuario extends PantallaBase {
         panel.setBorder(new EmptyBorder(0, 12, 0, 0));
         panel.setPreferredSize(new Dimension(220, 0));
 
-//        Boton btnSucursal = crearBoton("Elegir Sucursal", Boton.Variante.SECUNDARIO);
-//        btnSucursal.addActionListener(e -> controlador.iniciarCompraMembresia());
-        btnQr = crearBoton("Código QR", Boton.Variante.SECUNDARIO);
-        btnQr.addActionListener(e -> controlador.irAQR());
+        btnQr = crearBoton("Mi Código QR", Boton.Variante.SECUNDARIO);
+        btnQr.addActionListener(e -> {
+            // El socio ve su propio QR para mostrarlo en recepción
+            dispose();
+            controlador.irAQR();
+        });
 
         btnMembresia = crearBoton("", Boton.Variante.PRIMARIO);
         btnMembresia.addActionListener(e -> manejarMembresia());
@@ -235,8 +237,17 @@ public class PantallaPerfilUsuario extends PantallaBase {
             controlador.irAInicioSesion();
         });
 
+        Boton btnRecepcion = crearBoton("Módulo Recepción", Boton.Variante.SECUNDARIO);
+        btnRecepcion.addActionListener(e -> {
+            // Abre el scanner QR de recepción
+            dispose();
+            controlador.irAModuloRecepcion();
+        });
+
         panel.add(Box.createVerticalGlue());
         panel.add(btnQr);
+        panel.add(Box.createVerticalStrut(14));
+        panel.add(btnRecepcion);
         //panel.add(btnSucursal);
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnMembresia);

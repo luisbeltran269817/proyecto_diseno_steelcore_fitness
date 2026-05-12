@@ -70,7 +70,11 @@ public interface IControladorAplicacion {
 
     void irASeleccionHorario();
 
+    /** Abre PantallaQR — el socio ve su código para mostrar en recepción. */
     void irAQR();
+
+    /** Abre BC_PantallaEspera — el módulo de recepción que escanea el QR. */
+    void irAModuloRecepcion();
 
     void irATransaccionFallida(String causa);
 
@@ -87,6 +91,13 @@ public interface IControladorAplicacion {
     boolean tieneMembresiaActiva();
 
     MembresiaDTO obtenerMembresiaActiva();
+
+    /**
+     * Devuelve la membresia comprada en ESTA sesion, o null si no hay ninguna.
+     * PantallaQR la usa para mostrar el QR correcto de inmediato tras la compra,
+     * evitando que el mock M001 tape la membresia real recien creada.
+     */
+    MembresiaDTO getMembresiaRecienCreada();
 
     List<VisitaDTO> obtenerHistorial();
 
@@ -120,5 +131,10 @@ public interface IControladorAplicacion {
     void centrarMapaEn(double lat, double lng);
     void setOnMarcadorClickListener(IMapaSucursal.OnMarcadorSucursalClickListener listener);
     byte[] generarQRMembresia(String idMembresia);
+
+    String iniciarServidorQR(byte[] qrPng);
+
+    /** Apaga el servidor HTTP. Lo llama ControladorAplicacion al salir de PantallaQR. */
+    void detenerServidorQR();
     void ubicarUsuarioAutomaticamente();
 }
