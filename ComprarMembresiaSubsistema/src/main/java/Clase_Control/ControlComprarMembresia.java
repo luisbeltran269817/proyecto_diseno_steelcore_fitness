@@ -4,6 +4,7 @@
  */
 package Clase_Control;
 
+import Excepciones.NegocioException;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -79,15 +80,15 @@ public class ControlComprarMembresia {
         this.citaBO = new CitaBO();
         this.pagoFachada = new FachadaPagoMembresiaStripe();
     }
-
-    public List<SucursalDTO> obtenerSucursales() {
-        return sucursalBO.obtenerTodas();
+    //ARREGLADO
+    public List<SucursalDTO> obtenerSucursales() throws NegocioException {
+        return sucursalBO.obtenerSucursales();
     }
-
+    //ARREGLADO
     public List<PlanDTO> obtenerPlanes(String idSucursal) {
         return planBO.obtenerPorSucursal(idSucursal);
     }
-
+    //ARREGLADO
     public List<AmenidadDTO> obtenerAmenidadesDePlan(String idPlan) {
         PlanDTO plan = planBO.buscarPorId(idPlan);
         if (plan == null || plan.getAmenidades() == null) {
@@ -95,15 +96,15 @@ public class ControlComprarMembresia {
         }
         return plan.getAmenidades();
     }
-
+    //ARREGLADO
     public List<AmenidadDTO> obtenerAmenidadesExtra() {
         return amenidadBO.obtenerTodas().stream()
                 .filter(a -> a.getTipo() == AmenidadDTO.TipoAmenidad.EXTRA)
                 .toList();
     }
-
+    //FALTAN COSAS DE AQUÍ
     public MembresiaDTO comprarMembresia(String idCliente, String idPlan,
-            String idSucursal, List<AmenidadDTO> extras, String tokenTarjeta) {
+            String idSucursal, List<AmenidadDTO> extras, String tokenTarjeta) throws NegocioException {
 
         if (tieneMembresiaActiva(idCliente)) {
             throw new RuntimeException("El cliente ya tiene una membresía activa");
@@ -125,7 +126,7 @@ public class ControlComprarMembresia {
     }
 
     private MembresiaDTO crearMembresia(String idCliente, String idPlan,
-            String idSucursal, List<AmenidadDTO> extras) {
+            String idSucursal, List<AmenidadDTO> extras) throws NegocioException {
 
         PlanDTO plan = planBO.buscarPorId(idPlan);
         SucursalDTO sucursal = sucursalBO.buscarPorId(idSucursal);
@@ -152,7 +153,7 @@ public class ControlComprarMembresia {
                 + "&sucursal=" + idSucursal
                 + "&vigencia=" + fechaVigencia;
         m.setCodigoQR(urlQR);
-
+        
         membresiaBO.guardar(m);
 
         ClienteDTO cliente = clienteBO.buscarPorCorreo(idCliente);

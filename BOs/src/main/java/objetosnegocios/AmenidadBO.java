@@ -5,10 +5,12 @@
 package objetosnegocios;
 
 import DAOs.AmenidadDAO;
+import dominios.AmenidadPojo;
 import dtos.AmenidadDTO;
 import interfaces.IAmenidadBO;
 import java.util.List;
 import interfaces.IAmenidadDAO;
+import mappersBO.AmenidadMapper;
 
 
 /**
@@ -22,10 +24,13 @@ public class AmenidadBO implements IAmenidadBO {
         this.amenidadDAO = new AmenidadDAO();
     }
     
+    //ESTE MÉTODO SE MANDA A LLAMAR DESDE EL CASO BASE
     @Override
     public List<AmenidadDTO> obtenerTodas() {
-        return amenidadDAO.obtenerTodas();
+        List<AmenidadPojo> pojos = amenidadDAO.ConsultarTodas();
+        return AmenidadMapper.toDTOList(pojos);
     }
+    //ESTOS NO
     @Override
     public AmenidadDTO buscarPorId(String id) {
         return amenidadDAO.buscarPorId(id);

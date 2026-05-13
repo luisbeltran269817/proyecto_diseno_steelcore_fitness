@@ -2,28 +2,28 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Exception.java to edit this template
  */
-package Excepciones;
+package excepciones;
 
 /**
  *
  * @author Tungs
  */
-public class NegocioException extends Exception {
+public class PersistenciaException extends Exception {
 
     /**
-     * Creates a new instance of <code>NegocioException</code> without detail
-     * message.
+     * Creates a new instance of <code>PersistenciaException</code> without
+     * detail message.
      */
-    public NegocioException() {
+    public PersistenciaException() {
     }
 
     /**
-     * Constructs an instance of <code>NegocioException</code> with the
+     * Constructs an instance of <code>PersistenciaException</code> with the
      * specified detail message.
      *
      * @param msg the detail message.
      */
-    public NegocioException(String msg) {
+    public PersistenciaException(String msg) {
         super(msg);
     }
 }

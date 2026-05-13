@@ -4,6 +4,7 @@
  */
 package interfaces;
 
+import dominios.AmenidadPojo;
 import dtos.AmenidadDTO;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public interface IAmenidadDAO {
     
-    public List<AmenidadDTO> obtenerTodas();
+    public List<AmenidadPojo> ConsultarTodas();
     public AmenidadDTO buscarPorId(String id);
     public List<AmenidadDTO> buscarPorIds(List<String> ids);
 }

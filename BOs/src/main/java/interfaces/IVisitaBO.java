@@ -4,6 +4,7 @@
  */
 package interfaces;
 
+import Excepciones.NegocioException;
 import dtos.VisitaDTO;
 import java.util.List;
 
@@ -19,8 +20,7 @@ public interface IVisitaBO {
      * @param idSucursal id de la sucursal donde se registra la entrada
      * @return el VisitaDTO creado y guardado
      */
-    VisitaDTO registrarVisita(String idCliente, String idSucursal);
- 
+    public VisitaDTO registrarVisita(String idCliente, String idSucursal) throws NegocioException;
     /**
      * Devuelve el historial de visitas de un cliente.
      * @param idCliente correo del cliente

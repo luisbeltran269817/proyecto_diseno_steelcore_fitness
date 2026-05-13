@@ -41,7 +41,9 @@ public class FachadaComprarMembresia implements IComprarMembresia {
     public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan) {
         return control.obtenerAmenidadesDePlan(plan.getIdPlan());
     }
-
+    
+    
+    //Este método ya está Mongosificado
     @Override
     public List<AmenidadDTO> obtenerAmenidadesExtra() {
         return control.obtenerAmenidadesExtra();

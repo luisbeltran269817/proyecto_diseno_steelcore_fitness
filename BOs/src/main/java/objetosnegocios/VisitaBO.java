@@ -5,6 +5,7 @@
 package objetosnegocios;
 
 import DAOs.VisitaDAO;
+import Excepciones.NegocioException;
 import dtos.SucursalDTO;
 import dtos.VisitaDTO;
 import interfaces.IVisitaBO;
@@ -33,7 +34,7 @@ public class VisitaBO implements IVisitaBO{
      * tal como lo espera la pantalla de historial de visitas existente.
      */
     @Override
-    public VisitaDTO registrarVisita(String idCliente, String idSucursal) {
+    public VisitaDTO registrarVisita(String idCliente, String idSucursal) throws NegocioException {
         // Resolución de datos de la sucursal para el historial visual
         SucursalDTO sucursal = sucursalBO.buscarPorId(idSucursal);
  

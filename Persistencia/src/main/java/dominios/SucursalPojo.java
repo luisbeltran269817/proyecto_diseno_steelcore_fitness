@@ -2,39 +2,36 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dtos;
+package dominios;
 
 import java.util.List;
 
 /**
  *
- * @author julian izaguirre
+ * @author Tungs
  */
-public class SucursalDTO {
+public class SucursalPojo {
     private String idSucursal;
+    
     private String nombre;
+
     private String calle;
+
     private String colonia;
+
     private String ciudad;
+
     private String codigoPostal;
+
     private Double latitud;
+
     private Double longitud;
-    private List<PlanDTO> planes;
-    private List<AmenidadDTO> amenidadesSucursal;
 
-    public SucursalDTO(String idSucursal, String nombre, String calle, String colonia, String ciudad, String codigoPostal, Double latitud, Double longitud, List<PlanDTO> planes) {
-        this.idSucursal = idSucursal;
-        this.nombre = nombre;
-        this.calle = calle;
-        this.colonia = colonia;
-        this.ciudad = ciudad;
-        this.codigoPostal = codigoPostal;
-        this.latitud = latitud;
-        this.longitud = longitud;
-        this.planes = planes;
-    }
+    private List<PlanPojo> planes;
+    
+    private List<AmenidadPojo> amenidadesSucursal;
 
-    public SucursalDTO(String idSucursal, String nombre, String calle, String colonia, String ciudad, String codigoPostal, Double latitud, Double longitud, List<PlanDTO> planes, List<AmenidadDTO> amenidadesSucursal) {
+    public SucursalPojo(String idSucursal, String nombre, String calle, String colonia, String ciudad, String codigoPostal, Double latitud, Double longitud, List<PlanPojo> planes, List<AmenidadPojo> amenidadesSucursal) {
         this.idSucursal = idSucursal;
         this.nombre = nombre;
         this.calle = calle;
@@ -46,18 +43,10 @@ public class SucursalDTO {
         this.planes = planes;
         this.amenidadesSucursal = amenidadesSucursal;
     }
-    
-    public SucursalDTO() {
+
+    public SucursalPojo() {
     }
 
-    public List<AmenidadDTO> getAmenidadesSucursal() {
-        return amenidadesSucursal;
-    }
-
-    public void setAmenidadesSucursal(List<AmenidadDTO> amenidadesSucursal) {
-        this.amenidadesSucursal = amenidadesSucursal;
-    }
-    
     
     public String getIdSucursal() {
         return idSucursal;
@@ -123,16 +112,21 @@ public class SucursalDTO {
         this.longitud = longitud;
     }
 
-    public List<PlanDTO> getPlanes() {
+    public List<PlanPojo> getPlanes() {
         return planes;
     }
 
-    public void setPlanes(List<PlanDTO> planes) {
+    public void setPlanes(List<PlanPojo> planes) {
         this.planes = planes;
     }
 
-    
+    public List<AmenidadPojo> getAmenidadesSucursal() {
+        return amenidadesSucursal;
+    }
 
+    public void setAmenidadesSucursal(List<AmenidadPojo> amenidadesSucursal) {
+        this.amenidadesSucursal = amenidadesSucursal;
+    }
     
     
 }

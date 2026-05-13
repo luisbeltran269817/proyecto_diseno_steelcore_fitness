@@ -4,7 +4,9 @@
  */
 package dtos;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  *
@@ -13,10 +15,15 @@ import java.time.LocalDateTime;
 public class HorarioDTO {
     private String idHorario;
     private String idEntrenador;
-
+    //Estos son los viejos, nononono
     private LocalDateTime inicio;
     private LocalDateTime fin;
+    //Nuevos
+    
+    private LocalTime horaInicio;
 
+    private LocalTime horaFin;
+    
     private boolean disponible;
 
     public HorarioDTO(String idHorario, String idEntrenador, LocalDateTime inicio, LocalDateTime fin, boolean disponible) {
@@ -26,7 +33,33 @@ public class HorarioDTO {
         this.fin = fin;
         this.disponible = disponible;
     }
+    
+    public HorarioDTO(String idHorario, String idEntrenador, LocalTime horaInicio, LocalTime horaFin, boolean disponible) {
+        this.idHorario = idHorario;
+        this.idEntrenador = idEntrenador;
+        this.horaInicio = horaInicio;
+        this.horaFin = horaFin;
+        this.disponible = disponible;
+    }
+    
 
+    public LocalTime getHoraInicio() {
+        return horaInicio;
+    }
+
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
+    }
+    
+    
     public HorarioDTO() {
     }
     

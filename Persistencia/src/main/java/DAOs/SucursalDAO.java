@@ -4,10 +4,19 @@
  */
 package DAOs;
 
-import dtos.SucursalDTO;
+import com.mongodb.MongoException;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import conexion.MongoConexion;
+import dominios.PlanPojo;
+import dominios.SucursalPojo;
+import excepciones.PersistenciaException;
 import interfaces.ISucursalDAO;
 import java.util.ArrayList;
 import java.util.List;
+import mappersPersistencia.SucursalPersistenciaMapper;
+import org.bson.Document;
 
 /**
  *
@@ -15,16 +24,76 @@ import java.util.List;
  */
 public class SucursalDAO implements ISucursalDAO{
     private final AlmacenComprarMembresiaMock almacen;
-
+    private MongoCollection<Document> coleccion;
+    private static final System.Logger LOG = System.getLogger(SucursalDAO.class.getName());
+    
     public SucursalDAO() {
         this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.coleccion =MongoConexion.obtenerBaseDatos().getCollection("sucursales");
     }
-
-    public List<SucursalDTO> obtenerTodas() {
-        return new ArrayList<>(almacen.getSucursales().values());
+    
+    @Override
+    public List<SucursalPojo>obtenerSucursales() throws PersistenciaException {
+        try {
+            List<SucursalPojo> lista =new ArrayList<>();
+            FindIterable<Document> docs =coleccion.find();
+            for (Document doc : docs) {
+                lista.add(SucursalPersistenciaMapper.toPojo(doc));
+            }
+            return lista;
+        } catch (MongoException ex) {
+            throw new PersistenciaException("Error al consultar sucursales");
+        }
     }
-
-    public SucursalDTO buscarPorId(String id) {
-        return almacen.getSucursales().get(id);
+    
+    @Override
+    public SucursalPojo buscarPorId( String idSucursal) throws PersistenciaException {
+        try{
+            Document doc =coleccion.find(Filters.eq("_id",idSucursal)).first();
+            if (doc == null) {
+                return null;
+            }
+            return SucursalPersistenciaMapper.toPojo(doc);
+        }catch(MongoException ex){
+            throw new PersistenciaException("Error al buscar Sucursal");
+        }
+    }
+    
+    @Override
+    public List<PlanPojo>obtenerPlanesSucursal(String idSucursal) throws PersistenciaException {
+        try {
+            SucursalPojo sucursal =buscarPorId(idSucursal);
+            if (sucursal == null) {
+                return new ArrayList<>();
+            }
+            return sucursal.getPlanes();
+        } catch (MongoException ex) {
+            throw new PersistenciaException("Ocurrió un Mongo error");
+        }catch(PersistenciaException ex){
+            throw new PersistenciaException("Si estás leyendo esto tengo hambre");
+        }
+    }
+    
+    //Tue hacerlo así para no modificar la firma del método que tenemos en capas superiores
+    @Override
+    public PlanPojo buscarPlanPorId(String idPlan)throws PersistenciaException {
+        try {
+            List<SucursalPojo> sucursales = obtenerSucursales();
+            for (SucursalPojo sucursal: sucursales) {
+                if (sucursal.getPlanes() != null) {
+                    for (PlanPojo plan: sucursal.getPlanes()) {
+                        if (plan.getIdPlan().equals(idPlan)) {
+                            LOG.log(System.Logger.Level.INFO, idPlan + " Plan encontrado");
+                            return plan;
+                        }
+                    }
+                }
+            }
+            LOG.log(System.Logger.Level.ALL, "No se encontró el plan");
+            return null;
+        } catch (MongoException ex) {
+            LOG.log(System.Logger.Level.ERROR,  "Error al buscar plan" );
+            throw new PersistenciaException("Error al buscar plan");
+        }
     }
 }

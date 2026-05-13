@@ -2,26 +2,31 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dtos;
+package dominios;
 
 import java.util.List;
 
 /**
  *
- * @author julian izaguirre
+ * @author Tungs
  */
-public class PlanDTO {
+public class PlanPojo {
     private String idPlan;
-    private String nombre;
-    private Double precio;
-    private String descripcion;
-    private int mesesDuracion;
-    private List<AmenidadDTO> amenidades;
 
-    public PlanDTO() {
+    private String nombre;
+
+    private Double precio;
+
+    private String descripcion;
+
+    private int mesesDuracion;
+
+    private List<AmenidadPojo> amenidades;
+
+    public PlanPojo() {
     }
 
-    public PlanDTO(String idPlan, String nombre, Double precio, String descripcion, int mesesDuracion, List<AmenidadDTO> amenidades) {
+    public PlanPojo(String idPlan, String nombre, Double precio, String descripcion, int mesesDuracion, List<AmenidadPojo> amenidades) {
         this.idPlan = idPlan;
         this.nombre = nombre;
         this.precio = precio;
@@ -70,15 +75,14 @@ public class PlanDTO {
         this.mesesDuracion = mesesDuracion;
     }
 
-    public List<AmenidadDTO> getAmenidades() {
+    public List<AmenidadPojo> getAmenidades() {
         return amenidades;
     }
 
-    public void setAmenidades(List<AmenidadDTO> amenidades) {
+    public void setAmenidades(List<AmenidadPojo> amenidades) {
         this.amenidades = amenidades;
     }
+    
+    
 
-    
- 
-    
 }

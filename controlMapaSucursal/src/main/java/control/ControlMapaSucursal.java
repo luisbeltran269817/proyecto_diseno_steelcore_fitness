@@ -4,6 +4,7 @@
  */
 package control;
 
+import Excepciones.NegocioException;
 import dtos.SucursalDTO;
 import fachada.IMapa;
 import fachada.IMapa.OnMarcadorClickListener;
@@ -40,8 +41,8 @@ public class ControlMapaSucursal {
         return mapa.getComponente();
     }
 
-    public List<SucursalDTO> iniciarMapa() {
-        sucursales = sucursalBO.obtenerTodas();
+    public List<SucursalDTO> iniciarMapa() throws NegocioException{
+        sucursales = sucursalBO.obtenerSucursales();
         mapa.colocarMarcadores(sucursales);
         return new ArrayList<>(sucursales);
     }
@@ -70,7 +71,7 @@ public class ControlMapaSucursal {
         mapa.setOnMarcadorClickListener(listener);
     }
 
-    public List<SucursalDTO> filtrarPorCiudad(String ciudad) {
+    public List<SucursalDTO> filtrarPorCiudad(String ciudad) throws NegocioException {
         if (sucursales.isEmpty()) iniciarMapa();
         List<SucursalDTO> filtradas = sucursales.stream()
             .filter(s -> s.getCiudad().equalsIgnoreCase(ciudad))
@@ -79,7 +80,7 @@ public class ControlMapaSucursal {
         return filtradas;
     }
 
-    public List<SucursalDTO> filtrarPorColonia(String colonia) {
+    public List<SucursalDTO> filtrarPorColonia(String colonia) throws NegocioException {
         if (sucursales.isEmpty()) iniciarMapa();
         List<SucursalDTO> filtradas = sucursales.stream()
             .filter(s -> s.getColonia().equalsIgnoreCase(colonia))
@@ -88,7 +89,7 @@ public class ControlMapaSucursal {
         return filtradas;
     }
 
-    public SucursalDTO verSucursalMasCercana(double lat, double lng) {
+    public SucursalDTO verSucursalMasCercana(double lat, double lng) throws NegocioException {
         if (sucursales.isEmpty()) iniciarMapa();
         SucursalDTO masCercana = null;
         double menorDistancia = Double.MAX_VALUE;

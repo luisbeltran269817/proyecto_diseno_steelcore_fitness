@@ -4,10 +4,16 @@
  */
 package DAOs;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import conexion.MongoConexion;
+import dominios.AmenidadPojo;
 import dtos.AmenidadDTO;
 import interfaces.IAmenidadDAO;
 import java.util.ArrayList;
 import java.util.List;
+import mappersPersistencia.AmenidadPersistenciaMapper;
+import org.bson.Document;
 
 /**
  *
@@ -15,15 +21,34 @@ import java.util.List;
  */
 public class AmenidadDAO implements IAmenidadDAO{
     private final AlmacenComprarMembresiaMock almacen;
-
+    private MongoCollection<Document> coleccion;
+    
     public AmenidadDAO() {
         this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.coleccion =MongoConexion.obtenerBaseDatos().getCollection("amenidades");
     }
     
-    @Override
-    public List<AmenidadDTO> obtenerTodas() {
-        return new ArrayList<>(almacen.getAmenidades().values());
+    
+    //Método para el nuevo pobladorBD;
+    public void agregar(
+        AmenidadPojo amenidad) {
+        Document doc =
+            AmenidadPersistenciaMapper.toDocument(
+                    amenidad
+            );
+        coleccion.insertOne(doc);
     }
+    //Metodo nuevo supremo del mongo
+    @Override
+    public List<AmenidadPojo> ConsultarTodas(){
+        List<AmenidadPojo> lista = new ArrayList<>();
+        FindIterable<Document> docs = coleccion.find();
+        for (Document doc : docs) {
+            AmenidadPojo pojo = AmenidadPersistenciaMapper.toPojo(doc);
+            lista.add(pojo);
+        }
+            return lista;
+        }
     
     @Override
     public AmenidadDTO buscarPorId(String id) {
