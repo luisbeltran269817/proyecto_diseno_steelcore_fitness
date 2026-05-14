@@ -5,6 +5,7 @@
 package fachada;
 
 import Clase_Control.ControlComprarMembresia;
+import Excepciones.NegocioException;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
@@ -50,7 +51,7 @@ public class FachadaComprarMembresia implements IComprarMembresia {
     }
 
     @Override
-    public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token) {
+    public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token) throws NegocioException  {
         return control.comprarMembresia(
                 dto.getIdCliente(),
                 dto.getIdPlan(),

@@ -4,11 +4,18 @@
  */
 package DAOs;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import conexion.MongoConexion;
+import dominios.EntrenadorPojo;
 import dtos.EntrenadorDTO;
 import dtos.SucursalDTO;
 import interfaces.IEntrenadorDAO;
 import java.util.ArrayList;
 import java.util.List;
+import mappersPersistencia.EntrenadorPersistenciaMapper;
+import org.bson.Document;
 
 /**
  *
@@ -16,9 +23,12 @@ import java.util.List;
  */
 public class EntrenadorDAO implements IEntrenadorDAO {
     private final AlmacenComprarMembresiaMock almacen;
+    private MongoCollection<Document> coleccion;
 
     public EntrenadorDAO() {
         this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        //la coleccion de entrenadores en la bd de mongo debe llamarse "entrenadores"
+        this.coleccion = MongoConexion.obtenerBaseDatos().getCollection("entrenadores");
     }
     
     @Override
@@ -31,18 +41,20 @@ public class EntrenadorDAO implements IEntrenadorDAO {
         return almacen.getEntrenadores().get(id);
     }
     
+    /**
+     * METODO CONVERTIDO A MONGO PORQUE LO USA EL CASO BASE
+     * obtiene todos los entrenadores de una sucursal
+     * @param idSucursal
+     * @return 
+     */
     @Override
-    public List<EntrenadorDTO> obtenerPorSucursal(String idSucursal) {
-        List<EntrenadorDTO> lista = new ArrayList<>();
-        for (EntrenadorDTO e : almacen.getEntrenadores().values()) {
-            if (e.getSucursales() != null) {
-                for (SucursalDTO s : e.getSucursales()) {
-                    if (s.getIdSucursal().equals(idSucursal)) {
-                        lista.add(e);
-                        break;
-                    }
-                }
-            }
+    public List<EntrenadorPojo> obtenerPorSucursal(String idSucursal) {
+        List<EntrenadorPojo> lista = new ArrayList<>();
+        FindIterable<Document> docs = coleccion.find(Filters.eq("idSucursal", idSucursal));
+        
+        for (Document doc : docs) {
+            EntrenadorPojo pojo = EntrenadorPersistenciaMapper.toPojo(doc);
+            lista.add(pojo);
         }
         return lista;
     }

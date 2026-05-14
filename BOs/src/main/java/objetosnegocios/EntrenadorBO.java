@@ -5,10 +5,13 @@
 package objetosnegocios;
 
 import DAOs.EntrenadorDAO;
+import dominios.EntrenadorPojo;
 import dtos.EntrenadorDTO;
 import interfaces.IEntrenadorBO;
 import interfaces.IEntrenadorDAO;
+import java.util.ArrayList;
 import java.util.List;
+import mappersBO.EntrenadorMapper;
 
 /**
  *
@@ -30,10 +33,21 @@ public class EntrenadorBO implements IEntrenadorBO {
     public EntrenadorDTO buscarPorId(String id) {
         return entrenadorDAO.buscarPorId(id);
     }
-
+    
+    /**
+     * METODO ADAPTADO PARA EL CASO BASE
+     * recupera la lista de entrenadorPojo que le da el dao, y usa el mapper de negocio para convertirla en lista de entrenadordto
+     * @param idSucursal
+     * @return 
+     */
     @Override
     public List<EntrenadorDTO> obtenerPorSucursal(String idSucursal) {
-        return entrenadorDAO.obtenerPorSucursal(idSucursal);
+        List<EntrenadorPojo> pojos = entrenadorDAO.obtenerPorSucursal(idSucursal);
+        List<EntrenadorDTO> dtos = new ArrayList<>();
+
+        for (EntrenadorPojo pojo : pojos) {
+            dtos.add(EntrenadorMapper.toDTO(pojo));
+        }
+        return dtos;
     }
-    
 }

@@ -5,6 +5,7 @@
 package fachada;
 
 
+import Excepciones.NegocioException;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
@@ -27,7 +28,7 @@ public interface IComprarMembresia {
   public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal);
   public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan);
   public List<AmenidadDTO> obtenerAmenidadesExtra();
-  public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token);
+  public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token) throws NegocioException;
   public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal);
   public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador);
   public CitaDTO agendarCita(CitaDTO dto);

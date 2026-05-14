@@ -13,6 +13,8 @@ import java.util.List;
  *
  * @author luiscarlosbeltran
  */
+
+//DEJARA DE EXISTIR probablemente
 public class HorarioDAO implements IHorarioDAO{
     private final AlmacenComprarMembresiaMock almacen;
 

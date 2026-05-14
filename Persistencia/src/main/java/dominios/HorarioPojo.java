@@ -2,27 +2,28 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dtos;
+package dominios;
+
 
 import java.time.LocalTime;
 
 /**
  *
- * @author Tungs
+ * @author luiscarlosbeltran
  */
-public class HorarioDTO {
+public class HorarioPojo {
     private String nombreDia;
-    private LocalTime horaInicio;
-    private LocalTime horaFin;
+    private LocalTime inicio;
+    private LocalTime fin;
     private boolean disponible;
 
-    public HorarioDTO() {
+    public HorarioPojo() {
     }
 
-    public HorarioDTO(String nombreDia, LocalTime horaInicio, LocalTime horaFin, boolean disponible) {
+    public HorarioPojo(String nombreDia, LocalTime inicio, LocalTime fin, boolean disponible) {
         this.nombreDia = nombreDia;
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
+        this.inicio = inicio;
+        this.fin = fin;
         this.disponible = disponible;
     }
 
@@ -34,20 +35,20 @@ public class HorarioDTO {
         this.nombreDia = nombreDia;
     }
 
-    public LocalTime getHoraInicio() {
-        return horaInicio;
+    public LocalTime getInicio() {
+        return inicio;
     }
 
-    public void setHoraInicio(LocalTime horaInicio) {
-        this.horaInicio = horaInicio;
+    public void setInicio(LocalTime inicio) {
+        this.inicio = inicio;
     }
 
-    public LocalTime getHoraFin() {
-        return horaFin;
+    public LocalTime getFin() {
+        return fin;
     }
 
-    public void setHoraFin(LocalTime horaFin) {
-        this.horaFin = horaFin;
+    public void setFin(LocalTime fin) {
+        this.fin = fin;
     }
 
     public boolean isDisponible() {
@@ -57,6 +58,7 @@ public class HorarioDTO {
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
+    
     
     
 }

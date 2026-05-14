@@ -4,6 +4,7 @@
  */
 package interfaces;
 
+import dominios.EntrenadorPojo;
 import dtos.EntrenadorDTO;
 import java.util.List;
 
@@ -14,5 +15,5 @@ import java.util.List;
 public interface IEntrenadorDAO {
     public List<EntrenadorDTO> obtenerTodos();
     public EntrenadorDTO buscarPorId(String id);
-    public List<EntrenadorDTO> obtenerPorSucursal(String idSucursal);
+    public List<EntrenadorPojo> obtenerPorSucursal(String idSucursal);
 }

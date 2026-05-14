@@ -221,6 +221,8 @@ public class ControlComprarMembresia {
     }
 
     // ── Entrenadores / Horarios / Citas ───────────────────────────────────────
+    //ESTE METODO YA ESTA CON MONGO
+    //aqui sigue hablandole al bo, pero las capas de negocio y persistenvcia ya cambiaron y (se supone) ya quedan con mongo
     public List<EntrenadorDTO> obtenerEntrenadores(String idSucursal) {
         return entrenadorBO.obtenerPorSucursal(idSucursal);
     }

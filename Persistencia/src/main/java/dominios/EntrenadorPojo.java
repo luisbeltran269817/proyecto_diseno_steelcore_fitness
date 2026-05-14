@@ -2,31 +2,32 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dtos;
+package dominios;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  *
- * @author Gael Galaviz
+ * @author luiscarlosbeltran
  */
-public class EntrenadorDTO {
+public class EntrenadorPojo {
     private String idEntrenador;
     private String nombre;
+    private List<HorarioPojo> horarios;
     private String idSucursal;
-    private List<HorarioDTO> horarios;
-
-    public EntrenadorDTO() {
+    
+    //constructores
+    public EntrenadorPojo() {
     }
 
-    public EntrenadorDTO(String idEntrenador, String nombre, String idSucursal, List<HorarioDTO> horarios) {
+    public EntrenadorPojo(String idEntrenador, String nombre, List<HorarioPojo> horarios, String idSucursal) {
         this.idEntrenador = idEntrenador;
         this.nombre = nombre;
-        this.idSucursal = idSucursal;
         this.horarios = horarios;
+        this.idSucursal = idSucursal;
     }
 
+    //get y set
     public String getIdEntrenador() {
         return idEntrenador;
     }
@@ -43,6 +44,14 @@ public class EntrenadorDTO {
         this.nombre = nombre;
     }
 
+    public List<HorarioPojo> getHorarios() {
+        return horarios;
+    }
+
+    public void setHorarios(List<HorarioPojo> horarios) {
+        this.horarios = horarios;
+    }
+
     public String getIdSucursal() {
         return idSucursal;
     }
@@ -50,12 +59,6 @@ public class EntrenadorDTO {
     public void setIdSucursal(String idSucursal) {
         this.idSucursal = idSucursal;
     }
-
-    public List<HorarioDTO> getHorarios() {
-        return horarios;
-    }
-
-    public void setHorarios(List<HorarioDTO> horarios) {
-        this.horarios = horarios;
-    }
+    
+    
 }
