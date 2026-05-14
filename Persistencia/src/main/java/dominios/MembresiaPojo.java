@@ -2,43 +2,35 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dtos;
+package dominios;
 
 import java.time.LocalDate;
 
-
 /**
  *
- * @author julian izaguirre
+ * @author luiscarlosbeltran
  */
-public class MembresiaDTO {
-    //igual que el pojo, lo que se supone que usa el caso base
-    //nomas que aqui se conserva el enum, en el pojo es String
+public class MembresiaPojo {
+    //atributos que se supone necesitamos para el caso base, despues se pueden agregar mas segun los requisitos
     private String idPlan;
     private String idSucursal;
     private String codigoQR;
     private Double montoPagado;
     private LocalDate fechaTramite;
     private LocalDate fechaCaducidad;
-    private EstadoMembresia estado;
-    
-    public enum EstadoMembresia {
-        ACTIVA,
-        VENCIDA,
-        CANCELADA
+    private String estadoMembresia;
+
+    public MembresiaPojo() {
     }
 
-    public MembresiaDTO() {
-    }
-
-    public MembresiaDTO(String idPlan, String idSucursal, String codigoQR, Double montoPagado, LocalDate fechaTramite, LocalDate fechaCaducidad, EstadoMembresia estado) {
+    public MembresiaPojo(String idPlan, String idSucursal, String codigoQR, Double montoPagado, LocalDate fechaTramite, LocalDate fechaCaducidad, String estadoMembresia) {
         this.idPlan = idPlan;
         this.idSucursal = idSucursal;
         this.codigoQR = codigoQR;
         this.montoPagado = montoPagado;
         this.fechaTramite = fechaTramite;
         this.fechaCaducidad = fechaCaducidad;
-        this.estado = estado;
+        this.estadoMembresia = estadoMembresia;
     }
 
     public String getIdPlan() {
@@ -89,12 +81,12 @@ public class MembresiaDTO {
         this.fechaCaducidad = fechaCaducidad;
     }
 
-    public EstadoMembresia getEstado() {
-        return estado;
+    public String getEstadoMembresia() {
+        return estadoMembresia;
     }
 
-    public void setEstado(EstadoMembresia estado) {
-        this.estado = estado;
+    public void setEstadoMembresia(String estadoMembresia) {
+        this.estadoMembresia = estadoMembresia;
     }
     
     
