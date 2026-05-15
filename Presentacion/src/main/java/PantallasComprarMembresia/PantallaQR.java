@@ -117,9 +117,30 @@ public class PantallaQR extends PantallaBase {
             return panel;
         }
 
-        byte[] qrBytes = controlador.generarQRMembresia(m.getIdMembresia());
+        byte[] qrBytes;
+        try {
+            qrBytes =controlador.generarQRMembresia(m.getIdMembresia());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No fue posible generar el código QR.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+            panel.add(
+                    etiquetaError(
+                            "Error al generar el QR"),
+                    BorderLayout.CENTER);
+            return panel;
+        }
+
         if (qrBytes == null) {
-            panel.add(etiquetaError("Error al generar el QR"), BorderLayout.CENTER);
+
+            panel.add(
+                    etiquetaError(
+                            "Error al generar el QR"),
+                    BorderLayout.CENTER);
+
             return panel;
         }
 

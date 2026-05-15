@@ -13,6 +13,7 @@ import java.util.List;
  * @author Gael Galaviz
  */
 public class ClienteDTO extends UsuarioDTO {
+    private String idCliente;
     private String apellidoPaterno;
     private String apellidoMaterno;
     private LocalDate fechaNacimiento;
@@ -20,11 +21,42 @@ public class ClienteDTO extends UsuarioDTO {
 
     private List<MembresiaDTO> membresias;
     private List<VisitaDTO> historialVisitas;
-    private String idCitaBienvenida;
+    private CitaDTO citaBienvenida;
 
     public ClienteDTO() {
     }
     
+    public ClienteDTO(String idCliente, String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String curp, List<MembresiaDTO> membresias, List<VisitaDTO> historialVisitas, CitaDTO citaBienvenida, String correo, String nombre, String contraseña, Rol rol) {
+        super(correo, nombre, contraseña, rol);
+        this.idCliente = idCliente;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
+        this.fechaNacimiento = fechaNacimiento;
+        this.curp = curp;
+        this.membresias = membresias;
+        this.historialVisitas = historialVisitas;
+        this.citaBienvenida = citaBienvenida;
+    }
+
+    public ClienteDTO(String idCliente, String apellidoPaterno, String apellidoMaterno, LocalDate fechaNacimiento, String curp, List<MembresiaDTO> membresias, List<VisitaDTO> historialVisitas, CitaDTO citaBienvenida) {
+        this.idCliente = idCliente;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
+        this.fechaNacimiento = fechaNacimiento;
+        this.curp = curp;
+        this.membresias = membresias;
+        this.historialVisitas = historialVisitas;
+        this.citaBienvenida = citaBienvenida;
+    }
+    
+    public String getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(String idCliente) {
+        this.idCliente = idCliente;
+    }
+
     public String getApellidoPaterno() {
         return apellidoPaterno;
     }
@@ -73,12 +105,12 @@ public class ClienteDTO extends UsuarioDTO {
         this.historialVisitas = historialVisitas;
     }
 
-    public String getIdCitaBienvenida() {
-        return idCitaBienvenida;
+    public CitaDTO getCitaBienvenida() {
+        return citaBienvenida;
     }
 
-    public void setIdCitaBienvenida(String idCitaBienvenida) {
-        this.idCitaBienvenida = idCitaBienvenida;
+    public void setCitaBienvenida(CitaDTO citaBienvenida) {
+        this.citaBienvenida = citaBienvenida;
     }
 
     public String getCorreo() {
@@ -112,7 +144,6 @@ public class ClienteDTO extends UsuarioDTO {
     public void setRol(Rol rol) {
         this.rol = rol;
     }
-    
-        
 
+    
 }

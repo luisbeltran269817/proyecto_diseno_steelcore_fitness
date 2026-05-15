@@ -4,7 +4,9 @@
  */
 package interfaces;
 
+import dominios.VisitaPojo;
 import dtos.VisitaDTO;
+import excepciones.PersistenciaException;
 import java.util.List;
 
 /**
@@ -13,7 +15,6 @@ import java.util.List;
  */
 public interface IVisitaDAO {
     
-    public void guardar(String idCliente, VisitaDTO visita);
- 
-    List<VisitaDTO> obtenerPorCliente(String idCliente);
+   public List<VisitaPojo> obtenerPorCliente(String idCliente)throws PersistenciaException;
+   public VisitaPojo guardar(String idCliente,VisitaPojo visita) throws PersistenciaException;
 }

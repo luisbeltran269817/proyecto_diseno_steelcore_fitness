@@ -6,15 +6,20 @@ package objetosnegocios;
 
 import DAOs.SucursalDAO;
 import Excepciones.NegocioException;
+import dominios.AmenidadPojo;
 import dominios.PlanPojo;
 import dominios.SucursalPojo;
+import dtos.AmenidadDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import excepciones.PersistenciaException;
 import interfaces.ISucursalBO;
 import interfaces.ISucursalDAO;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import mappersBO.AmenidadMapper;
 import mappersBO.PlanMapper;
 import mappersBO.SucursalMapper;
 
@@ -66,6 +71,38 @@ public class SucursalBO implements ISucursalBO{
         } catch (PersistenciaException ex) {
             logger.severe("Error al buscar plan");
             throw new NegocioException("Error al buscar plan"        );
+        }
+    }
+    
+    @Override
+    public List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal)throws NegocioException {
+        try {
+            List<PlanPojo> pojos= sucursalDAO.obtenerPlanesSucursal(idSucursal);
+            List<PlanDTO> planes= new ArrayList<>();
+            for (PlanPojo pojo : pojos) {
+                planes.add(PlanMapper.toDTO(pojo));
+            }
+            logger.log(Level.INFO, "Planes obtenidos correctamente");
+            return planes;
+        } catch (PersistenciaException e) {
+            logger.log(Level.SEVERE,"Error al obtener planes", e);
+            throw new NegocioException(
+                    "Error al obtener planes");
+        }
+    }
+    @Override
+    public List<AmenidadDTO> obtenerAmenidadesDePlan(String idPlan)throws NegocioException {
+        try {
+            List<AmenidadPojo> pojos =sucursalDAO.obtenerAmenidadesDePlan(idPlan);
+            List<AmenidadDTO> amenidades = new ArrayList<>();
+            for (AmenidadPojo pojo : pojos) {
+                amenidades.add(AmenidadMapper.toDTO(pojo));
+            }
+            logger.log(Level.INFO, "Amenidades obtenidas correctamente");
+            return amenidades;
+        } catch (PersistenciaException e) {
+            logger.log(Level.SEVERE, "Error al obtener amenidades", e);
+            throw new NegocioException( "Error al obtener amenidades");
         }
     }
 }

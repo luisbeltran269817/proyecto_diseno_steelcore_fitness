@@ -5,6 +5,8 @@
 package dtos;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**
@@ -12,16 +14,23 @@ import java.time.LocalDate;
  * @author julian izaguirre
  */
 public class MembresiaDTO {
-    //igual que el pojo, lo que se supone que usa el caso base
-    //nomas que aqui se conserva el enum, en el pojo es String
+    private String idMembresia;
+    private String idCliente;
     private String idPlan;
     private String idSucursal;
+
+    private List<AmenidadDTO> amenidadesExtra;
+    private String metodoPago;
+
     private String codigoQR;
     private Double montoPagado;
-    private LocalDate fechaTramite;
-    private LocalDate fechaCaducidad;
+
+    private LocalDateTime fechaTramite;
+    private LocalDateTime fechaCaducidad;
+
     private EstadoMembresia estado;
-    
+    private PagoDTO pago;
+
     public enum EstadoMembresia {
         ACTIVA,
         VENCIDA,
@@ -31,14 +40,35 @@ public class MembresiaDTO {
     public MembresiaDTO() {
     }
 
-    public MembresiaDTO(String idPlan, String idSucursal, String codigoQR, Double montoPagado, LocalDate fechaTramite, LocalDate fechaCaducidad, EstadoMembresia estado) {
+    public MembresiaDTO(String idMembresia, String idCliente, String idPlan, String idSucursal, List<AmenidadDTO> amenidadesExtra, String metodoPago, String codigoQR, Double montoPagado, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresia estado, PagoDTO pago) {
+        this.idMembresia = idMembresia;
+        this.idCliente = idCliente;
         this.idPlan = idPlan;
         this.idSucursal = idSucursal;
+        this.amenidadesExtra = amenidadesExtra;
+        this.metodoPago = metodoPago;
         this.codigoQR = codigoQR;
         this.montoPagado = montoPagado;
         this.fechaTramite = fechaTramite;
         this.fechaCaducidad = fechaCaducidad;
         this.estado = estado;
+        this.pago = pago;
+    }
+    
+    public String getIdMembresia() {
+        return idMembresia;
+    }
+
+    public void setIdMembresia(String idMembresia) {
+        this.idMembresia = idMembresia;
+    }
+
+    public String getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(String idCliente) {
+        this.idCliente = idCliente;
     }
 
     public String getIdPlan() {
@@ -57,6 +87,22 @@ public class MembresiaDTO {
         this.idSucursal = idSucursal;
     }
 
+    public List<AmenidadDTO> getAmenidadesExtra() {
+        return amenidadesExtra;
+    }
+
+    public void setAmenidadesExtra(List<AmenidadDTO> amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
+
     public String getCodigoQR() {
         return codigoQR;
     }
@@ -73,19 +119,19 @@ public class MembresiaDTO {
         this.montoPagado = montoPagado;
     }
 
-    public LocalDate getFechaTramite() {
+    public LocalDateTime getFechaTramite() {
         return fechaTramite;
     }
 
-    public void setFechaTramite(LocalDate fechaTramite) {
+    public void setFechaTramite(LocalDateTime fechaTramite) {
         this.fechaTramite = fechaTramite;
     }
 
-    public LocalDate getFechaCaducidad() {
+    public LocalDateTime getFechaCaducidad() {
         return fechaCaducidad;
     }
 
-    public void setFechaCaducidad(LocalDate fechaCaducidad) {
+    public void setFechaCaducidad(LocalDateTime fechaCaducidad) {
         this.fechaCaducidad = fechaCaducidad;
     }
 
@@ -95,6 +141,14 @@ public class MembresiaDTO {
 
     public void setEstado(EstadoMembresia estado) {
         this.estado = estado;
+    }
+
+    public PagoDTO getPago() {
+        return pago;
+    }
+
+    public void setPago(PagoDTO pago) {
+        this.pago = pago;
     }
     
     

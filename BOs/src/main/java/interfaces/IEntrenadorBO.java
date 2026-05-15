@@ -4,7 +4,9 @@
  */
 package interfaces;
 
+import Excepciones.NegocioException;
 import dtos.EntrenadorDTO;
+import dtos.HorarioDTO;
 import java.util.List;
 
 /**
@@ -12,7 +14,7 @@ import java.util.List;
  * @author Tungs
  */
 public interface IEntrenadorBO {
-    public List<EntrenadorDTO> obtenerTodos();
-    public EntrenadorDTO buscarPorId(String id);
-    public List<EntrenadorDTO> obtenerPorSucursal(String idSucursal);
+    public EntrenadorDTO buscarPorId(String idEntrenador)throws NegocioException;
+    public List<EntrenadorDTO> obtenerPorSucursal(String idSucursal) throws NegocioException;
+    public List<HorarioDTO>obtenerHorariosEntrenador(String idEntrenador)throws NegocioException;
 }

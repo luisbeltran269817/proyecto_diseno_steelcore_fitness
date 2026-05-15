@@ -5,7 +5,9 @@
 package interfaces;
 
 import dominios.EntrenadorPojo;
+import dominios.HorarioPojo;
 import dtos.EntrenadorDTO;
+import excepciones.PersistenciaException;
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ import java.util.List;
  * @author luiscarlosbeltran
  */
 public interface IEntrenadorDAO {
-    public List<EntrenadorDTO> obtenerTodos();
-    public EntrenadorDTO buscarPorId(String id);
-    public List<EntrenadorPojo> obtenerPorSucursal(String idSucursal);
+    public EntrenadorPojo buscarPorId(String idEntrenador) throws PersistenciaException;
+    public List<EntrenadorPojo> obtenerPorSucursal(String idSucursal) throws PersistenciaException;
+    public List<HorarioPojo>obtenerHorariosEntrenador(String idEntrenador)throws PersistenciaException;
 }

@@ -4,8 +4,10 @@
  */
 package interfaces;
 
-import dtos.ClienteDTO;
-import dtos.VisitaDTO;
+import dominios.CitaPojo;
+import dominios.ClientePojo;
+import dominios.MembresiaActivaPojo;
+import excepciones.PersistenciaException;
 import java.util.List;
 
 /**
@@ -13,8 +15,14 @@ import java.util.List;
  * @author luiscarlosbeltran
  */
 public interface IClienteDAO {
-    public List<ClienteDTO> obtenerClientes();
-    public ClienteDTO buscarPorCorreo(String correo);
-    public void actualizar(ClienteDTO cliente);
-    public List<VisitaDTO> obtenerHistorial(String idCliente);
+    List<ClientePojo> obtenerClientes() throws PersistenciaException;
+
+    ClientePojo buscarPorCorreo(String correo) throws PersistenciaException;
+
+    void actualizar(ClientePojo cliente) throws PersistenciaException;
+
+    MembresiaActivaPojo obtenerMembresiaActiva(String correo) throws PersistenciaException;
+
+    void guardarCitaBienvenida(String correo, CitaPojo cita) throws PersistenciaException;
+    public void eliminarMembresiaActiva(String correo)throws PersistenciaException;
 }

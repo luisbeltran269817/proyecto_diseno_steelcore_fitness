@@ -14,33 +14,36 @@ import org.bson.Document;
  */
 public class HorarioPersistenciaMapper {
 
-    /**
-     * recibe un HorarioPojo y lo convierte a document
-     * @param horario
-     * @return 
-     */
-    public static Document toDocument(HorarioPojo horario) {
+    public static Document toDocument(HorarioPojo pojo) {
         Document doc = new Document();
-        
-        doc.append("nombreDia", horario.getNombreDia());
-        doc.append("inicio", horario.getInicio().toString());
-        doc.append("fin", horario.getFin().toString());
-        doc.append("disponible", horario.isDisponible());
+
+        doc.append("idHorario",pojo.getIdHorario());
+        doc.append("nombreDia",pojo.getNombreDia());
+
+        doc.append("horaInicio",pojo.getHoraInicio().toString());
+
+        doc.append("horaFin",pojo.getHoraFin().toString());
+
+        doc.append("disponible",pojo.isDisponible());
+
         return doc;
     }
-
-    /**
-     * recibe un Document de horario y lo convierte a HorarioPojo
-     * @param doc
-     * @return 
-     */
+    
     public static HorarioPojo toPojo(Document doc) {
-        HorarioPojo horario = new HorarioPojo();
         
-        horario.setNombreDia(doc.getString("nombreDia"));
-        horario.setInicio(LocalTime.parse(doc.getString("inicio")));
-        horario.setFin(LocalTime.parse(doc.getString("fin")));
-        horario.setDisponible(doc.getBoolean("disponible"));
-        return horario;
+        HorarioPojo pojo = new HorarioPojo();
+        pojo.setIdHorario(doc.getString("idHorario"));
+
+        pojo.setNombreDia(doc.getString("nombreDia"));
+        
+        pojo.setHoraInicio(LocalTime.parse(doc.getString("horaInicio")));
+
+        pojo.setHoraFin(LocalTime.parse(doc.getString("horaFin")));
+
+        pojo.setDisponible(doc.getBoolean("disponible"));
+
+        return pojo;
     }
+    
+    
 }

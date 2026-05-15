@@ -11,6 +11,7 @@ import java.time.LocalTime;
  * @author Tungs
  */
 public class HorarioDTO {
+    private String idHorario;
     private String nombreDia;
     private LocalTime horaInicio;
     private LocalTime horaFin;
@@ -19,11 +20,20 @@ public class HorarioDTO {
     public HorarioDTO() {
     }
 
-    public HorarioDTO(String nombreDia, LocalTime horaInicio, LocalTime horaFin, boolean disponible) {
+    public HorarioDTO(String idHorario, String nombreDia, LocalTime horaInicio, LocalTime horaFin, boolean disponible) {
+        this.idHorario = idHorario;
         this.nombreDia = nombreDia;
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
         this.disponible = disponible;
+    }
+
+    public String getIdHorario() {
+        return idHorario;
+    }
+
+    public void setIdHorario(String idHorario) {
+        this.idHorario = idHorario;
     }
 
     public String getNombreDia() {
@@ -57,6 +67,7 @@ public class HorarioDTO {
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
+
     
     
 }

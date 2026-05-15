@@ -5,6 +5,7 @@
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -66,15 +67,19 @@ public class PantallaSeleccionSucursal extends PantallaBase {
     }
  
     private void cargarSucursales() {
-        List<SucursalDTO> lista = controlador.iniciarMapa();
-        panelSucursales.removeAll();
-        grupoBotones = new ButtonGroup();
-        for (SucursalDTO s : lista) {
-            panelSucursales.add(crearCard(s));
-            panelSucursales.add(Box.createVerticalStrut(10));
+        try {
+            List<SucursalDTO> lista = controlador.iniciarMapa();
+            panelSucursales.removeAll();
+            grupoBotones = new ButtonGroup();
+            for (SucursalDTO s : lista) {
+                panelSucursales.add(crearCard(s));
+                panelSucursales.add(Box.createVerticalStrut(10));
+            }
+            panelSucursales.revalidate();
+            panelSucursales.repaint();
+        } catch (NegocioException ex) {
+            System.getLogger(PantallaSeleccionSucursal.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        panelSucursales.revalidate();
-        panelSucursales.repaint();
     }
 
  

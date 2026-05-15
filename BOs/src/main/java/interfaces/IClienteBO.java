@@ -4,7 +4,10 @@
  */
 package interfaces;
 
+import Excepciones.NegocioException;
+import dtos.CitaDTO;
 import dtos.ClienteDTO;
+import dtos.MembresiaDTO;
 import dtos.VisitaDTO;
 import java.util.List;
 
@@ -13,8 +16,11 @@ import java.util.List;
  * @author Tungs
  */
 public interface IClienteBO {
-    public List<ClienteDTO> obtenerClientes();
-    public ClienteDTO buscarPorCorreo(String correo);
-    public void actualizar(ClienteDTO cliente);
-    public List<VisitaDTO> obtenerHistorial(String idCliente);
+    public List<ClienteDTO> obtenerClientes() throws NegocioException;
+    public ClienteDTO buscarPorCorreo(String correo) throws NegocioException;
+    public void actualizar(ClienteDTO cliente) throws NegocioException;
+    public MembresiaDTO obtenerMembresiaActiva(String correo) throws NegocioException;
+    public void guardarCitaBienvenida(String correo, CitaDTO cita)throws NegocioException;
+    public void eliminarMembresiaActiva(String correo) throws NegocioException;
+
 }

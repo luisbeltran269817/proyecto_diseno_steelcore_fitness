@@ -1,6 +1,7 @@
 package Fachada;
 
 import Control.ControlAcceso;
+import Excepciones.NegocioException;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,10 +36,16 @@ public class FachadaControlAcceso implements Icontrolacceso {
     public void configurarSucursal(String idSucursal) {
         control.setIdSucursalLocal(idSucursal);
     }
-
+    
+    //Mnechacaaaaaaaaaaaaaaaaaa
     @Override
     public ResultadoAccesoDTO procesarQR(String codigoQR) throws AccesoDenegadoException {
-        return control.procesarQR(codigoQR);
+        try {
+            return control.procesarQR(codigoQR);
+        } catch (NegocioException ex) {
+            System.getLogger(FachadaControlAcceso.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+        return null;
     }
 
     public String iniciarServidorQR(byte[] qrPng) {

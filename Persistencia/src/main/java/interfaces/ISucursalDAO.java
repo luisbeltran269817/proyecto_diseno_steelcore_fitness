@@ -4,6 +4,7 @@
  */
 package interfaces;
 
+import dominios.AmenidadPojo;
 import dominios.PlanPojo;
 import dominios.SucursalPojo;
 import dtos.SucursalDTO;
@@ -19,4 +20,5 @@ public interface ISucursalDAO {
     public SucursalPojo buscarPorId( String idSucursal) throws PersistenciaException;
     public List<PlanPojo>obtenerPlanesSucursal(String idSucursal) throws PersistenciaException;
     public PlanPojo buscarPlanPorId(String idPlan)throws PersistenciaException;
+     public List<AmenidadPojo> obtenerAmenidadesDePlan(String idPlan) throws PersistenciaException ;
 }

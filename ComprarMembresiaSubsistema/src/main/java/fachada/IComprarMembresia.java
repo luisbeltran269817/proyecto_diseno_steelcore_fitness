@@ -24,23 +24,23 @@ import java.util.List;
  */
 public interface IComprarMembresia {
     
-  public List<SucursalDTO> obtenerSucursales();
-  public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal);
-  public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan);
+  public List<SucursalDTO> obtenerSucursales() throws NegocioException;
+  public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal)throws NegocioException;
+  public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan) throws NegocioException;
   public List<AmenidadDTO> obtenerAmenidadesExtra();
   public MembresiaDTO comprarMembresia(MembresiaDTO dto, String token) throws NegocioException;
-  public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal);
-  public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador);
-  public CitaDTO agendarCita(CitaDTO dto);
-  public boolean hayHorarios(EntrenadorDTO entrenador);
-  public boolean tieneMembresiaActiva(String idCliente);
-  public MembresiaDTO obtenerMembresiaActiva(String idCliente);
-  public CitaDTO obtenerCitaBienvenida(String idCliente);
-  public List<VisitaDTO> obtenerHistorial(String idCliente);
-  public void cancelarMembresia(String idCliente);
-   public double calcularTotal(String idPlan, List<AmenidadDTO> extras);
+  public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal) throws NegocioException;
+  public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador) throws NegocioException;
+  public CitaDTO agendarCita(CitaDTO dto) throws NegocioException;
+  public boolean hayHorarios(EntrenadorDTO entrenador) throws NegocioException;
+  public boolean tieneMembresiaActiva(String idCliente) throws NegocioException;
+  public MembresiaDTO obtenerMembresiaActiva(String idCliente) throws NegocioException;
+  public CitaDTO obtenerCitaBienvenida(String idCliente)throws NegocioException;
+  public List<VisitaDTO> obtenerHistorial(String idCliente) throws NegocioException;
+  public void cancelarMembresia(String idCliente)throws NegocioException;
+   public double calcularTotal(String idPlan, List<AmenidadDTO> extras) throws NegocioException;
    
    
-   byte[] generarQRMembresia(String idMembresia);
+   byte[] generarQRMembresia(String idMembresia) throws NegocioException;
    
 }

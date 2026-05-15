@@ -4,6 +4,7 @@
  */
 package Control;
 
+import Excepciones.NegocioException;
 import Fachada.Icontrolacceso.AccesoDenegadoException;
 import dtos.ClienteDTO;
 import dtos.MembresiaDTO;
@@ -57,7 +58,8 @@ public class ControlAcceso {
      * @return ResultadoAccesoDTO con cliente, membresía y visita ya registrada
      * @throws AccesoDenegadoException si cualquier validación falla
      */
-    public ResultadoAccesoDTO procesarQR(String codigoQR) throws AccesoDenegadoException {
+    //ARREGLAR LO DEL MANEJO DE EXCEPCIONES
+    public ResultadoAccesoDTO procesarQR(String codigoQR) throws AccesoDenegadoException, NegocioException {
         if (codigoQR == null || codigoQR.isBlank()) {
             throw new AccesoDenegadoException("Código QR vacío o inválido.");
         }
@@ -102,11 +104,14 @@ public class ControlAcceso {
         String idSucursalParaRegistro = (idSucursalLocal != null)
                 ? idSucursalLocal
                 : membresia.getIdSucursal();
+        VisitaDTO  vis = new VisitaDTO();
+        vis.setGimnasio("Menchaca");
+        vis.setCalle("Lo");
+        vis.setColonia("siento");
+        vis.setCiudad("Mucho");
+        //Menchaca tendrás que arreglar esto, ya es muy tarde y nisiquiera e probado que persistencia funcione bien ayudaaaaa
+        VisitaDTO visita = visitaBO.guardar(membresia.getIdCliente(), idSucursalLocal, vis);
 
-        VisitaDTO visita = visitaBO.registrarVisita(
-            membresia.getIdCliente(),
-            idSucursalParaRegistro
-        );
 
         return new ResultadoAccesoDTO(cliente, membresia, visita);
     }
@@ -118,23 +123,24 @@ public class ControlAcceso {
      *      -> extrae el parametro "id" y busca por idMembresia directamente (O(1))
      *   2. Cualquier otro string -> comparacion exacta con m.getCodigoQR()
      */
-    private MembresiaDTO buscarMembresiaPorQR(String codigoQR) {
+    private MembresiaDTO buscarMembresiaPorQR(String codigoQR) throws NegocioException {
         // Intento rapido: si es la URL canonica, extraer el ?id= y buscar directo
         String idExtraido = extraerIdDeUrl(codigoQR);
         if (idExtraido != null) {
             MembresiaDTO m = membresiaBO.buscarPorId(idExtraido);
             if (m != null) return m;
-        }
-
+        }//Menchaca tendrás que agregar ese método tú
+        
+        
         // Fallback: busqueda por coincidencia exacta del campo codigoQR
-        for (ClienteDTO c : clienteBO.obtenerClientes()) {
-            List<MembresiaDTO> lista = membresiaBO.obtenerPorCliente(c.getCorreo());
-            for (MembresiaDTO m : lista) {
-                if (codigoQR.equals(m.getCodigoQR())) {
-                    return m;
-                }
-            }
-        }
+        //for (ClienteDTO c : clienteBO.obtenerClientes()) {
+            //List<MembresiaDTO> lista = membresiaBO.obtenerPorCliente(c.getCorreo());
+            //for (MembresiaDTO m : lista) {
+              //  if (codigoQR.equals(m.getCodigoQR())) {
+                //    return m;
+                //}
+            //}
+        //}
         return null;
     }
 

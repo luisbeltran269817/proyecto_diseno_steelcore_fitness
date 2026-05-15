@@ -12,19 +12,33 @@ import java.time.LocalTime;
  * @author luiscarlosbeltran
  */
 public class HorarioPojo {
+    private String idHorario;
+
     private String nombreDia;
-    private LocalTime inicio;
-    private LocalTime fin;
+
+    private LocalTime horaInicio;
+
+    private LocalTime horaFin;
+
     private boolean disponible;
 
     public HorarioPojo() {
     }
 
-    public HorarioPojo(String nombreDia, LocalTime inicio, LocalTime fin, boolean disponible) {
+    public HorarioPojo(String idHorario, String nombreDia, LocalTime horaInicio, LocalTime horaFin, boolean disponible) {
+        this.idHorario = idHorario;
         this.nombreDia = nombreDia;
-        this.inicio = inicio;
-        this.fin = fin;
+        this.horaInicio = horaInicio;
+        this.horaFin = horaFin;
         this.disponible = disponible;
+    }
+    
+    public String getIdHorario() {
+        return idHorario;
+    }
+
+    public void setIdHorario(String idHorario) {
+        this.idHorario = idHorario;
     }
 
     public String getNombreDia() {
@@ -35,20 +49,20 @@ public class HorarioPojo {
         this.nombreDia = nombreDia;
     }
 
-    public LocalTime getInicio() {
-        return inicio;
+    public LocalTime getHoraInicio() {
+        return horaInicio;
     }
 
-    public void setInicio(LocalTime inicio) {
-        this.inicio = inicio;
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
     }
 
-    public LocalTime getFin() {
-        return fin;
+    public LocalTime getHoraFin() {
+        return horaFin;
     }
 
-    public void setFin(LocalTime fin) {
-        this.fin = fin;
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
     }
 
     public boolean isDisponible() {

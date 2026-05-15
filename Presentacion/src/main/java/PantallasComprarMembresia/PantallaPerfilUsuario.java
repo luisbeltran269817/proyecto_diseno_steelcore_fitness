@@ -264,121 +264,179 @@ public class PantallaPerfilUsuario extends PantallaBase {
 
     public void cargarDatos() {
 
-        UsuarioDTO usuario = controlador.getUsuarioActual();
+         try {
 
-        String nombre = usuario.getNombre();
-        lblNombre.setText(nombre);
+            UsuarioDTO usuario =
+                    controlador.getUsuarioActual();
 
-        String[] partes = nombre.trim().split("\\s+");
-        String iniciales = partes.length >= 2
-                ? "" + partes[0].charAt(0) + partes[1].charAt(0)
-                : nombre.substring(0, Math.min(2, nombre.length()));
-        lblIniciales.setText(iniciales.toUpperCase());
+            String nombre = usuario.getNombre();
 
-        boolean activa = controlador.tieneMembresiaActiva();
-        btnQr.setVisible(activa);
+            lblNombre.setText(nombre);
 
-        if (activa) {
-            MembresiaDTO m = controlador.obtenerMembresiaActiva();
-            lblEstado.setText("● Membresía activa");
-            lblEstado.setForeground(new Color(94, 220, 153));
-            lblPlan.setText(m.getIdPlan());
-            lblVencimiento.setText(m.getFechaCaducidad().toLocalDate().toString());
-        } else {
-            lblEstado.setText("○ Sin membresía");
-            lblEstado.setForeground(new Color(220, 94, 94));
-            lblPlan.setText("—");
-            lblVencimiento.setText("—");
+            String[] partes =
+                    nombre.trim().split("\\s+");
+
+            String iniciales =
+                    partes.length >= 2
+                    ? "" + partes[0].charAt(0)
+                    + partes[1].charAt(0)
+                    : nombre.substring(
+                            0,
+                            Math.min(2, nombre.length()));
+
+            lblIniciales.setText(
+                    iniciales.toUpperCase());
+
+            boolean activa =
+                    controlador.tieneMembresiaActiva();
+
+            btnQr.setVisible(activa);
+
+            if (activa) {
+                MembresiaDTO m = controlador.obtenerMembresiaActiva();
+                lblEstado.setText(
+                        "● Membresía activa");
+                lblEstado.setForeground(
+                        new Color(94, 220, 153));
+                lblPlan.setText(
+                        m.getIdPlan());
+                lblVencimiento.setText(
+                        m.getFechaCaducidad()
+                                .toLocalDate()
+                                .toString());
+            } else {
+                lblEstado.setText(
+                        "○ Sin membresía");
+                lblEstado.setForeground(
+                        new Color(220, 94, 94));
+                lblPlan.setText("—");
+                lblVencimiento.setText("—");
+            }
+            actualizarBoton();
+            actualizarBotonCita();
+            cargarVisitas();
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No fue posible cargar el perfil.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
-
-        actualizarBoton();
-        actualizarBotonCita();
-        cargarVisitas();
     }
 
     private void cargarVisitas() {
+        try{
+            tablaVisitas.limpiar();
+            //formato para que se vea bonita la fecha
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        tablaVisitas.limpiar();
-        //formato para que se vea bonita la fecha
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        List<VisitaDTO> visitas = controlador.obtenerHistorial();
-        for (VisitaDTO v : visitas) {
-            tablaVisitas.agregarFila(new Object[]{
-                v.getGimnasio(),
-                v.getCalle(),
-                v.getColonia(),
-                v.getCiudad(),
-                v.getFechaHora().format(formato)
-            });
+            List<VisitaDTO> visitas = controlador.obtenerHistorial();
+            for (VisitaDTO v : visitas) {
+                tablaVisitas.agregarFila(new Object[]{
+                    v.getGimnasio(),
+                    v.getCalle(),
+                    v.getColonia(),
+                    v.getCiudad(),
+                    v.getFechaHora().format(formato)
+                });
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No fue posible cargar el historial.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void actualizarBoton() {
-        btnMembresia.setText(controlador.tieneMembresiaActiva() ? "Cancelar Membresía" : "Adquirir Membresía");
+        try{
+            btnMembresia.setText(controlador.tieneMembresiaActiva() ? "Cancelar Membresía" : "Adquirir Membresía");
+        } catch (Exception ex) {
+            btnMembresia.setText(
+                    "Adquirir Membresía");
+        }
     }
 
     private void actualizarBotonCita() {
-        boolean tieneMembresia = controlador.tieneMembresiaActiva();
-        // Si no tiene membresía, ocultar botón
-        btnCita.setVisible(tieneMembresia);
-
-        // Si no tiene membresía ya no seguimos
-        if (!tieneMembresia) {
-            return;
+        try{
+            boolean tieneMembresia = controlador.tieneMembresiaActiva();
+            btnCita.setVisible(tieneMembresia);
+            if (!tieneMembresia) {
+                return;
+            }
+            boolean tieneCita = controlador.tieneCitaBienvenida();
+            btnCita.setText(
+                    tieneCita
+                            ? "Consultar Cita"
+                            : "Agendar Cita"
+            );
+        }catch (Exception ex) {
+            btnCita.setVisible(false);
         }
-        boolean tieneCita = controlador.tieneCitaBienvenida();
-        btnCita.setText(
-                tieneCita
-                        ? "Consultar Cita"
-                        : "Agendar Cita"
-        );
     }
 
     private void manejarMembresia() {
-        if (controlador.tieneMembresiaActiva()) {
+        try{ 
+            if (controlador.tieneMembresiaActiva()) {
 
-            int opcion = JOptionPane.showConfirmDialog(
-                    this, "¿Desea cancelar su membresaía?", "Confirmar cancelación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
-            );
-            if (opcion == JOptionPane.YES_OPTION) {
-                controlador.cancelarMembresia();
-                cargarDatos();
+                int opcion = JOptionPane.showConfirmDialog(
+                        this, "¿Desea cancelar su membresaía?", "Confirmar cancelación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
+                );
+                if (opcion == JOptionPane.YES_OPTION) {
+                    controlador.cancelarMembresia();
+                    cargarDatos();
+                }
+            } else {
+                controlador.irASeleccionSucursal();
             }
-        } else {
-            controlador.irASeleccionSucursal();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No fue posible completar la operación.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void manejarCita() {
-        if (controlador.tieneCitaBienvenida()) {
-            CitaDTO cita = controlador.obtenerCitaBienvenida();
-            String mensaje
-                    = "Ya tienes una cita agendada.\n\n"
-                    + "ID cita: " + cita.getIdCita() + "\n"
-                    + "Entrenador: " + cita.getIdEntrenador() + "\n"
-                    + "Sucursal: " + cita.getIdSucursal() + "\n"
-                    + "Fecha y hora: " + cita.getFechaHora();
+        try{
+            if (controlador.tieneCitaBienvenida()) {
+                CitaDTO cita = controlador.obtenerCitaBienvenida();
+                String mensaje
+                        = "Ya tienes una cita agendada.\n\n"
+                        + "ID cita: " + cita.getIdCita() + "\n"
+                        + "Entrenador: " + cita.getIdEntrenador() + "\n"
+                        + "Sucursal: " + cita.getIdSucursal() + "\n"
+                        + "Fecha y hora: " + cita.getFechaHora();
 
+                JOptionPane.showMessageDialog(
+                        this,
+                        mensaje,
+                        "Cita de Bienvenida",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } else {
+                int opcion = JOptionPane.showConfirmDialog(
+                        this,
+                        "No tienes una cita de bienvenida.\n\n¿Deseas agendar una?",
+                        "Agendar cita",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+                if (opcion == JOptionPane.YES_OPTION) {
+                    controlador.irASeleccionInstructor();
+                }
+            }
+        }catch (Exception ex) {
             JOptionPane.showMessageDialog(
                     this,
-                    mensaje,
-                    "Cita de Bienvenida",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-        } else {
-            int opcion = JOptionPane.showConfirmDialog(
-                    this,
-                    "No tienes una cita de bienvenida.\n\n¿Deseas agendar una?",
-                    "Agendar cita",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
-            if (opcion == JOptionPane.YES_OPTION) {
-                controlador.irASeleccionInstructor();
-            }
-        }
+                    "No fue posible consultar la cita.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }    
     }
 
     private JLabel lblIniciales;

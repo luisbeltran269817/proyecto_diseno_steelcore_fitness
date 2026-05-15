@@ -4,6 +4,7 @@
  */
 package fachada;
 
+import Excepciones.NegocioException;
 import dtos.SucursalDTO;
 import java.util.List;
 import javax.swing.JComponent;
@@ -27,7 +28,7 @@ public interface IMapaSucursal {
 
     JComponent getComponenteMapa();
 
-    List<SucursalDTO> iniciarMapa();
+    List<SucursalDTO> iniciarMapa() throws NegocioException;
 
     SucursalDTO onMarcadorClickeado(String idSucursal);
 
@@ -37,11 +38,11 @@ public interface IMapaSucursal {
 
     void centrarMapaEn(double lat, double lng);
 
-    List<SucursalDTO> filtrarPorCiudad(String ciudad);
+    List<SucursalDTO> filtrarPorCiudad(String ciudad) throws NegocioException;
 
-    List<SucursalDTO> filtrarPorColonia(String colonia);
+    List<SucursalDTO> filtrarPorColonia(String colonia) throws NegocioException;
 
-    SucursalDTO verSucursalMasCercana(double lat, double lng);
+    SucursalDTO verSucursalMasCercana(double lat, double lng) throws NegocioException;
 
     void ubicarUsuarioAutomaticamente();
 }

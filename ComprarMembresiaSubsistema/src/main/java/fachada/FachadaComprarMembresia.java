@@ -29,17 +29,17 @@ public class FachadaComprarMembresia implements IComprarMembresia {
     }
 
     @Override
-    public List<SucursalDTO> obtenerSucursales() {
+    public List<SucursalDTO> obtenerSucursales() throws NegocioException {
         return control.obtenerSucursales();
     }
 
     @Override
-    public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal) {
+    public List<PlanDTO> obtenerPlanes(SucursalDTO sucursal) throws NegocioException {
         return control.obtenerPlanes(sucursal.getIdSucursal());
     }
 
     @Override
-    public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan) {
+    public List<AmenidadDTO> obtenerAmenidadesPlan(PlanDTO plan) throws NegocioException {
         return control.obtenerAmenidadesDePlan(plan.getIdPlan());
     }
     
@@ -62,17 +62,17 @@ public class FachadaComprarMembresia implements IComprarMembresia {
     }
 
     @Override
-    public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal) {
+    public List<EntrenadorDTO> obtenerEntrenadores(SucursalDTO sucursal) throws NegocioException {
         return control.obtenerEntrenadores(sucursal.getIdSucursal());
     }
 
     @Override
-    public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador) {
+    public List<HorarioDTO> obtenerHorarios(EntrenadorDTO entrenador) throws NegocioException {
         return control.obtenerHorarios(entrenador.getIdEntrenador());
     }
 
     @Override
-    public CitaDTO agendarCita(CitaDTO dto) {
+    public CitaDTO agendarCita(CitaDTO dto) throws NegocioException {
         return control.agendarCitaBienvenida(
                 dto.getIdCliente(),
                 dto.getIdEntrenador(),
@@ -82,42 +82,42 @@ public class FachadaComprarMembresia implements IComprarMembresia {
     }
 
     @Override
-    public boolean hayHorarios(EntrenadorDTO entrenador) {
+    public boolean hayHorarios(EntrenadorDTO entrenador) throws NegocioException {
         return control.hayHorariosDisponibles(entrenador.getIdEntrenador());
     }
 
     @Override
-    public boolean tieneMembresiaActiva(String idCliente) {
+    public boolean tieneMembresiaActiva(String idCliente) throws NegocioException {
         return control.tieneMembresiaActiva(idCliente);
     }
 
     @Override
-    public MembresiaDTO obtenerMembresiaActiva(String idCliente) {
+    public MembresiaDTO obtenerMembresiaActiva(String idCliente) throws NegocioException {
         return control.obtenerMembresiaActiva(idCliente);
     }
 
     @Override
-    public CitaDTO obtenerCitaBienvenida(String idCliente) {
+    public CitaDTO obtenerCitaBienvenida(String idCliente) throws NegocioException {
         return control.obtenerCitaBienvenida(idCliente);
     }
 
     @Override
-    public List<VisitaDTO> obtenerHistorial(String idCliente) {
+    public List<VisitaDTO> obtenerHistorial(String idCliente) throws NegocioException {
         return control.obtenerHistorial(idCliente);
     }
 
     @Override
-    public void cancelarMembresia(String idCliente) {
+    public void cancelarMembresia(String idCliente) throws NegocioException {
         control.cancelarMembresia(idCliente);
     }
 
     @Override
-    public double calcularTotal(String idPlan, List<AmenidadDTO> extras) {
+    public double calcularTotal(String idPlan, List<AmenidadDTO> extras) throws NegocioException {
         return control.calcularTotal(idPlan, extras);
     }
-
+    
     @Override
-    public byte[] generarQRMembresia(String idMembresia) {
+    public byte[] generarQRMembresia(String idMembresia) throws NegocioException {
         return control.generarQRMembresia(idMembresia);
     }
 }

@@ -8,6 +8,7 @@ import dtos.AmenidadDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.MembresiaDTO;
+import dtos.PagoDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import java.util.List;
@@ -41,20 +42,6 @@ public interface IMembresiaBuilder {
     public IMembresiaBuilder setExtras(List<AmenidadDTO> amenidades);
     
     /**
-     * metodo para settear entrenador
-     * @param dto
-     * @return 
-     */
-    public IMembresiaBuilder setEntrenador(EntrenadorDTO dto);
-    
-    /**
-     * metodo para settear el horario
-     * @param dto
-     * @return 
-     */
-    public IMembresiaBuilder setHorario(HorarioDTO dto);
-    
-    /**
      * metodo para asignar el cliente, recibe su correo
      * @param correo
      * @return 
@@ -67,6 +54,13 @@ public interface IMembresiaBuilder {
      * @return 
      */
     public IMembresiaBuilder setMetodoPago(String metodo);
+    
+    /**
+     * Método para asignar el pago dentro de la membresia
+     * @param pago el pago a asignar
+     * @return 
+     */
+    public MembresiaBuilder setPago(PagoDTO pago);
     
     /**
      * metodo que construye la membresia

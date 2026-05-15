@@ -30,13 +30,5 @@ public class AmenidadBO implements IAmenidadBO {
         List<AmenidadPojo> pojos = amenidadDAO.ConsultarTodas();
         return AmenidadMapper.toDTOList(pojos);
     }
-    //ESTOS NO
-    @Override
-    public AmenidadDTO buscarPorId(String id) {
-        return amenidadDAO.buscarPorId(id);
-    }
-    @Override
-    public List<AmenidadDTO> buscarPorIds(List<String> ids) {
-        return amenidadDAO.buscarPorIds(ids);
-    }
+
 }

@@ -4,11 +4,11 @@
  */
 package Controladores;
 
+import Excepciones.NegocioException;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
-import dtos.InicioSesionDTO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
@@ -68,7 +68,7 @@ public interface IControladorAplicacion {
 
     void irASeleccionInstructor();
 
-    void irASeleccionHorario();
+    void irASeleccionHorario()throws NegocioException;
 
     /** Abre PantallaQR — el socio ve su código para mostrar en recepción. */
     void irAQR();
@@ -84,13 +84,13 @@ public interface IControladorAplicacion {
 
     void cerrarSesion();
 
-    boolean tieneCitaBienvenida();
+    boolean tieneCitaBienvenida() throws NegocioException;
 
-    CitaDTO obtenerCitaBienvenida();
+    CitaDTO obtenerCitaBienvenida() throws NegocioException;
 
-    boolean tieneMembresiaActiva();
+    boolean tieneMembresiaActiva() throws NegocioException;
 
-    MembresiaDTO obtenerMembresiaActiva();
+    MembresiaDTO obtenerMembresiaActiva() throws NegocioException;
 
     /**
      * Devuelve la membresia comprada en ESTA sesion, o null si no hay ninguna.
@@ -99,25 +99,25 @@ public interface IControladorAplicacion {
      */
     MembresiaDTO getMembresiaRecienCreada();
 
-    List<VisitaDTO> obtenerHistorial();
+    List<VisitaDTO> obtenerHistorial()throws NegocioException;
 
-    void cancelarMembresia();
+    void cancelarMembresia() throws NegocioException;
 
-    List<SucursalDTO> obtenerSucursales();
+    List<SucursalDTO> obtenerSucursales() throws NegocioException;
 
-    List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal);
+    List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal) throws NegocioException;
 
-    List<AmenidadDTO> obtenerAmenidadesExtra();
+    List<AmenidadDTO> obtenerAmenidadesExtra() throws NegocioException;
 
-    List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal);
+    List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal) throws NegocioException;
 
-    List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador);
+    List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador) throws NegocioException;
 
     public void confirmarCompra();
 
-    public double calcularTotal();
+    public double calcularTotal() throws NegocioException;
 
-    void confirmarCitaBienvenida();
+    void confirmarCitaBienvenida() throws NegocioException;
 
     public void setTokenTarjeta(String token);
 
@@ -125,12 +125,12 @@ public interface IControladorAplicacion {
 
     // Mapa — Presentación solo ve JComponent y el listener propio de controlMapaSucursal
     JComponent getComponenteMapa();
-    List<SucursalDTO> iniciarMapa();
+    List<SucursalDTO> iniciarMapa() throws NegocioException;
     SucursalDTO onMarcadorClickeado(String idSucursal);
     void actualizarUbicacion(double lat, double lng);
     void centrarMapaEn(double lat, double lng);
     void setOnMarcadorClickListener(IMapaSucursal.OnMarcadorSucursalClickListener listener);
-    byte[] generarQRMembresia(String idMembresia);
+    byte[] generarQRMembresia(String idMembresia) throws NegocioException;
 
     String iniciarServidorQR(byte[] qrPng);
 

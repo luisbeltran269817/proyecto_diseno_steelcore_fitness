@@ -14,6 +14,4 @@ import java.util.List;
 public interface IAmenidadBO {
     
     public List<AmenidadDTO> obtenerTodas();
-    public AmenidadDTO buscarPorId(String id);
-    public List<AmenidadDTO> buscarPorIds(List<String> ids);
 }

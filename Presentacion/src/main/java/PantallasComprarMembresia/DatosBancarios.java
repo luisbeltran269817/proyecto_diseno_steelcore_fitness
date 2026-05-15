@@ -5,6 +5,7 @@
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -38,78 +39,82 @@ public class DatosBancarios extends PantallaBase {
 
     @Override
     protected void inicializarComponentes() {
-        JPanel fondo = new JPanel(new GridBagLayout());
-        fondo.setBackground(Colores.FONDO_PRINCIPAL);
-        setContentPane(fondo);
-
-        JPanel card = crearCard(520, 600);
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBorder(new EmptyBorder(44, 52, 44, 52));
-
-        JLabel titulo = new JLabel("Datos Bancarios");
-        titulo.setFont(Colores.FUENTE_TITULO);
-        titulo.setForeground(Colores.TEXTO_PRINCIPAL);
-        titulo.setAlignmentX(CENTER_ALIGNMENT);
-
-        JLabel lblMonto = new JLabel("Total a pagar: " + calcularTotal());
-        lblMonto.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblMonto.setForeground(Colores.ACENTO);
-        lblMonto.setAlignmentX(CENTER_ALIGNMENT);
-
-        txtTitular     = crearCampo("Nombre del titular");
-        txtNumero      = crearCampo("Número de tarjeta (16 dígitos)");
-        txtVencimiento = crearCampo("Fecha de vencimiento (MM/AA)");
-        txtCVV         = crearCampo("CVV");
-
-        aplicarFiltroNumerico(txtNumero, 16);
-        aplicarFiltroNumerico(txtCVV, 4);
-
-        JPanel panelBtns = new JPanel();
-        panelBtns.setOpaque(false);
-        panelBtns.setLayout(new BoxLayout(panelBtns, BoxLayout.X_AXIS));
-        panelBtns.setAlignmentX(CENTER_ALIGNMENT);
-
-        Boton btnAtras    = crearBoton("Atrás", Boton.Variante.SECUNDARIO);
-        Boton btnProceder = crearBoton("Proceder al pago", Boton.Variante.PRIMARIO);
-
-        btnAtras.addActionListener(e -> controlador.irATerminosCondiciones());
-        btnProceder.addActionListener(e -> procesarPago());
-
-        panelBtns.add(btnAtras);
-        panelBtns.add(Box.createHorizontalStrut(16));
-        panelBtns.add(btnProceder);
-
-        card.add(titulo);
-        card.add(Box.createVerticalStrut(6));
-        card.add(lblMonto);
-        card.add(Box.createVerticalStrut(28));
-        card.add(crearEtiqueta("Nombre del titular"));
-        card.add(Box.createVerticalStrut(4));
-        card.add(txtTitular);
-        card.add(Box.createVerticalStrut(14));
-        card.add(crearEtiqueta("Número de tarjeta"));
-        card.add(Box.createVerticalStrut(4));
-        card.add(txtNumero);
-        card.add(Box.createVerticalStrut(14));
-
-        JPanel rowFecha = new JPanel();
-        rowFecha.setOpaque(false);
-        rowFecha.setLayout(new BoxLayout(rowFecha, BoxLayout.X_AXIS));
-        rowFecha.setAlignmentX(LEFT_ALIGNMENT);
-        rowFecha.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-
-        JPanel colFecha = crearColumna("Fecha de vencimiento", txtVencimiento);
-        JPanel colCVV   = crearColumna("CVV", txtCVV);
-
-        rowFecha.add(colFecha);
-        rowFecha.add(Box.createHorizontalStrut(16));
-        rowFecha.add(colCVV);
-
-        card.add(rowFecha);
-        card.add(Box.createVerticalStrut(28));
-        card.add(panelBtns);
-
-        fondo.add(card);
+     try {
+         JPanel fondo = new JPanel(new GridBagLayout());
+         fondo.setBackground(Colores.FONDO_PRINCIPAL);
+         setContentPane(fondo);
+         
+         JPanel card = crearCard(520, 600);
+         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+         card.setBorder(new EmptyBorder(44, 52, 44, 52));
+         
+         JLabel titulo = new JLabel("Datos Bancarios");
+         titulo.setFont(Colores.FUENTE_TITULO);
+         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
+         titulo.setAlignmentX(CENTER_ALIGNMENT);
+         
+         JLabel lblMonto = new JLabel("Total a pagar: " + calcularTotal());
+         lblMonto.setFont(new Font("Segoe UI", Font.BOLD, 18));
+         lblMonto.setForeground(Colores.ACENTO);
+         lblMonto.setAlignmentX(CENTER_ALIGNMENT);
+         
+         txtTitular     = crearCampo("Nombre del titular");
+         txtNumero      = crearCampo("Número de tarjeta (16 dígitos)");
+         txtVencimiento = crearCampo("Fecha de vencimiento (MM/AA)");
+         txtCVV         = crearCampo("CVV");
+         
+         aplicarFiltroNumerico(txtNumero, 16);
+         aplicarFiltroNumerico(txtCVV, 4);
+         
+         JPanel panelBtns = new JPanel();
+         panelBtns.setOpaque(false);
+         panelBtns.setLayout(new BoxLayout(panelBtns, BoxLayout.X_AXIS));
+         panelBtns.setAlignmentX(CENTER_ALIGNMENT);
+         
+         Boton btnAtras    = crearBoton("Atrás", Boton.Variante.SECUNDARIO);
+         Boton btnProceder = crearBoton("Proceder al pago", Boton.Variante.PRIMARIO);
+         
+         btnAtras.addActionListener(e -> controlador.irATerminosCondiciones());
+         btnProceder.addActionListener(e -> procesarPago());
+         
+         panelBtns.add(btnAtras);
+         panelBtns.add(Box.createHorizontalStrut(16));
+         panelBtns.add(btnProceder);
+         
+         card.add(titulo);
+         card.add(Box.createVerticalStrut(6));
+         card.add(lblMonto);
+         card.add(Box.createVerticalStrut(28));
+         card.add(crearEtiqueta("Nombre del titular"));
+         card.add(Box.createVerticalStrut(4));
+         card.add(txtTitular);
+         card.add(Box.createVerticalStrut(14));
+         card.add(crearEtiqueta("Número de tarjeta"));
+         card.add(Box.createVerticalStrut(4));
+         card.add(txtNumero);
+         card.add(Box.createVerticalStrut(14));
+         
+         JPanel rowFecha = new JPanel();
+         rowFecha.setOpaque(false);
+         rowFecha.setLayout(new BoxLayout(rowFecha, BoxLayout.X_AXIS));
+         rowFecha.setAlignmentX(LEFT_ALIGNMENT);
+         rowFecha.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+         
+         JPanel colFecha = crearColumna("Fecha de vencimiento", txtVencimiento);
+         JPanel colCVV   = crearColumna("CVV", txtCVV);
+         
+         rowFecha.add(colFecha);
+         rowFecha.add(Box.createHorizontalStrut(16));
+         rowFecha.add(colCVV);
+         
+         card.add(rowFecha);
+         card.add(Box.createVerticalStrut(28));
+         card.add(panelBtns);
+         
+         fondo.add(card);
+     } catch (NegocioException ex) {
+         System.getLogger(DatosBancarios.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+     }
     }
 
     private JTextField crearCampo(String placeholder) {
@@ -200,7 +205,7 @@ public class DatosBancarios extends PantallaBase {
         JOptionPane.showMessageDialog(this, msg, "Datos incompletos", JOptionPane.WARNING_MESSAGE);
     }
 
-    private String calcularTotal() {
+    private String calcularTotal() throws NegocioException {
         double total = controlador.calcularTotal();
         return String.format("$%.2f MXN", total);
     }

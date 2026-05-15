@@ -5,32 +5,71 @@
 package dominios;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
  * @author luiscarlosbeltran
  */
 public class MembresiaPojo {
-    //atributos que se supone necesitamos para el caso base, despues se pueden agregar mas segun los requisitos
+    private String idMembresia;
+    private String idCliente;
     private String idPlan;
     private String idSucursal;
-    private String codigoQR;
+
+    private List<AmenidadPojo> amenidadesExtra;
+
+    private String metodoPago;
     private Double montoPagado;
-    private LocalDate fechaTramite;
-    private LocalDate fechaCaducidad;
-    private String estadoMembresia;
+
+    private String codigoQR;
+
+    private LocalDateTime fechaTramite;
+    private LocalDateTime fechaCaducidad;
+
+    private  EstadoMembresiaPojo estado;
+
+    private PagoPojo pago;
+    
+    public enum EstadoMembresiaPojo {
+        ACTIVA,
+        CANCELADA,
+        VENCIDA
+    }
 
     public MembresiaPojo() {
     }
 
-    public MembresiaPojo(String idPlan, String idSucursal, String codigoQR, Double montoPagado, LocalDate fechaTramite, LocalDate fechaCaducidad, String estadoMembresia) {
+    public MembresiaPojo(String idMembresia, String idCliente, String idPlan, String idSucursal, List<AmenidadPojo> amenidadesExtra, String metodoPago, Double montoPagado, String codigoQR, LocalDateTime fechaTramite, LocalDateTime fechaCaducidad, EstadoMembresiaPojo estado, PagoPojo pago) {
+        this.idMembresia = idMembresia;
+        this.idCliente = idCliente;
         this.idPlan = idPlan;
         this.idSucursal = idSucursal;
-        this.codigoQR = codigoQR;
+        this.amenidadesExtra = amenidadesExtra;
+        this.metodoPago = metodoPago;
         this.montoPagado = montoPagado;
+        this.codigoQR = codigoQR;
         this.fechaTramite = fechaTramite;
         this.fechaCaducidad = fechaCaducidad;
-        this.estadoMembresia = estadoMembresia;
+        this.estado = estado;
+        this.pago = pago;
+    }
+
+    public String getIdMembresia() {
+        return idMembresia;
+    }
+
+    public void setIdMembresia(String idMembresia) {
+        this.idMembresia = idMembresia;
+    }
+
+    public String getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(String idCliente) {
+        this.idCliente = idCliente;
     }
 
     public String getIdPlan() {
@@ -49,12 +88,20 @@ public class MembresiaPojo {
         this.idSucursal = idSucursal;
     }
 
-    public String getCodigoQR() {
-        return codigoQR;
+    public List<AmenidadPojo> getAmenidadesExtra() {
+        return amenidadesExtra;
     }
 
-    public void setCodigoQR(String codigoQR) {
-        this.codigoQR = codigoQR;
+    public void setAmenidadesExtra(List<AmenidadPojo> amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
     }
 
     public Double getMontoPagado() {
@@ -65,29 +112,44 @@ public class MembresiaPojo {
         this.montoPagado = montoPagado;
     }
 
-    public LocalDate getFechaTramite() {
+    public String getCodigoQR() {
+        return codigoQR;
+    }
+
+    public void setCodigoQR(String codigoQR) {
+        this.codigoQR = codigoQR;
+    }
+
+    public LocalDateTime getFechaTramite() {
         return fechaTramite;
     }
 
-    public void setFechaTramite(LocalDate fechaTramite) {
+    public void setFechaTramite(LocalDateTime fechaTramite) {
         this.fechaTramite = fechaTramite;
     }
 
-    public LocalDate getFechaCaducidad() {
+    public LocalDateTime getFechaCaducidad() {
         return fechaCaducidad;
     }
 
-    public void setFechaCaducidad(LocalDate fechaCaducidad) {
+    public void setFechaCaducidad(LocalDateTime fechaCaducidad) {
         this.fechaCaducidad = fechaCaducidad;
     }
 
-    public String getEstadoMembresia() {
-        return estadoMembresia;
+    public EstadoMembresiaPojo getEstado() {
+        return estado;
     }
 
-    public void setEstadoMembresia(String estadoMembresia) {
-        this.estadoMembresia = estadoMembresia;
+    public void setEstado(EstadoMembresiaPojo estado) {
+        this.estado = estado;
     }
-    
+
+    public PagoPojo getPago() {
+        return pago;
+    }
+
+    public void setPago(PagoPojo pago) {
+        this.pago = pago;
+    }
     
 }

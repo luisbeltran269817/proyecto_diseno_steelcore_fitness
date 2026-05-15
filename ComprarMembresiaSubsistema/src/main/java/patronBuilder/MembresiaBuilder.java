@@ -8,6 +8,7 @@ import dtos.AmenidadDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.MembresiaDTO;
+import dtos.PagoDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import java.util.ArrayList;
@@ -23,18 +24,17 @@ public class MembresiaBuilder implements IMembresiaBuilder {
     private String idSucursal;
     private String idPlan;
     private List<AmenidadDTO> extrasContratados;
-    private String idEntrenador;
-    private String idHorario;
     private String idCliente;
     private String metodoPago;
     private Double montoPagado;
+    private PagoDTO pago;
     
     //constructor que empieza con extras vacios y el monto pagado en 0
     public MembresiaBuilder() {
         this.extrasContratados = new ArrayList<>();
         this.montoPagado = 0.0;
     }
-    
+
     @Override
     public MembresiaBuilder setSucursal(SucursalDTO dto) {
         this.idSucursal = dto.getIdSucursal();
@@ -65,11 +65,6 @@ public class MembresiaBuilder implements IMembresiaBuilder {
         return this;
     }
     
-    @Override
-    public MembresiaBuilder setEntrenador(EntrenadorDTO dto) {
-        this.idEntrenador = dto.getIdEntrenador();
-        return this;
-    }
     
     @Override
     public MembresiaBuilder setCliente(String correo) {
@@ -82,12 +77,12 @@ public class MembresiaBuilder implements IMembresiaBuilder {
         this.metodoPago = metodo;
         return this;
     }
-    
     @Override
-    public MembresiaBuilder setHorario(HorarioDTO dto) {
-        this.idHorario = dto.getIdHorario();
+    public MembresiaBuilder setPago(PagoDTO pago){
+        this.pago= pago;
         return this;
     }
+    
     
     @Override
     public MembresiaDTO build() {
@@ -95,11 +90,10 @@ public class MembresiaBuilder implements IMembresiaBuilder {
         dto.setIdSucursal(idSucursal);
         dto.setIdPlan(idPlan);
         dto.setAmenidadesExtra(extrasContratados);
-        dto.setIdEntrenador(idEntrenador);
-        dto.setIdHorario(idHorario);
         dto.setIdCliente(idCliente);
         dto.setMetodoPago(metodoPago);
         dto.setMontoPagado(montoPagado);
+        dto.setPago(pago);
         return dto;
     }
 }

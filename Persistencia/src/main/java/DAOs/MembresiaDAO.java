@@ -4,47 +4,88 @@
  */
 package DAOs;
 
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import conexion.MongoConexion;
+import dominios.MembresiaPojo;
 import dtos.MembresiaDTO;
+import excepciones.PersistenciaException;
 import interfaces.IMembresiaDAO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import mappersPersistencia.MembresiaPersistenciaMapper;
+import org.bson.Document;
 
 /**
  *
  * @author luiscarlosbeltran
  */
 public class MembresiaDAO implements IMembresiaDAO{
-    private final AlmacenComprarMembresiaMock almacen;
-
+    private static final Logger logger = Logger.getLogger(MembresiaDAO.class.getName());
+     private final MongoCollection<Document> coleccion;
     public MembresiaDAO() {
-        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
+        this.coleccion = MongoConexion.obtenerBaseDatos().getCollection("membresias");
     }
     
+    /**
+     * Método que guarda una membresía en la BD
+     * @param membresia la membresia a guardar
+     * @throws PersistenciaException si ocurre un error
+     */
     @Override
-    public void guardar(MembresiaDTO m) {
-        almacen.getMembresias().put(m.getIdMembresia(), m);
-    }
-    @Override
-    public MembresiaDTO buscarPorId(String id) {
-        return almacen.getMembresias().get(id);
-    }
-    @Override
-    public List<MembresiaDTO> obtenerPorCliente(String idCliente) {
-        List<MembresiaDTO> lista = new ArrayList<>();
-
-        for (MembresiaDTO m : almacen.getMembresias().values()) {
-            if (m.getIdCliente().equals(idCliente)) {
-                lista.add(m);
+    public void guardar(MembresiaPojo membresia) throws PersistenciaException {
+        try {
+            if (membresia == null) {
+                throw new PersistenciaException("La membresia es nula");
             }
+            Document doc = MembresiaPersistenciaMapper.toDocument(membresia);
+            coleccion.insertOne(doc);
+            logger.log(Level.INFO, "Membresía guardada correctamente");
+        } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error al guardar la membresía", e);
+            throw new PersistenciaException("Error al guardar la membresía");
         }
-        return lista;
     }
+    /**
+     * Método que busca una membresia por su id
+     * @param idMembresia el id de la membresía a buscar
+     * @return la membresiaPojo encontrada
+     * @throws PersistenciaException si ocurre un error
+     */
     @Override
-    public void actualizar(MembresiaDTO membresia) {
-        if (membresia == null || membresia.getIdMembresia() == null) {
-            return;
+    public MembresiaPojo buscarPorId(String idMembresia) throws PersistenciaException {
+        try {
+            Document doc = coleccion.find(Filters.eq("_id", idMembresia)).first();
+            if (doc == null) {
+                return null;
+            }
+            return MembresiaPersistenciaMapper.toPojo(doc);
+        } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error al buscar membresía", e);
+            throw new PersistenciaException("Error al buscar membresía");
         }
-        almacen.getMembresias().put(membresia.getIdMembresia(),membresia
-        );
+    }
+    
+    /**
+     * Método que actualiza los datos de una membresia
+     * @param membresia la membresia nueva a actualizar
+     * @throws PersistenciaException si ocurre un error
+     */
+    @Override
+    public void actualizar(MembresiaPojo membresia) throws PersistenciaException {
+        try {
+            if (membresia == null) {
+                throw new PersistenciaException("La membresía no puede ser null");
+            }
+            Document doc = MembresiaPersistenciaMapper.toDocument(membresia);
+            coleccion.replaceOne(Filters.eq("_id", membresia.getIdMembresia()),doc);
+            logger.log(Level.INFO, "Membresía actualizada correctamente");
+        } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error al actualizar la membresía", e);
+            throw new PersistenciaException("Error al actualizar la membresía");
+        }
     }
 }

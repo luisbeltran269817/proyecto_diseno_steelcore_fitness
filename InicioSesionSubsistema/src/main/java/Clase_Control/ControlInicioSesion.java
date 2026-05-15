@@ -4,28 +4,28 @@
  */
 package Clase_Control;
 
+import dtos.ClienteDTO;
 import dtos.UsuarioDTO;
-import objetosnegocios.UsuarioBO;
+import objetosnegocios.ClienteBO;
 
 /**
  *
  * @author julian izaguirre
  */
 public class ControlInicioSesion {
-    private final UsuarioBO usuarioBO;
-
+    private final ClienteBO clienteBO;
     public ControlInicioSesion() {
-        this.usuarioBO = new UsuarioBO();
+        this.clienteBO = new ClienteBO();
     }
     
     public UsuarioDTO iniciarSesion(String correo, String contraseña) throws Exception {
-        UsuarioDTO usuario = usuarioBO.obtenerUsuarioPorCorreo(correo);
-        if (usuario == null) {
+        ClienteDTO cliente = clienteBO.buscarPorCorreo(correo);
+        if (cliente == null) {
             throw new Exception("Correo o contraseña incorrectos.");
         }
-        if (!usuario.getContraseña().equals(contraseña)) {
+        if (!cliente.getContraseña().equals(contraseña)) {
             throw new Exception("Correo o contraseña incorrectos.");
         }
-        return usuario;
+        return cliente;
     }
 }

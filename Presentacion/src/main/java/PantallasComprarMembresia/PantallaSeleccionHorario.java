@@ -5,6 +5,7 @@
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -27,8 +28,8 @@ public class PantallaSeleccionHorario extends PantallaBase{
  
     private static final DateTimeFormatter FMT =
         DateTimeFormatter.ofPattern("dd/MM/yyyy  HH:mm");
- 
-    public PantallaSeleccionHorario(IControladorAplicacion controlador) {
+    
+    public PantallaSeleccionHorario(IControladorAplicacion controlador) throws NegocioException {
         super(controlador);
         setTitle("Seleccionar Horario - SteelCore Fitness");
         inicializarComponentes();
@@ -96,9 +97,9 @@ public class PantallaSeleccionHorario extends PantallaBase{
             controlador.setHorarioSeleccionado(horarioSeleccionado);
             try {
                 controlador.confirmarCitaBienvenida();
-            } catch (RuntimeException ex) {
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
-                    ex.getMessage(), "Error al agendar",
+                    "Ocurrió un error al intentar agendar", "Error al agendar",
                     JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -120,7 +121,7 @@ public class PantallaSeleccionHorario extends PantallaBase{
         fondo.add(contenedor);
     }
  
-    private void cargarHorarios() {
+    private void cargarHorarios() throws NegocioException {
         EntrenadorDTO entrenador = controlador.getEntrenadorSeleccionado();
         panelHorarios.removeAll();
  
@@ -129,9 +130,7 @@ public class PantallaSeleccionHorario extends PantallaBase{
             panelHorarios.revalidate();
             return;
         }
- 
-        List<HorarioDTO> horarios =
-            controlador.obtenerHorariosDeEntrenador(entrenador.getIdEntrenador());
+        List<HorarioDTO> horarios = controlador.obtenerHorariosDeEntrenador(entrenador.getIdEntrenador());
  
         if (horarios == null || horarios.isEmpty()) {
             panelHorarios.add(mensajeSinHorarios());
@@ -200,23 +199,43 @@ public class PantallaSeleccionHorario extends PantallaBase{
         card.setBorder(new EmptyBorder(16, 20, 16, 20));
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
  
-        String textoInicio = (h.getInicio() != null) ? h.getInicio().format(FMT) : "—";
-        String textoFin    = (h.getFin()    != null) ? h.getFin().format(FMT)    : "—";
+        DateTimeFormatter fmtHora =
+        DateTimeFormatter.ofPattern("HH:mm");
+
+        String textoDia =
+                (h.getNombreDia() != null)
+                ? h.getNombreDia()
+                : "—";
+
+        String textoInicio =
+                (h.getHoraInicio() != null)
+                ? h.getHoraInicio().format(fmtHora)
+                : "—";
+
+        String textoFin =
+                (h.getHoraFin() != null)
+                ? h.getHoraFin().format(fmtHora)
+                : "—";
  
-        JLabel lblInicio = new JLabel("Inicio: " + textoInicio);
-        lblInicio.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblInicio.setForeground(Colores.TEXTO_PRINCIPAL);
- 
-        JLabel lblFin = new JLabel("Fin:     " + textoFin);
-        lblFin.setFont(Colores.FUENTE_LABEL);
-        lblFin.setForeground(Colores.TEXTO_SECUNDARIO);
- 
+        JLabel lblDia = new JLabel("Día: " + textoDia);
+        lblDia.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblDia.setForeground(Colores.TEXTO_PRINCIPAL);
+        JLabel lblHorario = new JLabel(
+                "Horario: " + textoInicio
+                + " - "
+                + textoFin);
+
+        lblHorario.setFont(Colores.FUENTE_LABEL);
+        lblHorario.setForeground(
+                Colores.TEXTO_SECUNDARIO);
+        
         JPanel info = new JPanel();
         info.setOpaque(false);
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-        info.add(lblInicio);
+
+        info.add(lblDia);
         info.add(Box.createVerticalStrut(4));
-        info.add(lblFin);
+        info.add(lblHorario);
  
         JRadioButton radio = new JRadioButton("Seleccionar");
         radio.setFont(Colores.FUENTE_BOTON_SM);

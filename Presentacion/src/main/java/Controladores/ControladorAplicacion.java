@@ -6,6 +6,7 @@ package Controladores;
 
 import Fachada.FachadaControlAcceso;
 import ControlDeAcceso.BC_PantallaEspera;
+import Excepciones.NegocioException;
 import Fachada.FachadaInicioSesion;
 import Fachada.IInicioSesion;
 import PantallasComprarMembresia.DatosBancarios;
@@ -235,7 +236,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public void irASeleccionHorario() {
+    public void irASeleccionHorario() throws NegocioException {
         cerrarPantallas();
         pantallaHorario = new PantallaSeleccionHorario(this);
         pantallaHorario.setVisible(true);
@@ -291,7 +292,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public boolean tieneMembresiaActiva() {
+    public boolean tieneMembresiaActiva() throws NegocioException {
         if (usuarioActual == null) {
             return false;
         }
@@ -299,7 +300,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public boolean tieneCitaBienvenida() {
+    public boolean tieneCitaBienvenida() throws NegocioException {
         if (usuarioActual == null) {
             return false;
         }
@@ -307,7 +308,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public MembresiaDTO obtenerMembresiaActiva() {
+    public MembresiaDTO obtenerMembresiaActiva() throws NegocioException {
         if (usuarioActual == null) {
             return null;
         }
@@ -315,7 +316,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public CitaDTO obtenerCitaBienvenida() {
+    public CitaDTO obtenerCitaBienvenida() throws NegocioException {
         if (usuarioActual == null) {
             return null;
         }
@@ -323,7 +324,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public List<VisitaDTO> obtenerHistorial() {
+    public List<VisitaDTO> obtenerHistorial() throws NegocioException {
         if (usuarioActual == null) {
             return new ArrayList<>();
         }
@@ -331,19 +332,19 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public void cancelarMembresia() {
+    public void cancelarMembresia() throws NegocioException {
         if (usuarioActual != null) {
             compraFachada.cancelarMembresia(usuarioActual.getCorreo());
         }
     }
 
     @Override
-    public List<SucursalDTO> obtenerSucursales() {
+    public List<SucursalDTO> obtenerSucursales() throws NegocioException {
         return compraFachada.obtenerSucursales();
     }
 
     @Override
-    public List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal) {
+    public List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal) throws NegocioException {
         SucursalDTO temp = new SucursalDTO();
         temp.setIdSucursal(idSucursal);
         return compraFachada.obtenerPlanes(temp);
@@ -355,14 +356,14 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal) {
+    public List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal) throws NegocioException {
         SucursalDTO temp = new SucursalDTO();
         temp.setIdSucursal(idSucursal);
         return compraFachada.obtenerEntrenadores(temp);
     }
 
     @Override
-    public List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador) {
+    public List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador) throws NegocioException {
         EntrenadorDTO temp = new EntrenadorDTO();
         temp.setIdEntrenador(idEntrenador);
         return compraFachada.obtenerHorarios(temp);
@@ -399,7 +400,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public double calcularTotal() {
+    public double calcularTotal() throws NegocioException{
         if (planSeleccionado == null) {
             return 0.0;
         }
@@ -407,7 +408,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public void confirmarCitaBienvenida() {
+    public void confirmarCitaBienvenida() throws NegocioException {
         if (entrenadorSeleccionado == null || horarioSeleccionado == null) {
             return;
         }
@@ -426,7 +427,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public List<SucursalDTO> iniciarMapa() {
+    public List<SucursalDTO> iniciarMapa() throws NegocioException {
         return controlMapa.iniciarMapa();
     }
 
@@ -451,7 +452,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     @Override
-    public byte[] generarQRMembresia(String idMembresia) {
+    public byte[] generarQRMembresia(String idMembresia) throws NegocioException {
         return compraFachada.generarQRMembresia(idMembresia);
     }
 

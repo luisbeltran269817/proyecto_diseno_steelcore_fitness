@@ -5,6 +5,7 @@
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -81,25 +82,29 @@ public class PantallaSeleccionInstructor extends PantallaBase {
         btnOmitir.addActionListener(e -> controlador.irAPerfilUsuario());
  
         btnContinuar.addActionListener(e -> {
-            if (entrenadorSeleccionado == null) {
-                JOptionPane.showMessageDialog(this,
-                    "Selecciona un instructor.", "Aviso",
-                    JOptionPane.WARNING_MESSAGE);
-                return;
+            try {
+                if (entrenadorSeleccionado == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Selecciona un instructor.", "Aviso",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                // Verificar si el entrenador tiene horarios disponibles
+                List<HorarioDTO> horarios = controlador.obtenerHorariosDeEntrenador(
+                        entrenadorSeleccionado.getIdEntrenador());
+                
+                if (horarios == null || horarios.isEmpty()) {
+                    JOptionPane.showMessageDialog(this,
+                            "Lo sentimos, este instructor no cuenta con horarios disponibles.\n"
+                                    + "Por favor elige otro o intenta más tarde.",
+                            "Sin horarios", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                controlador.setEntrenadorSeleccionado(entrenadorSeleccionado);
+                controlador.irASeleccionHorario();
+            } catch (NegocioException ex) {
+                System.getLogger(PantallaSeleccionInstructor.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
-            // Verificar si el entrenador tiene horarios disponibles
-            List<HorarioDTO> horarios = controlador.obtenerHorariosDeEntrenador(
-                entrenadorSeleccionado.getIdEntrenador());
- 
-            if (horarios == null || horarios.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                    "Lo sentimos, este instructor no cuenta con horarios disponibles.\n"
-                    + "Por favor elige otro o intenta más tarde.",
-                    "Sin horarios", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            controlador.setEntrenadorSeleccionado(entrenadorSeleccionado);
-            controlador.irASeleccionHorario();
         });
  
         panelBtns.add(btnOmitir);
@@ -118,29 +123,32 @@ public class PantallaSeleccionInstructor extends PantallaBase {
     }
  
     private void cargarEntrenadores() {
-        SucursalDTO sucursal = controlador.getSucursalSeleccionada();
-        if (sucursal == null) return;
- 
-        List<EntrenadorDTO> entrenadores =
-            controlador.obtenerEntrenadoresDeSucursal(sucursal.getIdSucursal());
- 
-        panelEntrenadores.removeAll();
- 
-        if (entrenadores == null || entrenadores.isEmpty()) {
-            JLabel sinEntrenadores = new JLabel("No hay instructores disponibles en esta sucursal.");
-            sinEntrenadores.setFont(Colores.FUENTE_LABEL);
-            sinEntrenadores.setForeground(Colores.TEXTO_SECUNDARIO);
-            sinEntrenadores.setAlignmentX(CENTER_ALIGNMENT);
-            panelEntrenadores.add(sinEntrenadores);
-        } else {
-            for (EntrenadorDTO e : entrenadores) {
-                panelEntrenadores.add(crearFilaEntrenador(e));
-                panelEntrenadores.add(Box.createVerticalStrut(10));
+        try {
+            SucursalDTO sucursal = controlador.getSucursalSeleccionada();
+            if (sucursal == null) return;
+            
+            List<EntrenadorDTO> entrenadores =controlador.obtenerEntrenadoresDeSucursal(sucursal.getIdSucursal());
+            
+            panelEntrenadores.removeAll();
+            
+            if (entrenadores == null || entrenadores.isEmpty()) {
+                JLabel sinEntrenadores = new JLabel("No hay instructores disponibles en esta sucursal.");
+                sinEntrenadores.setFont(Colores.FUENTE_LABEL);
+                sinEntrenadores.setForeground(Colores.TEXTO_SECUNDARIO);
+                sinEntrenadores.setAlignmentX(CENTER_ALIGNMENT);
+                panelEntrenadores.add(sinEntrenadores);
+            } else {
+                for (EntrenadorDTO e : entrenadores) {
+                    panelEntrenadores.add(crearFilaEntrenador(e));
+                    panelEntrenadores.add(Box.createVerticalStrut(10));
+                }
             }
+            
+            panelEntrenadores.revalidate();
+            panelEntrenadores.repaint();
+        } catch (NegocioException ex) {
+            System.getLogger(PantallaSeleccionInstructor.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
- 
-        panelEntrenadores.revalidate();
-        panelEntrenadores.repaint();
     }
  
     private JPanel crearFilaEntrenador(EntrenadorDTO e) {

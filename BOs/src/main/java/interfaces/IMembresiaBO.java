@@ -4,6 +4,7 @@
  */
 package interfaces;
 
+import Excepciones.NegocioException;
 import dtos.MembresiaDTO;
 import java.util.List;
 
@@ -12,8 +13,7 @@ import java.util.List;
  * @author Tungs
  */
 public interface IMembresiaBO {
-    public void guardar(MembresiaDTO m);
-    public MembresiaDTO buscarPorId(String id);
-    public List<MembresiaDTO> obtenerPorCliente(String idCliente);
-    public void actualizar(MembresiaDTO membresia);
+    public void guardar(MembresiaDTO membresia) throws NegocioException;
+    public void actualizar(MembresiaDTO membresia) throws NegocioException;
+    public MembresiaDTO buscarPorId(String idMembresia) throws NegocioException;
 }

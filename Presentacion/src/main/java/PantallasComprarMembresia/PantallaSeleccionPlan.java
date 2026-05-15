@@ -12,6 +12,7 @@ import dtos.AmenidadDTO;
 import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -106,7 +107,18 @@ public class PantallaSeleccionPlan extends PantallaBase {
             return;
         }
  
-        List<PlanDTO> planes = controlador.obtenerPlanesDeSucursal(sucursal.getIdSucursal());
+        List<PlanDTO> planes = new ArrayList<>();
+        try{
+            planes= controlador.obtenerPlanesDeSucursal(sucursal.getIdSucursal());
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudieron cargar los planes de sucursal",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+            planes = new ArrayList<>();
+        }
         panelPlanes.removeAll();
         for (PlanDTO p : planes) {
             panelPlanes.add(crearCardPlan(p));

@@ -19,6 +19,8 @@ public class PagoDTO {
     private EstadoPago estado;
 
     private LocalDateTime fecha;
+    
+    private String metodoPago;
 
     public enum EstadoPago {
         PENDIENTE,
@@ -26,17 +28,18 @@ public class PagoDTO {
         FALLIDO
     }
 
-    public PagoDTO(String idPago, String idCliente, Double monto, EstadoPago estado, LocalDateTime fecha) {
+    public PagoDTO(String idPago, String idCliente, Double monto, EstadoPago estado, LocalDateTime fecha, String metodoPago) {
         this.idPago = idPago;
         this.idCliente = idCliente;
         this.monto = monto;
         this.estado = estado;
         this.fecha = fecha;
+        this.metodoPago = metodoPago;
     }
 
     public PagoDTO() {
     }
-
+    
     public String getIdPago() {
         return idPago;
     }
@@ -76,5 +79,14 @@ public class PagoDTO {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
+
     
 }

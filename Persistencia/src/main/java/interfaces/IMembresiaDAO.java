@@ -4,7 +4,9 @@
  */
 package interfaces;
 
+import dominios.MembresiaPojo;
 import dtos.MembresiaDTO;
+import excepciones.PersistenciaException;
 import java.util.List;
 
 /**
@@ -12,8 +14,7 @@ import java.util.List;
  * @author luiscarlosbeltran
  */
 public interface IMembresiaDAO {
-    public void guardar(MembresiaDTO m);
-    public MembresiaDTO buscarPorId(String id);
-    public List<MembresiaDTO> obtenerPorCliente(String idCliente);
-    public void actualizar(MembresiaDTO membresia);
+    public void guardar(MembresiaPojo membresia) throws PersistenciaException;
+    public MembresiaPojo buscarPorId(String idMembresia) throws PersistenciaException;
+    public void actualizar(MembresiaPojo membresia) throws PersistenciaException;
 }

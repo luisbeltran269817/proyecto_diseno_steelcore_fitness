@@ -1,5 +1,6 @@
 package fachada;
 
+import Excepciones.NegocioException;
 import control.ControlMapaSucursal;
 import dtos.SucursalDTO;
 import java.util.List;
@@ -27,7 +28,7 @@ public class MapaSucursal implements IMapaSucursal {
     }
 
     @Override
-    public List<SucursalDTO> iniciarMapa() {
+    public List<SucursalDTO> iniciarMapa() throws NegocioException {
         return control.iniciarMapa();
     }
 
@@ -53,17 +54,17 @@ public class MapaSucursal implements IMapaSucursal {
     }
 
     @Override
-    public List<SucursalDTO> filtrarPorCiudad(String ciudad) {
+    public List<SucursalDTO> filtrarPorCiudad(String ciudad) throws NegocioException {
         return control.filtrarPorCiudad(ciudad);
     }
 
     @Override
-    public List<SucursalDTO> filtrarPorColonia(String colonia) {
+    public List<SucursalDTO> filtrarPorColonia(String colonia) throws NegocioException {
         return control.filtrarPorColonia(colonia);
     }
 
     @Override
-    public SucursalDTO verSucursalMasCercana(double lat, double lng) {
+    public SucursalDTO verSucursalMasCercana(double lat, double lng) throws NegocioException {
         return control.verSucursalMasCercana(lat, lng);
     }
 

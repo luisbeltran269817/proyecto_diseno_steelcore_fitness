@@ -153,7 +153,18 @@ public class PantallaDetallePlan extends PantallaBase {
         card.add(sub);
         card.add(Box.createVerticalStrut(20));
  
-        List<AmenidadDTO> extras = controlador.obtenerAmenidadesExtra();
+        List<AmenidadDTO> extras = new ArrayList<>();
+        try {
+            extras =controlador.obtenerAmenidadesExtra();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudieron cargar las amenidades disponibles.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+            extras = new ArrayList<>();
+        }
  
         if (extras == null || extras.isEmpty()) {
             JLabel sinExtras = new JLabel("No hay extras disponibles.");

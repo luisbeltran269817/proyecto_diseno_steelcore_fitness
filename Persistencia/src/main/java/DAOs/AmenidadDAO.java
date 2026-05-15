@@ -20,11 +20,9 @@ import org.bson.Document;
  * @author luiscarlosbeltran
  */
 public class AmenidadDAO implements IAmenidadDAO{
-    private final AlmacenComprarMembresiaMock almacen;
     private MongoCollection<Document> coleccion;
     
     public AmenidadDAO() {
-        this.almacen = AlmacenComprarMembresiaMock.getInstancia();
         this.coleccion =MongoConexion.obtenerBaseDatos().getCollection("amenidades");
     }
     
@@ -49,20 +47,4 @@ public class AmenidadDAO implements IAmenidadDAO{
         }
             return lista;
         }
-    
-    @Override
-    public AmenidadDTO buscarPorId(String id) {
-        return almacen.getAmenidades().get(id);
-    }
-    @Override
-    public List<AmenidadDTO> buscarPorIds(List<String> ids) {
-        List<AmenidadDTO> lista = new ArrayList<>();
-        for (String id : ids) {
-            AmenidadDTO a = almacen.getAmenidades().get(id);
-            if (a != null) {
-                lista.add(a);
-            }
-        }
-        return lista;
-    }
 }

@@ -31,7 +31,7 @@ public class CitaDTO {
         CANCELADA,
         COMPLETADA
     }
-
+    
     public String getIdCita() {
         return idCita;
     }

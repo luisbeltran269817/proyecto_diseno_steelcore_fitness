@@ -15,49 +15,52 @@ import org.bson.Document;
  * @author luiscarlosbeltran
  */
 public class EntrenadorPersistenciaMapper {
-    /**
-     * Convierte un entrenadorPoojo a Document
-     * @param entrenador
-     * @return 
-     */
-    public static Document toDocument(EntrenadorPojo entrenador) {
-        List<Document> horariosDocs = new ArrayList<>();
-        
-        if (entrenador.getHorarios()!= null) {
-            for (HorarioPojo horario : entrenador.getHorarios()) {
-                horariosDocs.add( HorarioPersistenciaMapper.toDocument(horario));
+    
+    public static Document toDocument(EntrenadorPojo pojo) {
+
+        List<Document> horariosDocs =new ArrayList<>();
+
+        if (pojo.getHorarios() != null) {
+            for (HorarioPojo horario: pojo.getHorarios()) {
+                horariosDocs.add(HorarioPersistenciaMapper.toDocument(horario));
             }
         }
-        
+
         Document doc = new Document();
-        
-        doc.append("_id", entrenador.getIdEntrenador());
-        doc.append("nombre", entrenador.getNombre());
-        doc.append("horarios", horariosDocs);
-        doc.append("idSucursal", entrenador.getIdSucursal());
+
+        doc.append("_id",pojo.getIdEntrenador());
+
+        doc.append("nombre",pojo.getNombre());
+
+        doc.append("idSucursal",pojo.getIdSucursal());
+
+        doc.append("horarios",horariosDocs);
+
         return doc;
     }
-
-    /**
-     * convierte un document a entrenadorPojo
-     * @param doc
-     * @return 
-     */
+    
     public static EntrenadorPojo toPojo(Document doc) {
-        EntrenadorPojo entrenador = new EntrenadorPojo();
-        
-        entrenador.setIdEntrenador(doc.getString("_id"));
-        entrenador.setNombre(doc.getString("nombre"));
-        
-        List<Document> horariosDocs = (List<Document>) doc.get("horarios");
-        List<HorarioPojo> horarios = new ArrayList<>();
+
+        EntrenadorPojo pojo = new EntrenadorPojo();
+
+        pojo.setIdEntrenador(doc.getString("_id"));
+
+        pojo.setNombre(doc.getString("nombre"));
+
+        pojo.setIdSucursal(doc.getString("idSucursal"));
+
+        List<Document> horariosDocs =(List<Document>)doc.get("horarios");
+
+        List<HorarioPojo> horarios =new ArrayList<>();
+
         if (horariosDocs != null) {
-            for (Document horarioDoc : horariosDocs) {
+            for (Document horarioDoc: horariosDocs) {
                 horarios.add(HorarioPersistenciaMapper.toPojo(horarioDoc));
             }
         }
-        entrenador.setHorarios(horarios);
-        entrenador.setIdSucursal(doc.getString("idSucursal"));
-        return entrenador;
+
+        pojo.setHorarios(horarios);
+
+        return pojo;
     }
 }
