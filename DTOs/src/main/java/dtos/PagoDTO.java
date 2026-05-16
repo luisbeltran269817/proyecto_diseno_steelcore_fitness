@@ -7,7 +7,7 @@ package dtos;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Clase DTO para pagos
  * @author Tungs
  */
 public class PagoDTO {

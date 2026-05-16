@@ -17,7 +17,7 @@ import mappersPersistencia.MembresiaPersistenciaMapper;
 import org.bson.Document;
 
 /**
- *
+ * Clase DAO para membresia
  * @author luiscarlosbeltran
  */
 public class MembresiaDAO implements IMembresiaDAO{
@@ -65,7 +65,12 @@ public class MembresiaDAO implements IMembresiaDAO{
             throw new PersistenciaException("Error al buscar membresía");
         }
     }
-    
+    /**
+     * Metodo que busca una membresia por codigoQR
+     * @param codigoQR un string del codigoQR
+     * @return MembresiaPojo si se encontro, null en caso contrario
+     * @throws PersistenciaException 
+     */
     @Override
     public MembresiaPojo buscarPorCodigoQR(String codigoQR) throws PersistenciaException {
         try {

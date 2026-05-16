@@ -5,7 +5,7 @@
 package dtos;
 
 /**
- *
+ * Clase DTO para usuarios
  * @author Tungs
  */
 public class UsuarioDTO {

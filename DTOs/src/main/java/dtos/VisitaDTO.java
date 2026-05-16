@@ -7,7 +7,7 @@ package dtos;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Clase DTO para visitas
  * @author Tungs
  */
 public class VisitaDTO {

@@ -15,7 +15,7 @@ import mappersPersistencia.AmenidadPersistenciaMapper;
 import org.bson.Document;
 
 /**
- *
+ * Clase DAO para amenidades
  * @author luiscarlosbeltran
  */
 public class AmenidadDAO implements IAmenidadDAO{
@@ -26,7 +26,10 @@ public class AmenidadDAO implements IAmenidadDAO{
     }
     
     
-    //Método para el nuevo pobladorBD;
+    /**
+     * Metodo para el nuevo poblador en BO
+     * @param amenidad la amenidad a agregar
+     */
     public void agregar(
         AmenidadPojo amenidad) {
         Document doc =
@@ -35,7 +38,10 @@ public class AmenidadDAO implements IAmenidadDAO{
             );
         coleccion.insertOne(doc);
     }
-    //Metodo nuevo supremo del mongo
+    /**
+     * metodo que consulta todas las amenidades en mongo
+     * @return List<AmenidadPojo> todas las amenidades
+     */
     @Override
     public List<AmenidadPojo> ConsultarTodas(){
         List<AmenidadPojo> lista = new ArrayList<>();

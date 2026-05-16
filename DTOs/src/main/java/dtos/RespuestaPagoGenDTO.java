@@ -5,9 +5,9 @@
 package dtos;
 
 /**
- *
+ * clase DTO para la respuesta a la peticion del pago
  * @author Tungs
- */
+ */ 
 public class RespuestaPagoGenDTO {
     private boolean exitoso;
     private String mensaje;

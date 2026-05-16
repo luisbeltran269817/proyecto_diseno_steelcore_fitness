@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
+ * Clase DTO para entrenadores
  * @author Gael Galaviz
  */
 public class EntrenadorDTO {

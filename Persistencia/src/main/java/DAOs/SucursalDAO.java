@@ -21,7 +21,7 @@ import mappersPersistencia.SucursalPersistenciaMapper;
 import org.bson.Document;
 
 /**
- *
+ * Clase DAO para sucursal
  * @author luiscarlosbeltran
  */
 public class SucursalDAO implements ISucursalDAO{
@@ -31,7 +31,11 @@ public class SucursalDAO implements ISucursalDAO{
     public SucursalDAO() {
         this.coleccion =MongoConexion.obtenerBaseDatos().getCollection("sucursales");
     }
-    
+    /**
+     * Metodo para obtener todas las sucursales
+     * @return List<SucursalPojo> las sucursales encontradas
+     * @throws PersistenciaException 
+     */
     @Override
     public List<SucursalPojo>obtenerSucursales() throws PersistenciaException {
         try {
@@ -45,7 +49,12 @@ public class SucursalDAO implements ISucursalDAO{
             throw new PersistenciaException("Error al consultar sucursales");
         }
     }
-    
+    /**
+     * Metodo buscar una sucursal usando su id
+     * @param idSucursal el id de la sucursal a buscar
+     * @return SucursalPojo de la sucursal si se encontro, null en caso contrario
+     * @throws PersistenciaException 
+     */
     @Override
     public SucursalPojo buscarPorId( String idSucursal) throws PersistenciaException {
         try{
@@ -58,7 +67,12 @@ public class SucursalDAO implements ISucursalDAO{
             throw new PersistenciaException("Error al buscar Sucursal");
         }
     }
-    
+    /**
+     * Metodo para obtener los planes de una sucursal
+     * @param idSucursal la sucursal de la que se quieren obtener los planes
+     * @return List<PlanPojo> si se encontro la sucursal, o lista vacia si no
+     * @throws PersistenciaException 
+     */
     @Override
     public List<PlanPojo>obtenerPlanesSucursal(String idSucursal) throws PersistenciaException {
         try {
@@ -73,8 +87,12 @@ public class SucursalDAO implements ISucursalDAO{
             throw new PersistenciaException("Si estás leyendo esto tengo hambre");
         }
     }
-    
-    //Tue hacerlo así para no modificar la firma del método que tenemos en capas superiores
+    /**
+     * metodo para buscar un plan por su id
+     * @param idPlan el id del plan a buscar
+     * @return PlanPojo si se encuentra, null si no
+     * @throws PersistenciaException 
+     */
     @Override
     public PlanPojo buscarPlanPorId(String idPlan)throws PersistenciaException {
         try {
@@ -96,7 +114,12 @@ public class SucursalDAO implements ISucursalDAO{
             throw new PersistenciaException("Error al buscar plan");
         }
     }
-    
+    /**
+     * metodo para obtener las amenidades de un plan
+     * @param idPlan el plan del cual se quieren obtener las amenidades
+     * @return List<AmenidadPojo> si se encontro el plan, lista vacia si no
+     * @throws PersistenciaException 
+     */
     @Override
     public List<AmenidadPojo> obtenerAmenidadesDePlan(String idPlan) throws PersistenciaException {
         try {

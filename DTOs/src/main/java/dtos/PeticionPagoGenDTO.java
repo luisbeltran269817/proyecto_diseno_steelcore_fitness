@@ -5,7 +5,7 @@
 package dtos;
 
 /**
- *
+ * Clase DTO para la peticion de un pago
  * @author Tungs
  */
 public class PeticionPagoGenDTO {

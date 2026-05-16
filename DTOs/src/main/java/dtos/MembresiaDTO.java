@@ -10,7 +10,7 @@ import java.util.List;
 
 
 /**
- *
+ * Clase DTO para membresias
  * @author julian izaguirre
  */
 public class MembresiaDTO {

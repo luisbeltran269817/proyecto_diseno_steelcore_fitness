@@ -7,7 +7,7 @@ package dtos;
 import java.util.List;
 
 /**
- *
+ * Clase DTO para planes
  * @author julian izaguirre
  */
 public class PlanDTO {

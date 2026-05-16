@@ -7,7 +7,7 @@ package dtos;
 import java.util.List;
 
 /**
- *
+ * Clase DTO para sucursales
  * @author julian izaguirre
  */
 public class SucursalDTO {

@@ -7,7 +7,7 @@ package dtos;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Clase DTO para citas
  * @author Gael Galaviz
  */
 public class CitaDTO {

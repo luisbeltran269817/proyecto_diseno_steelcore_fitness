@@ -20,7 +20,7 @@ import mappersPersistencia.EntrenadorPersistenciaMapper;
 import org.bson.Document;
 
 /**
- *
+ * Clase DAO para entrenadores
  * @author luiscarlosbeltran
  */
 public class EntrenadorDAO implements IEntrenadorDAO {
@@ -34,6 +34,12 @@ public class EntrenadorDAO implements IEntrenadorDAO {
         this.coleccion = MongoConexion.obtenerBaseDatos().getCollection("entrenadores");
     }
     
+    /**
+     * Metodo para buscar un entrenador por su id
+     * @param idEntrenador el id para buscar al entrenador
+     * @return EntrenadorPojo si se encontro, null en caso contrario
+     * @throws PersistenciaException 
+     */
     @Override
     public EntrenadorPojo buscarPorId(String idEntrenador) throws PersistenciaException {
         try{
@@ -52,8 +58,8 @@ public class EntrenadorDAO implements IEntrenadorDAO {
     /**
      * METODO CONVERTIDO A MONGO PORQUE LO USA EL CASO BASE
      * obtiene todos los entrenadores de una sucursal
-     * @param idSucursal
-     * @return 
+     * @param idSucursal la sucursal en la que se buscaran los entrenadores
+     * @return List<EntrenadorPojo> lista de entrenadores de la sucursal
      */
     @Override
     public List<EntrenadorPojo> obtenerPorSucursal(String idSucursal) throws PersistenciaException {
@@ -70,7 +76,12 @@ public class EntrenadorDAO implements IEntrenadorDAO {
             throw new PersistenciaException("Ocurrió un error al intentar obtener a los entrenadores por sucursal");
         }
     }
-    
+    /**
+     * Metodo para obtener los horarios de un entrenador
+     * @param idEntrenador el entrenador del que se quiere saber sus horarios
+     * @return List<HorarioPojo> los horarios del entrenados
+     * @throws PersistenciaException 
+     */
     @Override
     public List<HorarioPojo>obtenerHorariosEntrenador(String idEntrenador)throws PersistenciaException {
         try {

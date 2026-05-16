@@ -5,7 +5,7 @@
 package EstadoMembresia;
 
 /**
- *
+ * Clase ENUM para definir los estados de una membresia
  * @author Gael Galaviz
  */
 public enum EstadoMembresiaDTO {

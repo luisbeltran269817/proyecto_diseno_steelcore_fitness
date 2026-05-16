@@ -7,7 +7,7 @@ package dtos;
 import java.time.LocalTime;
 
 /**
- *
+ * Clase DTO para horarios
  * @author Tungs
  */
 public class HorarioDTO {

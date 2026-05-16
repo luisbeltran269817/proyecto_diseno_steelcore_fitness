@@ -25,7 +25,7 @@ import mappersPersistencia.MembresiaActivaPersistenciaMapper;
 import org.bson.Document;
 
 /**
- *
+ * Clase DAO para clientes
  * @author luiscarlosbeltran
  */
 public class ClienteDAO implements IClienteDAO {
@@ -140,7 +140,11 @@ public class ClienteDAO implements IClienteDAO {
             throw new PersistenciaException( "Error al guardar cita de bienvenida");
         }
     }
-    
+    /**
+     * Metodo para eliminar la membresia activa de un cliente
+     * @param correo el correo para buscar al cliente al que se le eliminara la membresia
+     * @throws PersistenciaException 
+     */
     @Override
     public void eliminarMembresiaActiva(String correo)throws PersistenciaException {
         try {

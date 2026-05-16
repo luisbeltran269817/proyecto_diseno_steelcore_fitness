@@ -5,7 +5,7 @@
 package dtos;
 
 /**
- *
+ * Clase DTO para amenidades
  * @author Gael Galaviz
  */
 public class AmenidadDTO {

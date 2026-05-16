@@ -5,7 +5,7 @@
 package dtos;
 
 /**
- *
+ * Clase DTO para el inicio de sesion
  * @author Tungs
  */
 public class InicioSesionDTO {

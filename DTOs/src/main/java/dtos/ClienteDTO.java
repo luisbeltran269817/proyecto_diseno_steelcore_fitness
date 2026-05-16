@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Clase DTO para clientes
  * @author Gael Galaviz
  */
 public class ClienteDTO extends UsuarioDTO {

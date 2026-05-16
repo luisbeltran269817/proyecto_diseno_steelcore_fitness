@@ -20,7 +20,7 @@ import mappersPersistencia.VisitaPersistenciaMapper;
 import org.bson.Document;
 
 /**
- *
+ * Clase DAO para visitas
  * @author julian izaguirre
  */
 public class VisitaDAO implements IVisitaDAO {
@@ -30,7 +30,13 @@ public class VisitaDAO implements IVisitaDAO {
     public VisitaDAO() {
           this.coleccion = MongoConexion.obtenerBaseDatos().getCollection("visitas");
     }
- 
+    /**
+     * metodo para guardar una visita
+     * @param idCliente el id del cliente que realizo la visita
+     * @param visita objeto VisitaPojo a guardar
+     * @return VisitaPojo
+     * @throws PersistenciaException 
+     */
     @Override
     public VisitaPojo guardar(String idCliente,VisitaPojo visita) throws PersistenciaException {
         try {
@@ -52,7 +58,12 @@ public class VisitaDAO implements IVisitaDAO {
         }
     }
 
-    
+    /**
+     * Metodo para obtener visitas de un cliente
+     * @param idCliente el cliente del que se quieren obtener las visitas
+     * @return List<VisitaPojo> las visitas del cliente
+     * @throws PersistenciaException 
+     */
     @Override
     public List<VisitaPojo> obtenerPorCliente(String idCliente)throws PersistenciaException {
         try {
