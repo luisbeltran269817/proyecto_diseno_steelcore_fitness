@@ -5,6 +5,7 @@
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -12,6 +13,7 @@ import dtos.MembresiaDTO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -120,7 +122,7 @@ public class PantallaQR extends PantallaBase {
         byte[] qrBytes;
         try {
             qrBytes =controlador.generarQRMembresia(m.getIdMembresia());
-        } catch (Exception ex) {
+        } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(
                     this,
                     "No fue posible generar el código QR.",
@@ -153,7 +155,7 @@ public class PantallaQR extends PantallaBase {
             } else {
                 panel.add(etiquetaError("No se pudo leer el QR"), BorderLayout.CENTER);
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             panel.add(etiquetaError("Error al mostrar el QR"), BorderLayout.CENTER);
         }
 
@@ -222,7 +224,7 @@ public class PantallaQR extends PantallaBase {
             MembresiaDTO reciente = controlador.getMembresiaRecienCreada();
             if (reciente != null) return reciente;
             return controlador.obtenerMembresiaActiva();
-        } catch (Exception e) {
+        } catch (NegocioException e) {
             return null;
         }
     }

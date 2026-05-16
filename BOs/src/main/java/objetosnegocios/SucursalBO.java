@@ -42,7 +42,7 @@ public class SucursalBO implements ISucursalBO{
             return SucursalMapper.toDTOList(pojos);
         } catch (PersistenciaException ex) {
             logger.severe("Error al obtener sucursales");
-            throw new NegocioException("No fue posible obtener sucursales");
+            throw new NegocioException("No fue posible obtener sucursales", ex);
         }
     }
     @Override
@@ -56,7 +56,7 @@ public class SucursalBO implements ISucursalBO{
             return SucursalMapper.toDTO(pojo);
         } catch (PersistenciaException ex) {
             logger.severe("Error al buscar sucursal");
-            throw new NegocioException("Error al buscar sucursal");
+            throw new NegocioException("Error al buscar sucursal", ex);
         }
     }
     @Override

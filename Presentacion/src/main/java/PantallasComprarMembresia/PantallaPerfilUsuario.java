@@ -5,6 +5,7 @@
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -41,7 +42,6 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @author Tungs
  */
 public class PantallaPerfilUsuario extends PantallaBase {
-
     private Tabla tablaVisitas;
     private Boton btnMembresia;
     private Boton btnQr;
@@ -315,7 +315,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
             actualizarBoton();
             actualizarBotonCita();
             cargarVisitas();
-        } catch (Exception ex) {
+        } catch (NegocioException ex) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -341,7 +341,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
                     v.getFechaHora().format(formato)
                 });
             }
-        } catch (Exception ex) {
+        } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(
                     this,
                     "No fue posible cargar el historial.",
@@ -353,7 +353,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
     private void actualizarBoton() {
         try{
             btnMembresia.setText(controlador.tieneMembresiaActiva() ? "Cancelar Membresía" : "Adquirir Membresía");
-        } catch (Exception ex) {
+        } catch (NegocioException ex) {
             btnMembresia.setText(
                     "Adquirir Membresía");
         }
@@ -372,7 +372,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
                             ? "Consultar Cita"
                             : "Agendar Cita"
             );
-        }catch (Exception ex) {
+        }catch (NegocioException ex) {
             btnCita.setVisible(false);
         }
     }
@@ -391,7 +391,7 @@ public class PantallaPerfilUsuario extends PantallaBase {
             } else {
                 controlador.irASeleccionSucursal();
             }
-        } catch (Exception ex) {
+        } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(
                     this,
                     "No fue posible completar la operación.",
@@ -405,8 +405,10 @@ public class PantallaPerfilUsuario extends PantallaBase {
             if (controlador.tieneCitaBienvenida()) {
                 CitaDTO cita = controlador.obtenerCitaBienvenida();
                 String mensaje
-                        = "Ya tienes una cita agendada.\n\n"
-                        + "ID cita: " + cita.getIdCita() + "\n"
+                        = """
+                          Ya tienes una cita agendada.
+                          
+                          ID cita: """ + cita.getIdCita() + "\n"
                         + "Entrenador: " + cita.getIdEntrenador() + "\n"
                         + "Sucursal: " + cita.getIdSucursal() + "\n"
                         + "Fecha y hora: " + cita.getFechaHora();
@@ -427,10 +429,10 @@ public class PantallaPerfilUsuario extends PantallaBase {
                         JOptionPane.QUESTION_MESSAGE
                 );
                 if (opcion == JOptionPane.YES_OPTION) {
-                    controlador.irASeleccionInstructor();
+                    controlador.irAAgendarCitaDesdePerfil();
                 }
             }
-        }catch (Exception ex) {
+        }catch (NegocioException ex) {
             JOptionPane.showMessageDialog(
                     this,
                     "No fue posible consultar la cita.",

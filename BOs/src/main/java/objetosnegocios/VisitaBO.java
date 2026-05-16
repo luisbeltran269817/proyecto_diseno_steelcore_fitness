@@ -52,7 +52,7 @@ public class VisitaBO implements IVisitaBO{
             return visita;
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al guardar visita", e);
-            throw new NegocioException("Error al guardar visita");
+            throw new NegocioException("Error al guardar visita", e);
         }
     }
     /**
@@ -78,7 +78,7 @@ public class VisitaBO implements IVisitaBO{
             return visitas;
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al obtener visitas", e);
-            throw new NegocioException( "Error al obtener visitas");
+            throw new NegocioException("Error al obtener visitas", e);
         }
     }
 }

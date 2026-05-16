@@ -10,6 +10,8 @@ import dtos.MembresiaDTO;
 import dtos.VisitaDTO;
 
 import java.awt.*;
+import static java.awt.Component.CENTER_ALIGNMENT;
+import static java.awt.Component.LEFT_ALIGNMENT;
 import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

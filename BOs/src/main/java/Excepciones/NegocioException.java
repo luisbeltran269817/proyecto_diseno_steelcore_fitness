@@ -26,4 +26,15 @@ public class NegocioException extends Exception {
     public NegocioException(String msg) {
         super(msg);
     }
+    
+    /**
+     * Constructor con causa. Permite encadenar la excepcion original
+     * para que no se pierda el stack trace al envolver PersistenciaException.
+     *
+     * @param msg   mensaje descriptivo del error de negocio
+     * @param cause excepcion original (p.ej. PersistenciaException)
+     */
+    public NegocioException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

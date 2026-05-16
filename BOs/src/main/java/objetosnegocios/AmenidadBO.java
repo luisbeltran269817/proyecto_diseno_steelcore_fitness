@@ -24,7 +24,6 @@ public class AmenidadBO implements IAmenidadBO {
         this.amenidadDAO = new AmenidadDAO();
     }
     
-    //ESTE MÉTODO SE MANDA A LLAMAR DESDE EL CASO BASE
     @Override
     public List<AmenidadDTO> obtenerTodas() {
         List<AmenidadPojo> pojos = amenidadDAO.ConsultarTodas();

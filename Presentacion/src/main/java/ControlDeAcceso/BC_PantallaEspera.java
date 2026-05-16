@@ -17,6 +17,8 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
 import java.awt.*;
+import static java.awt.Component.CENTER_ALIGNMENT;
+import static java.awt.Component.LEFT_ALIGNMENT;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

@@ -12,6 +12,8 @@ import Utilerias.PantallaBase;
 import dtos.AmenidadDTO;
 import dtos.PlanDTO;
 import java.awt.*;
+import static java.awt.Component.CENTER_ALIGNMENT;
+import static java.awt.Component.LEFT_ALIGNMENT;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -39,7 +41,6 @@ public class DatosBancarios extends PantallaBase {
 
     @Override
     protected void inicializarComponentes() {
-     try {
          JPanel fondo = new JPanel(new GridBagLayout());
          fondo.setBackground(Colores.FONDO_PRINCIPAL);
          setContentPane(fondo);
@@ -52,16 +53,27 @@ public class DatosBancarios extends PantallaBase {
          titulo.setFont(Colores.FUENTE_TITULO);
          titulo.setForeground(Colores.TEXTO_PRINCIPAL);
          titulo.setAlignmentX(CENTER_ALIGNMENT);
-         
-         JLabel lblMonto = new JLabel("Total a pagar: " + calcularTotal());
+
+         // Calculamos el total de forma segura; si falla mostramos un aviso pero
+         // dejamos la pantalla funcional para que el usuario pueda regresar
+         String textoMonto;
+         try {
+             textoMonto = "Total a pagar: " + calcularTotal();
+         } catch (NegocioException ex) {
+             textoMonto = "Total a pagar: (no disponible)";
+             JOptionPane.showMessageDialog(this,
+                 "No se pudo calcular el total. Verifique su seleccion de plan.",
+                 "Advertencia", JOptionPane.WARNING_MESSAGE);
+         }
+         JLabel lblMonto = new JLabel(textoMonto);
          lblMonto.setFont(new Font("Segoe UI", Font.BOLD, 18));
          lblMonto.setForeground(Colores.ACENTO);
          lblMonto.setAlignmentX(CENTER_ALIGNMENT);
          
-         txtTitular     = crearCampo("Nombre del titular");
-         txtNumero      = crearCampo("Número de tarjeta (16 dígitos)");
+         txtTitular = crearCampo("Nombre del titular");
+         txtNumero = crearCampo("Número de tarjeta (16 dígitos)");
          txtVencimiento = crearCampo("Fecha de vencimiento (MM/AA)");
-         txtCVV         = crearCampo("CVV");
+         txtCVV = crearCampo("CVV");
          
          aplicarFiltroNumerico(txtNumero, 16);
          aplicarFiltroNumerico(txtCVV, 4);
@@ -112,9 +124,6 @@ public class DatosBancarios extends PantallaBase {
          card.add(panelBtns);
          
          fondo.add(card);
-     } catch (NegocioException ex) {
-         System.getLogger(DatosBancarios.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-     }
     }
 
     private JTextField crearCampo(String placeholder) {
@@ -153,7 +162,7 @@ public class DatosBancarios extends PantallaBase {
     private void aplicarFiltroNumerico(JTextField campo, int maxLen) {
         ((AbstractDocument) campo.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
-            public void insertString(FilterBypass fb, int off, String str, AttributeSet a)
+            public void insertString(DocumentFilter.FilterBypass fb, int off, String str, AttributeSet a)
                     throws BadLocationException {
                 if (str != null && str.matches("\\d+")
                         && fb.getDocument().getLength() + str.length() <= maxLen)
@@ -161,7 +170,7 @@ public class DatosBancarios extends PantallaBase {
             }
 
             @Override
-            public void replace(FilterBypass fb, int off, int len, String str, AttributeSet a)
+            public void replace(DocumentFilter.FilterBypass fb, int off, int len, String str, AttributeSet a)
                     throws BadLocationException {
                 if (str != null && str.matches("\\d*")
                         && fb.getDocument().getLength() - len + str.length() <= maxLen)

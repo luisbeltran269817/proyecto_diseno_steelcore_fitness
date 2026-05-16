@@ -30,12 +30,9 @@ import dtos.VisitaDTO;
 import fachada.FachadaPagoMembresiaStripe;
 import fachada.IPagoMembresiaStripe;
 import interfaces.IAmenidadBO;
-import interfaces.ICitaBO;
 import interfaces.IClienteBO;
 import interfaces.IEntrenadorBO;
-import interfaces.IHorarioBO;
 import interfaces.IMembresiaBO;
-import interfaces.IPlanBO;
 import interfaces.ISucursalBO;
 import interfaces.IVisitaBO;
 import java.io.ByteArrayOutputStream;
@@ -77,15 +74,15 @@ public class ControlComprarMembresia {
         this.visitaBO= new VisitaBO();
         this.pagoFachada = new FachadaPagoMembresiaStripe();
     }
-    //ARREGLADO
+    
     public List<SucursalDTO> obtenerSucursales() throws NegocioException {
         return sucursalBO.obtenerSucursales();
     }
-    //ARREGLADO
+
     public List<PlanDTO> obtenerPlanes(String idSucursal) throws NegocioException {
         return sucursalBO.obtenerPlanesDeSucursal(idSucursal);
     }
-    //ARREGLADO
+    
     public List<AmenidadDTO> obtenerAmenidadesDePlan(String idPlan) throws NegocioException {
         PlanDTO plan = sucursalBO.buscarPlanPorId(idPlan);
         if (plan == null || plan.getAmenidades() == null) {
@@ -93,13 +90,13 @@ public class ControlComprarMembresia {
         }
         return plan.getAmenidades();
     }
-    //ARREGLADO
+    
     public List<AmenidadDTO> obtenerAmenidadesExtra() {
         return amenidadBO.obtenerTodas().stream()
                 .filter(a -> a.getTipo() == AmenidadDTO.TipoAmenidad.EXTRA)
                 .toList();
     }
-    //ARREGLADO
+
     public MembresiaDTO comprarMembresia(String idCliente, String idPlan,
             String idSucursal, List<AmenidadDTO> extras, String tokenTarjeta) throws NegocioException {
         
@@ -126,7 +123,7 @@ public class ControlComprarMembresia {
         pago.setFecha(LocalDateTime.now());
         return crearMembresia(idCliente, idPlan, idSucursal, extras, pago);
     }
-    //ARREGLADO
+    
     private MembresiaDTO crearMembresia(String idCliente, String idPlan,String idSucursal, List<AmenidadDTO> extras, PagoDTO pago) throws NegocioException {
 
         PlanDTO plan = sucursalBO.buscarPlanPorId(idPlan);
@@ -181,6 +178,7 @@ public class ControlComprarMembresia {
      *
      * @param idMembresia identificador de la membresía a codificar
      * @return bytes PNG listos para convertir en ImageIcon, o null si falla
+     * @throws Excepciones.NegocioException
      */
     public byte[] generarQRMembresia(String idMembresia) throws NegocioException {
         // 1. Recuperar la URL almacenada en la membresía
@@ -221,8 +219,6 @@ public class ControlComprarMembresia {
         }
     }
 
-    // ── Entrenadores / Horarios / Citas ───────────────────────────────────────
-    //ESTE METODO YA ESTA CON MONGO
     //aqui sigue hablandole al bo, pero las capas de negocio y persistenvcia ya cambiaron y (se supone) ya quedan con mongo
     public List<EntrenadorDTO> obtenerEntrenadores(String idSucursal) throws NegocioException {
         return entrenadorBO.obtenerPorSucursal(idSucursal);
@@ -251,16 +247,15 @@ public class ControlComprarMembresia {
         cita.setIdEntrenador(idEntrenador);
         cita.setIdSucursal(idSucursal);
         cita.setIdHorario(idHorario);
-        //Aquí truena muy feo
-        //Lo hardcodearé por ahora
-        cita.setFechaHora(LocalDateTime.parse("2026-05-14T10:15"));
+        // Fecha real: se usa la hora actual como placeholder hasta que se implemente
+        // la seleccion de fecha concreta en el horario
+        cita.setFechaHora(LocalDateTime.now());
         cita.setEstado(CitaDTO.EstadoCita.PENDIENTE);
-        
-        //horario.setDisponible(false);
-        //citaBO..actualizar(horario);
 
-        cliente.setCitaBienvenida(cita);
-        clienteBO.actualizar(cliente);
+        // Usamos guardarCitaBienvenida en lugar de actualizar(cliente) para evitar
+        // sobreescribir el documento completo del cliente (lo que borraria membresiaActiva
+        // si la lista de membresias del DTO vino vacia desde el mapper).
+        clienteBO.guardarCitaBienvenida(idCliente, cita);
 
         return cita;
     }
@@ -278,7 +273,6 @@ public class ControlComprarMembresia {
         return cliente.getCitaBienvenida();
     }
     
-    // ── Membresía activa / historial ──────────────────────────────────────────
     public boolean tieneMembresiaActiva(String idCliente) throws NegocioException {
         return obtenerMembresiaActiva(idCliente) != null;
     }
@@ -312,7 +306,6 @@ public class ControlComprarMembresia {
         }
     }
 
-    // ── Cálculo de precio ─────────────────────────────────────────────────────
     public double calcularTotal(String idPlan, List<AmenidadDTO> extras) throws NegocioException {
         PlanDTO plan = sucursalBO.buscarPlanPorId(idPlan);
         double base = (plan != null && plan.getPrecio() != null) ? plan.getPrecio() : 0.0;

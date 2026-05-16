@@ -12,9 +12,7 @@ import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
-
 import dtos.SucursalDTO;
-import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
 import java.util.List;
 

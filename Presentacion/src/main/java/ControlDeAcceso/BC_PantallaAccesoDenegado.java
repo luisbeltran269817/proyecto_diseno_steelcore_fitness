@@ -6,6 +6,7 @@ import Utilerias.Colores;
 import Utilerias.PantallaBase;
 
 import java.awt.*;
+import static java.awt.Component.CENTER_ALIGNMENT;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 

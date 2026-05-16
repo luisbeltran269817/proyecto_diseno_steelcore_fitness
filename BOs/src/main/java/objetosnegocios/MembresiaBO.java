@@ -11,7 +11,6 @@ import dtos.MembresiaDTO;
 import excepciones.PersistenciaException;
 import interfaces.IMembresiaBO;
 import interfaces.IMembresiaDAO;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mappersBO.MembresiaMapper;
@@ -39,7 +38,7 @@ public class MembresiaBO implements IMembresiaBO {
             logger.log(Level.INFO, "Membresía guardada correctamente");
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al guardar membresía", e);
-            throw new NegocioException("Error al guardar la membresía");
+            throw new NegocioException("Error al guardar la membresía", e);
         }
     }
     
@@ -53,7 +52,7 @@ public class MembresiaBO implements IMembresiaBO {
             return MembresiaMapper.toDTO(pojo);
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al buscar membresía", e);
-            throw new NegocioException("Error al buscar la membresía");
+            throw new NegocioException("Error al buscar la membresía", e);
         }
     }
     
@@ -69,7 +68,7 @@ public class MembresiaBO implements IMembresiaBO {
             logger.log(Level.INFO, "Membresía actualizada correctamente");
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al actualizar membresía", e);
-            throw new NegocioException("Error al actualizar la membresía");
+            throw new NegocioException("Error al actualizar la membresía", e);
         }
     }
 }

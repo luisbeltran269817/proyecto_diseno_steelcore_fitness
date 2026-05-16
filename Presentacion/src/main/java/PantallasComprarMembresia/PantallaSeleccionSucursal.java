@@ -191,8 +191,6 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         return card;
     }
  
-    // ── Popup de marcador ─────────────────────────────────────────────────────
- 
     private void crearPopup() {
         popupWindow = new JWindow(this);
         popupWindow.setAlwaysOnTop(true);

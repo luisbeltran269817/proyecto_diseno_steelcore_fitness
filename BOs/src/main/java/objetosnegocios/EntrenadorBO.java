@@ -13,7 +13,6 @@ import dtos.HorarioDTO;
 import excepciones.PersistenciaException;
 import interfaces.IEntrenadorBO;
 import interfaces.IEntrenadorDAO;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import mappersBO.EntrenadorMapper;
@@ -43,7 +42,7 @@ public class EntrenadorBO implements IEntrenadorBO {
             return EntrenadorMapper.toDTO(pojo);
         } catch (PersistenciaException ex) {
             logger.severe("Error al buscar entrenador");
-            throw new NegocioException("No fue posible buscar el entrenador");
+            throw new NegocioException("No fue posible buscar el entrenador", ex);
         }
     }
     
@@ -61,7 +60,7 @@ public class EntrenadorBO implements IEntrenadorBO {
             return EntrenadorMapper.toDTOList(pojos);
         } catch (PersistenciaException ex) {
             logger.severe("Error al obtener entrenadores");
-            throw new NegocioException("No fue posible obtener los entrenadores");
+            throw new NegocioException("No fue posible obtener los entrenadores", ex);
         }
     }
     
@@ -79,7 +78,7 @@ public class EntrenadorBO implements IEntrenadorBO {
             return HorarioMapper.toDTOList(horarios);
         } catch (PersistenciaException ex) {
             logger.severe("Error al obtener horarios");
-            throw new NegocioException("No fue posible obtener los horarios");
+            throw new NegocioException("No fue posible obtener los horarios", ex);
         }
     }
 }

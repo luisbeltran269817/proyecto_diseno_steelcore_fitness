@@ -128,7 +128,7 @@ public class ClienteBO implements IClienteBO {
             clienteDAO.eliminarMembresiaActiva(correo);
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al eliminar la meembresía activa",e);
-            throw new NegocioException("Error al eliminar membresía activa");
+            throw new NegocioException("Error al eliminar membresía activa", e);
         }
     }
     
