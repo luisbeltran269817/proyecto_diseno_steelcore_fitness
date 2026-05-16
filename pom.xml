@@ -15,7 +15,6 @@
         <module>PagoMembresiaStripeSubsistema</module>
         <module>DTOInfraestructura</module>
         <module>Mapa</module>
-        <module>controlMapaSucursal</module>
         <module>PresentacionMapas</module>
         <module>ControlAccesoSubsistema</module>        
     </modules>
