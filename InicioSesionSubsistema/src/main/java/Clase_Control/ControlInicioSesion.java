@@ -4,6 +4,7 @@
  */
 package Clase_Control;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import dtos.ClienteDTO;
 import dtos.UsuarioDTO;
 import objetosnegocios.ClienteBO;
@@ -18,14 +19,27 @@ public class ControlInicioSesion {
         this.clienteBO = new ClienteBO();
     }
     
+    /**
+     * Valida credenciales usando BCrypt.
+     *
+     * @param correo correo del usuario
+     * @param contraseña contraseña en texto plano ingresada por el usuario
+     * @return UsuarioDTO si las credenciales son correctas
+     * @throws Exception si el correo no existe o la contraseña es incorrecta
+     */
     public UsuarioDTO iniciarSesion(String correo, String contraseña) throws Exception {
         ClienteDTO cliente = clienteBO.buscarPorCorreo(correo);
         if (cliente == null) {
             throw new Exception("Correo o contraseña incorrectos.");
         }
-        if (!cliente.getContraseña().equals(contraseña)) {
+ 
+        BCrypt.Result resultado = BCrypt.verifyer()
+                .verify(contraseña.toCharArray(), cliente.getContraseña());
+ 
+        if (!resultado.verified) {
             throw new Exception("Correo o contraseña incorrectos.");
         }
+ 
         return cliente;
     }
 }

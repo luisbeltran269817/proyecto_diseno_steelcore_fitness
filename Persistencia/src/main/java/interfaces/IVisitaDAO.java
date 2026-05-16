@@ -5,7 +5,6 @@
 package interfaces;
 
 import dominios.VisitaPojo;
-import dtos.VisitaDTO;
 import excepciones.PersistenciaException;
 import java.util.List;
 

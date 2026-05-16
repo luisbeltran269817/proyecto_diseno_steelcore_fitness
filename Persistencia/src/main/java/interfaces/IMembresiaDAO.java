@@ -5,9 +5,7 @@
 package interfaces;
 
 import dominios.MembresiaPojo;
-import dtos.MembresiaDTO;
 import excepciones.PersistenciaException;
-import java.util.List;
 
 /**
  *
@@ -16,5 +14,6 @@ import java.util.List;
 public interface IMembresiaDAO {
     public void guardar(MembresiaPojo membresia) throws PersistenciaException;
     public MembresiaPojo buscarPorId(String idMembresia) throws PersistenciaException;
+    public MembresiaPojo buscarPorCodigoQR(String codigoQR) throws PersistenciaException;
     public void actualizar(MembresiaPojo membresia) throws PersistenciaException;
 }

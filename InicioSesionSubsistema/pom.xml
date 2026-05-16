@@ -19,6 +19,11 @@
             <artifactId>BOs</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+            <version>0.10.2</version>
+        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.release>23</maven.compiler.release>

@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
+ * Pantalla de acceso denegado.
  *
  * @author julian izaguirre
  */
@@ -35,7 +36,7 @@ public class BC_PantallaAccesoDenegado extends PantallaBase {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(44, 52, 44, 52));
 
-        // ── Ícono de error ────────────────────────────────────────────────
+        // ── Ícono de error (solo texto, sin imagen externa) ───────────────
         JLabel ico = new JLabel("✕", SwingConstants.CENTER);
         ico.setFont(new Font("Segoe UI", Font.BOLD, 52));
         ico.setForeground(new Color(220, 80, 80));
@@ -47,8 +48,10 @@ public class BC_PantallaAccesoDenegado extends PantallaBase {
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
         titulo.setAlignmentX(CENTER_ALIGNMENT);
 
-        // ── Estado ────────────────────────────────────────────────────────
-        JLabel lblEstado = new JLabel("● Estado: INACTIVO", SwingConstants.CENTER);
+        // ── Estado dinámico según motivo ──────────────────────────────────
+        // CORRECCIÓN: ya no muestra siempre "INACTIVO"; usa el texto del motivo
+        String estadoTexto = resolverEstado(motivo);
+        JLabel lblEstado = new JLabel("● " + estadoTexto, SwingConstants.CENTER);
         lblEstado.setFont(Colores.FUENTE_LABEL);
         lblEstado.setForeground(new Color(220, 80, 80));
         lblEstado.setAlignmentX(CENTER_ALIGNMENT);
@@ -79,7 +82,6 @@ public class BC_PantallaAccesoDenegado extends PantallaBase {
         btnRenovar.setAlignmentX(CENTER_ALIGNMENT);
         btnRenovar.addActionListener(e -> {
             dispose();
-            // Redirige al flujo de compra de membresía (otro subsistema)
             controlador.iniciarCompraMembresia();
         });
 
@@ -90,7 +92,7 @@ public class BC_PantallaAccesoDenegado extends PantallaBase {
             new BC_PantallaEspera(controlador).setVisible(true);
         });
 
-        // ── Ensamblar ─────────────────────────────────────────────────────
+        // ── Ensamblar (sin imagen externa) ────────────────────────────────
         card.add(ico);
         card.add(Box.createVerticalStrut(10));
         card.add(titulo);
@@ -106,5 +108,19 @@ public class BC_PantallaAccesoDenegado extends PantallaBase {
         card.add(btnVolver);
 
         fondo.add(card);
+    }
+
+    /**
+     * Determina el texto de estado según el motivo recibido.
+     * Evita mostrar siempre "INACTIVO" cuando el motivo puede ser otro.
+     */
+    private String resolverEstado(String motivo) {
+        if (motivo == null) return "Estado: INACTIVO";
+        String m = motivo.toLowerCase();
+        if (m.contains("vencida") || m.contains("vencido")) return "Estado: VENCIDA";
+        if (m.contains("cancelada") || m.contains("cancelado")) return "Estado: CANCELADA";
+        if (m.contains("sucursal") || m.contains("ubicación")) return "Estado: SUCURSAL INCORRECTA";
+        if (m.contains("no encontrado") || m.contains("no corresponde")) return "Estado: NO REGISTRADO";
+        return "Estado: INACTIVO";
     }
 }

@@ -12,6 +12,7 @@ import Utilerias.PantallaBase;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import java.awt.*;
+import static java.awt.Component.CENTER_ALIGNMENT;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.*;
@@ -98,8 +99,11 @@ public class PantallaSeleccionHorario extends PantallaBase{
             try {
                 controlador.confirmarCitaBienvenida();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
-                    "Ocurrió un error al intentar agendar", "Error al agendar",
+                // Mostrar mensaje corto sin stack trace
+                String msg = (ex.getMessage() != null && !ex.getMessage().isBlank())
+                        ? ex.getMessage()
+                        : "No fue posible agendar la cita. Intenta de nuevo.";
+                JOptionPane.showMessageDialog(this, msg, "Error al agendar",
                     JOptionPane.ERROR_MESSAGE);
                 return;
             }

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
@@ -10,7 +6,9 @@ import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
 import dtos.MembresiaDTO;
+
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,8 +20,8 @@ import javax.swing.border.EmptyBorder;
 /**
  * Pantalla que muestra el código QR de la membresía activa del socio.
  * El socio la abre y pone la pantalla frente al scanner de recepción.
- *
- * @author julian izaguirre
+ * 
+ * @author julian izaguirre 
  */
 public class PantallaQR extends PantallaBase {
 
@@ -42,7 +40,7 @@ public class PantallaQR extends PantallaBase {
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
 
-        JPanel card = crearCard(520, 660);
+        JPanel card = crearCard(520, 700);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(36, 48, 36, 48));
 
@@ -61,11 +59,51 @@ public class PantallaQR extends PantallaBase {
         JPanel qrPanel = crearQRPanel(m);
         qrPanel.setAlignmentX(CENTER_ALIGNMENT);
 
-        String urlTexto = (m != null && m.getCodigoQR() != null) ? acortarUrl(m.getCodigoQR()) : "—";
-        JLabel lblCodigo = new JLabel(urlTexto, SwingConstants.CENTER);
-        lblCodigo.setFont(new Font("Monospaced", Font.PLAIN, 10));
-        lblCodigo.setForeground(Colores.TEXTO_SECUNDARIO);
-        lblCodigo.setAlignmentX(CENTER_ALIGNMENT);
+        // ── Código copiable ────────────────────────────────────────────────
+        // CORRECCIÓN: cambiado de JLabel (no seleccionable) a JTextField (seleccionable y copiable)
+        String codigoQR = (m != null && m.getCodigoQR() != null) ? m.getCodigoQR() : "";
+
+        JTextField txtCodigo = new JTextField(codigoQR);
+        txtCodigo.setFont(new Font("Monospaced", Font.PLAIN, 10));
+        txtCodigo.setForeground(Colores.TEXTO_SECUNDARIO);
+        txtCodigo.setBackground(Colores.FONDO_CAMPO);
+        txtCodigo.setCaretColor(Colores.TEXTO_SECUNDARIO);
+        txtCodigo.setEditable(false); // solo lectura, pero seleccionable
+        txtCodigo.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Colores.BORDE_CAMPO, 1, true),
+                new EmptyBorder(6, 10, 6, 10)));
+        txtCodigo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        txtCodigo.setAlignmentX(CENTER_ALIGNMENT);
+        // Seleccionar todo al hacer clic → facilita Ctrl+C
+        txtCodigo.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                txtCodigo.selectAll();
+            }
+        });
+
+        // Botón copiar
+        JButton btnCopiar = new JButton("📋 Copiar código");
+        btnCopiar.setFont(Colores.FUENTE_LABEL);
+        btnCopiar.setForeground(Colores.TEXTO_PRINCIPAL);
+        btnCopiar.setBackground(new Color(60, 60, 100));
+        btnCopiar.setOpaque(true);
+        btnCopiar.setBorderPainted(false);
+        btnCopiar.setFocusPainted(false);
+        btnCopiar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnCopiar.setAlignmentX(CENTER_ALIGNMENT);
+        btnCopiar.setEnabled(!codigoQR.isEmpty());
+        btnCopiar.addActionListener(e -> {
+            if (!codigoQR.isEmpty()) {
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(new StringSelection(codigoQR), null);
+                btnCopiar.setText("✅ Copiado");
+                Timer t = new Timer(2000, ev -> btnCopiar.setText("📋 Copiar código"));
+                t.setRepeats(false);
+                t.start();
+            }
+        });
 
         JSeparator sep = new JSeparator();
         sep.setForeground(Colores.BORDE_CARD);
@@ -87,8 +125,10 @@ public class PantallaQR extends PantallaBase {
         card.add(Box.createVerticalStrut(20));
         card.add(qrPanel);
         card.add(Box.createVerticalStrut(8));
-        card.add(lblCodigo);
-        card.add(Box.createVerticalStrut(16));
+        card.add(txtCodigo);
+        card.add(Box.createVerticalStrut(6));
+        card.add(btnCopiar);
+        card.add(Box.createVerticalStrut(14));
         card.add(sep);
         card.add(Box.createVerticalStrut(14));
         card.add(infoPanel);
@@ -121,28 +161,19 @@ public class PantallaQR extends PantallaBase {
 
         byte[] qrBytes;
         try {
-            qrBytes =controlador.generarQRMembresia(m.getIdMembresia());
+            qrBytes = controlador.generarQRMembresia(m.getIdMembresia());
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(
                     this,
                     "No fue posible generar el código QR.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-
-            panel.add(
-                    etiquetaError(
-                            "Error al generar el QR"),
-                    BorderLayout.CENTER);
+            panel.add(etiquetaError("Error al generar el QR"), BorderLayout.CENTER);
             return panel;
         }
 
         if (qrBytes == null) {
-
-            panel.add(
-                    etiquetaError(
-                            "Error al generar el QR"),
-                    BorderLayout.CENTER);
-
+            panel.add(etiquetaError("Error al generar el QR"), BorderLayout.CENTER);
             return panel;
         }
 
@@ -169,16 +200,6 @@ public class PantallaQR extends PantallaBase {
         lbl.setFont(Colores.FUENTE_LABEL);
         lbl.setForeground(Colores.TEXTO_SECUNDARIO);
         return lbl;
-    }
-
-    private String acortarUrl(String url) {
-        try {
-            int idx = url.indexOf("?id=");
-            if (idx < 0) return url;
-            return "steelcorefitness.com/acceso?id=" + url.substring(idx + 4, Math.min(idx + 12, url.length())) + "...";
-        } catch (Exception e) {
-            return url;
-        }
     }
 
     private JPanel crearPanelInfo(MembresiaDTO m) {

@@ -10,32 +10,46 @@ import Utilerias.Colores;
 import Utilerias.PantallaBase;
 
 import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
 import java.awt.*;
 import static java.awt.Component.CENTER_ALIGNMENT;
 import static java.awt.Component.LEFT_ALIGNMENT;
+import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Módulo de Recepción — pantalla principal del subsistema Control de Acceso
- *
- * Toda la lógica de negocio vive en ControlAcceso (subsistema).
+ * Módulo de Recepción — pantalla principal del subsistema Control de Acceso.
  *
  * @author julian izaguirre
  */
 public class BC_PantallaEspera extends PantallaBase {
+
+    // Hints para ZXing: solo decodificar QR_CODE → mucho más rápido
+    private static final Map<DecodeHintType, Object> QR_HINTS;
+    static {
+        QR_HINTS = new EnumMap<>(DecodeHintType.class);
+        QR_HINTS.put(DecodeHintType.POSSIBLE_FORMATS, List.of(BarcodeFormat.QR_CODE));
+        QR_HINTS.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+    }
+
     private final Icontrolacceso controlAcceso;
 
     private QRCamaraCapturador camaraCapturador;
-    private JLabel lblVisor;        
-    private JLabel lblEstadoCamara; 
+    private JLabel lblVisor;
+    private JLabel lblEstadoCamara;
     private JButton btnCamara;
     private boolean camaraActiva = false;
 
@@ -57,7 +71,7 @@ public class BC_PantallaEspera extends PantallaBase {
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
 
-        JPanel card = crearCard(500, 630);
+        JPanel card = crearCard(500, 650);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(32, 44, 32, 44));
 
@@ -118,6 +132,7 @@ public class BC_PantallaEspera extends PantallaBase {
         lblOr.setForeground(Colores.TEXTO_SECUNDARIO);
         lblOr.setAlignmentX(CENTER_ALIGNMENT);
 
+        // Campo de texto seleccionable (permite copiar/pegar)
         txtCodigo = new JTextField();
         txtCodigo.setFont(Colores.FUENTE_CAMPO);
         txtCodigo.setForeground(Colores.TEXTO_PRINCIPAL);
@@ -129,6 +144,36 @@ public class BC_PantallaEspera extends PantallaBase {
         txtCodigo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
         txtCodigo.setAlignmentX(LEFT_ALIGNMENT);
         txtCodigo.addActionListener(e -> procesarCodigoManual());
+
+        // Panel con campo + botón copiar en la misma fila
+        JPanel panelCodigo = new JPanel(new BorderLayout(8, 0));
+        panelCodigo.setOpaque(false);
+        panelCodigo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
+        panelCodigo.setAlignmentX(LEFT_ALIGNMENT);
+
+        JButton btnCopiar = new JButton("📋");
+        btnCopiar.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        btnCopiar.setToolTipText("Copiar código al portapapeles");
+        btnCopiar.setFocusPainted(false);
+        btnCopiar.setBorderPainted(false);
+        btnCopiar.setBackground(Colores.FONDO_CAMPO);
+        btnCopiar.setForeground(Colores.TEXTO_PRINCIPAL);
+        btnCopiar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnCopiar.addActionListener(e -> {
+            String texto = txtCodigo.getText().trim();
+            if (!texto.isEmpty()) {
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(new StringSelection(texto), null);
+                btnCopiar.setText("✅");
+                Timer t = new Timer(1500, ev -> btnCopiar.setText("📋"));
+                t.setRepeats(false);
+                t.start();
+            }
+        });
+
+        panelCodigo.add(txtCodigo, BorderLayout.CENTER);
+        panelCodigo.add(btnCopiar, BorderLayout.EAST);
 
         Boton btnProcesar = crearBoton("Procesar código", Boton.Variante.PRIMARIO);
         btnProcesar.setAlignmentX(CENTER_ALIGNMENT);
@@ -146,7 +191,7 @@ public class BC_PantallaEspera extends PantallaBase {
         card.add(Box.createVerticalStrut(18));
         card.add(lblOr);
         card.add(Box.createVerticalStrut(10));
-        card.add(txtCodigo);
+        card.add(panelCodigo);
         card.add(Box.createVerticalStrut(12));
         card.add(btnProcesar);
         card.add(Box.createVerticalStrut(18));
@@ -162,7 +207,6 @@ public class BC_PantallaEspera extends PantallaBase {
 
         fondo.add(card);
 
-        // Liberar cámara al cerrar la ventana
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -234,10 +278,9 @@ public class BC_PantallaEspera extends PantallaBase {
     }
 
     private void procesarCodigo(String codigo) {
-        detenerCamara(); // liberar cámara antes de navegar
+        detenerCamara();
 
         try {
-            // ← Delegación al subsistema (StarUML: Controlador → Fachada)
             ResultadoAccesoDTO resultado = controlAcceso.procesarQR(codigo);
 
             txtCodigo.setText("");
@@ -246,13 +289,17 @@ public class BC_PantallaEspera extends PantallaBase {
 
         } catch (AccesoDenegadoException ex) {
             txtCodigo.setText("");
-            procesando = false; // permitir otro intento si viene de cámara
+            procesando = false;
             dispose();
             new BC_PantallaAccesoDenegado(controlador, ex.getMotivo()).setVisible(true);
         }
     }
 
+    // ────────────────────────────────────────────────────────────────────────
+    // Capturador interno
+    // ────────────────────────────────────────────────────────────────────────
     private static class QRCamaraCapturador {
+
         @FunctionalInterface
         interface OnFrame { void onFrame(BufferedImage frame); }
 
@@ -263,8 +310,7 @@ public class BC_PantallaEspera extends PantallaBase {
         private final OnQR     onQR;
         private Thread         hilo;
         private volatile boolean corriendo = false;
-
-        private Object webcam; // com.github.sarxos.webcam.Webcam
+        private Object webcam;
 
         QRCamaraCapturador(OnFrame onFrame, OnQR onQR) {
             this.onFrame = onFrame;
@@ -294,24 +340,35 @@ public class BC_PantallaEspera extends PantallaBase {
             }
         }
 
+        /**
+         * Fallback: captura pantalla completa y decodifica QR.
+         * CORRECCIÓN: eliminado el llamado a obtenerQRDelServidor() en el loop.
+         * Ese HTTP con timeout de 150ms se acumulaba en cada frame y causaba
+         * que el primer QR detectado tardara varios minutos.
+         */
         private boolean iniciarConRobot() {
             try {
                 Robot robot = new Robot();
                 corriendo = true;
                 hilo = new Thread(() -> {
+                    // Reutilizar reader con hints → solo QR_CODE, mucho más rápido
                     MultiFormatReader reader = new MultiFormatReader();
+                    reader.setHints(QR_HINTS);
+
+                    Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+                    Rectangle areaCaptura = new Rectangle(0, 0, pantalla.width, pantalla.height);
+
                     while (corriendo) {
                         try {
-                            BufferedImage frame = leerImagenQR(robot);
-                            if (frame != null) {
-                                onFrame.onFrame(frame);
-                                detectarQR(frame, reader);
-                            }
-                            Thread.sleep(300);
+                            // Captura directa de pantalla, sin llamadas HTTP
+                            BufferedImage frame = robot.createScreenCapture(areaCaptura);
+                            onFrame.onFrame(frame);
+                            detectarQR(frame, reader);
+                            Thread.sleep(150); // más rápido que antes (300ms)
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                             break;
-                        }
+                        } catch (Exception ignored) {}
                     }
                 }, "QR-Robot");
                 hilo.setDaemon(true);
@@ -322,24 +379,14 @@ public class BC_PantallaEspera extends PantallaBase {
             }
         }
 
-        private BufferedImage leerImagenQR(Robot robot) {
-            // Prioridad: imagen del servidor (más limpia y directa)
-            byte[] png = Fachada.FachadaControlAcceso.getInstancia().obtenerQRDelServidor();
-            if (png != null) {
-                try {
-                    return javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(png));
-                } catch (Exception ignored) {}
-            }
-            // Fallback: captura de pantalla completa
-            try {
-                Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
-                return robot.createScreenCapture(new Rectangle(0, 0, pantalla.width, pantalla.height));
-            } catch (Exception ignored) {}
-            return null;
-        }
-
+        /**
+         * Loop de la webcam real.
+         * CORRECCIÓN: reader con hints de formato para decodificación rápida.
+         */
         private void bucleCaptura() {
             MultiFormatReader reader = new MultiFormatReader();
+            reader.setHints(QR_HINTS);
+
             try {
                 Class<?> webcamClass = Class.forName("com.github.sarxos.webcam.Webcam");
                 java.lang.reflect.Method getImage = webcamClass.getMethod("getImage");
@@ -350,26 +397,30 @@ public class BC_PantallaEspera extends PantallaBase {
                         onFrame.onFrame(frame);
                         detectarQR(frame, reader);
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(80); // ~12 fps es suficiente para QR
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
-                // cámara desconectada u otro error
+                // cámara desconectada
             }
         }
 
+        /**
+         * Decodifica QR del frame usando los hints preconfigurados.
+         * Al limitar a QR_CODE el reader no itera los 150+ formatos → instantáneo.
+         */
         private void detectarQR(BufferedImage imagen, MultiFormatReader reader) {
             try {
                 BinaryBitmap bitmap = new BinaryBitmap(
                     new HybridBinarizer(
                         new BufferedImageLuminanceSource(imagen)));
-                Result resultado = reader.decode(bitmap);
+                Result resultado = reader.decode(bitmap, QR_HINTS);
                 if (resultado != null) {
                     onQR.onQR(resultado.getText());
                 }
             } catch (NotFoundException e) {
-                // Sin QR en el frame — normal, no hacer nada
+                // Sin QR en el frame — normal
             } catch (Exception e) {
                 // Otro error de decodificación — ignorar
             }

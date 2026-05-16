@@ -7,7 +7,6 @@ package interfaces;
 import dominios.AmenidadPojo;
 import dominios.PlanPojo;
 import dominios.SucursalPojo;
-import dtos.SucursalDTO;
 import excepciones.PersistenciaException;
 import java.util.List;
 

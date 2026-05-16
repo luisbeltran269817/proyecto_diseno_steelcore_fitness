@@ -6,7 +6,6 @@ package interfaces;
 
 import dominios.EntrenadorPojo;
 import dominios.HorarioPojo;
-import dtos.EntrenadorDTO;
 import excepciones.PersistenciaException;
 import java.util.List;
 

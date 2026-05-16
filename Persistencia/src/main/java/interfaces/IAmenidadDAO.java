@@ -5,7 +5,6 @@
 package interfaces;
 
 import dominios.AmenidadPojo;
-import dtos.AmenidadDTO;
 import java.util.List;
 
 /**

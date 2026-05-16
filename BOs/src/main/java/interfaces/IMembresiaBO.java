@@ -6,7 +6,6 @@ package interfaces;
 
 import Excepciones.NegocioException;
 import dtos.MembresiaDTO;
-import java.util.List;
 
 /**
  *
@@ -16,4 +15,5 @@ public interface IMembresiaBO {
     public void guardar(MembresiaDTO membresia) throws NegocioException;
     public void actualizar(MembresiaDTO membresia) throws NegocioException;
     public MembresiaDTO buscarPorId(String idMembresia) throws NegocioException;
+    public MembresiaDTO buscarPorCodigoQR(String codigoQR) throws NegocioException;
 }

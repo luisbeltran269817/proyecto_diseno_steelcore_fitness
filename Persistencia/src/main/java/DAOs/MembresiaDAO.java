@@ -9,11 +9,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import conexion.MongoConexion;
 import dominios.MembresiaPojo;
-import dtos.MembresiaDTO;
 import excepciones.PersistenciaException;
 import interfaces.IMembresiaDAO;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mappersPersistencia.MembresiaPersistenciaMapper;
@@ -69,6 +66,18 @@ public class MembresiaDAO implements IMembresiaDAO{
         }
     }
     
+    @Override
+    public MembresiaPojo buscarPorCodigoQR(String codigoQR) throws PersistenciaException {
+        try {
+            if (codigoQR == null || codigoQR.isBlank()) return null;
+            Document doc = coleccion.find(Filters.eq("codigoQR", codigoQR)).first();
+            return (doc != null) ? MembresiaPersistenciaMapper.toPojo(doc) : null;
+        } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error al buscar membresia por QR", e);
+            throw new PersistenciaException("Error al buscar membresia por QR");
+        }
+    }
+
     /**
      * Método que actualiza los datos de una membresia
      * @param membresia la membresia nueva a actualizar

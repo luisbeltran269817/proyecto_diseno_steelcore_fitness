@@ -58,6 +58,18 @@ public class MembresiaBO implements IMembresiaBO {
     
     
     @Override
+    public MembresiaDTO buscarPorCodigoQR(String codigoQR) throws NegocioException {
+        try {
+            if (codigoQR == null || codigoQR.isBlank()) return null;
+            MembresiaPojo pojo = membresiaDAO.buscarPorCodigoQR(codigoQR);
+            return MembresiaMapper.toDTO(pojo);
+        } catch (PersistenciaException e) {
+            logger.log(Level.SEVERE, "Error al buscar membresia por QR", e);
+            return null;
+        }
+    }
+
+    @Override
     public void actualizar(MembresiaDTO membresia) throws NegocioException {
         try {
             if (membresia == null) {

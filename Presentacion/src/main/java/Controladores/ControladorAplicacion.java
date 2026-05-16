@@ -321,15 +321,19 @@ public class ControladorAplicacion implements IControladorAplicacion {
  
     @Override
     public void iniciarSesion(String correo, String contrasena) throws NegocioException {
-        UsuarioDTO usuario = null;
+        UsuarioDTO usuario;
         try {
             usuario = inicioSesionFachada.iniciarSesion(correo, contrasena);
         } catch (Exception ex) {
-            System.getLogger(ControladorAplicacion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            throw new NegocioException(ex.getMessage() != null ? ex.getMessage() : "Correo o contrasena incorrectos.");
         }
         gestor.setUsuarioActual(usuario);
-        CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
-        gestor.setCitaBienvenida(cita);
+        try {
+            CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
+            gestor.setCitaBienvenida(cita);
+        } catch (NegocioException ex) {
+            // No bloquear el login si falla la consulta de cita
+        }
         irAPerfilUsuario();
     }
  
@@ -424,7 +428,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
             gestor.setMembresiaRecienCreada(creada);
             gestor.setTokenTarjeta(null);
             irATransaccionExitosa();
-        } catch (Exception e) {
+        } catch (NegocioException e) {
             irATransaccionFallida(e.getMessage());
         }
     }

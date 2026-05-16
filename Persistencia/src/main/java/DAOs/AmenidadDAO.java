@@ -8,7 +8,6 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import conexion.MongoConexion;
 import dominios.AmenidadPojo;
-import dtos.AmenidadDTO;
 import interfaces.IAmenidadDAO;
 import java.util.ArrayList;
 import java.util.List;

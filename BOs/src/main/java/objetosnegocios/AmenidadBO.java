@@ -5,11 +5,20 @@
 package objetosnegocios;
 
 import DAOs.AmenidadDAO;
+import DAOs.SucursalDAO;
 import dominios.AmenidadPojo;
+import dominios.SucursalPojo;
 import dtos.AmenidadDTO;
+import excepciones.PersistenciaException;
 import interfaces.IAmenidadBO;
 import java.util.List;
 import interfaces.IAmenidadDAO;
+import interfaces.ISucursalDAO;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mappersBO.AmenidadMapper;
 
 
@@ -18,16 +27,30 @@ import mappersBO.AmenidadMapper;
  * @author Tungs
  */
 public class AmenidadBO implements IAmenidadBO {
-    private final IAmenidadDAO amenidadDAO;
-
+    private final ISucursalDAO sucursalDAO;
+    private static final Logger logger = Logger.getLogger(AmenidadBO.class.getName());
+ 
     public AmenidadBO() {
-        this.amenidadDAO = new AmenidadDAO();
+        this.sucursalDAO = new SucursalDAO();
     }
-    
+ 
     @Override
     public List<AmenidadDTO> obtenerTodas() {
-        List<AmenidadPojo> pojos = amenidadDAO.ConsultarTodas();
-        return AmenidadMapper.toDTOList(pojos);
+        try {
+            List<SucursalPojo> sucursales = sucursalDAO.obtenerSucursales();
+            Map<String, AmenidadPojo> mapa = new LinkedHashMap<>();
+            for (SucursalPojo sucursal : sucursales) {
+                if (sucursal.getAmenidadesSucursal() != null) {
+                    for (AmenidadPojo a : sucursal.getAmenidadesSucursal()) {
+                        mapa.putIfAbsent(a.getIdAmenidad(), a);
+                    }
+                }
+            }
+            return AmenidadMapper.toDTOList(new ArrayList<>(mapa.values()));
+        } catch (PersistenciaException e) {
+            logger.log(Level.SEVERE, "Error al obtener amenidades", e);
+            return new ArrayList<>();
+        }
     }
 
 }

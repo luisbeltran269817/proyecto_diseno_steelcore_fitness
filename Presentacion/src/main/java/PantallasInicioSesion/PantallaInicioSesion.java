@@ -94,8 +94,6 @@ public class PantallaInicioSesion extends PantallaBase {
 
             UsuarioDTO usuarioLogueado = controlador.getUsuarioActual();
 
-            JOptionPane.showMessageDialog(this,null, "Acceso Exitoso", JOptionPane.INFORMATION_MESSAGE);
-
         } catch (Exception ex) {
             mostrarError(ex.getMessage());
         }

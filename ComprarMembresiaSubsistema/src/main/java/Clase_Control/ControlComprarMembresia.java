@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Clase_Control;
 
 import Excepciones.NegocioException;
@@ -51,7 +47,7 @@ import objetosnegocios.VisitaBO;
 import patronBuilder.MembresiaBuilder;
 
 /**
- *
+ * 
  * @author julian izaguirre
  */
 public class ControlComprarMembresia {
@@ -63,18 +59,17 @@ public class ControlComprarMembresia {
     private final IEntrenadorBO entrenadorBO;
     private final IVisitaBO visitaBO;
     private final IPagoMembresiaStripe pagoFachada;
-    
-    public ControlComprarMembresia() {
 
+    public ControlComprarMembresia() {
         this.sucursalBO = new SucursalBO();
         this.amenidadBO = new AmenidadBO();
         this.membresiaBO = new MembresiaBO();
         this.clienteBO = new ClienteBO();
         this.entrenadorBO = new EntrenadorBO();
-        this.visitaBO= new VisitaBO();
+        this.visitaBO = new VisitaBO();
         this.pagoFachada = new FachadaPagoMembresiaStripe();
     }
-    
+
     public List<SucursalDTO> obtenerSucursales() throws NegocioException {
         return sucursalBO.obtenerSucursales();
     }
@@ -82,7 +77,7 @@ public class ControlComprarMembresia {
     public List<PlanDTO> obtenerPlanes(String idSucursal) throws NegocioException {
         return sucursalBO.obtenerPlanesDeSucursal(idSucursal);
     }
-    
+
     public List<AmenidadDTO> obtenerAmenidadesDePlan(String idPlan) throws NegocioException {
         PlanDTO plan = sucursalBO.buscarPlanPorId(idPlan);
         if (plan == null || plan.getAmenidades() == null) {
@@ -90,7 +85,7 @@ public class ControlComprarMembresia {
         }
         return plan.getAmenidades();
     }
-    
+
     public List<AmenidadDTO> obtenerAmenidadesExtra() {
         return amenidadBO.obtenerTodas().stream()
                 .filter(a -> a.getTipo() == AmenidadDTO.TipoAmenidad.EXTRA)
@@ -99,7 +94,7 @@ public class ControlComprarMembresia {
 
     public MembresiaDTO comprarMembresia(String idCliente, String idPlan,
             String idSucursal, List<AmenidadDTO> extras, String tokenTarjeta) throws NegocioException {
-        
+
         if (tieneMembresiaActiva(idCliente)) {
             throw new NegocioException("El cliente ya tiene una membresía activa");
         }
@@ -123,12 +118,13 @@ public class ControlComprarMembresia {
         pago.setFecha(LocalDateTime.now());
         return crearMembresia(idCliente, idPlan, idSucursal, extras, pago);
     }
-    
-    private MembresiaDTO crearMembresia(String idCliente, String idPlan,String idSucursal, List<AmenidadDTO> extras, PagoDTO pago) throws NegocioException {
+
+    private MembresiaDTO crearMembresia(String idCliente, String idPlan, String idSucursal,
+            List<AmenidadDTO> extras, PagoDTO pago) throws NegocioException {
 
         PlanDTO plan = sucursalBO.buscarPlanPorId(idPlan);
         SucursalDTO sucursal = sucursalBO.buscarPorId(idSucursal);
-        
+
         MembresiaDTO m = new MembresiaBuilder()
                 .setCliente(idCliente)
                 .setPlan(plan)
@@ -145,13 +141,13 @@ public class ControlComprarMembresia {
         String fechaVigencia = m.getFechaCaducidad()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String urlQR = "https://steelcorefitness.com/acceso"
-                + "?id="       + m.getIdMembresia()
-                + "&cliente="  + idCliente
-                + "&plan="     + idPlan
+                + "?id=" + m.getIdMembresia()
+                + "&cliente=" + idCliente
+                + "&plan=" + idPlan
                 + "&sucursal=" + idSucursal
                 + "&vigencia=" + fechaVigencia;
         m.setCodigoQR(urlQR);
-        
+
         membresiaBO.guardar(m);
 
         ClienteDTO cliente = clienteBO.buscarPorCorreo(idCliente);
@@ -161,53 +157,22 @@ public class ControlComprarMembresia {
         return m;
     }
 
-    /**
-     * Genera los bytes PNG del código QR para una membresía.
-     *
-     * El contenido del QR es la URL real almacenada en m.getCodigoQR(),
-     * con formato https://steelcorefitness.com/acceso?id=...
-     * Cualquier escáner de celular (Google Lens, cámara nativa) puede
-     * abrirla directamente en el navegador.
-     *
-     * Mejoras aplicadas vs la versión anterior:
-     *  - ErrorCorrectionLevel.H (30%): el QR sigue siendo legible aunque
-     *    esté parcialmente tapado o sucio.
-     *  - Margen 2 (antes era el default de 4): QR más grande en el mismo espacio.
-     *  - Fondo blanco forzado: MatrixToImageConfig garantiza contraste máximo.
-     *  - 400x400 px en lugar de 300x300: mejor resolución para escanear.
-     *
-     * @param idMembresia identificador de la membresía a codificar
-     * @return bytes PNG listos para convertir en ImageIcon, o null si falla
-     * @throws Excepciones.NegocioException
-     */
     public byte[] generarQRMembresia(String idMembresia) throws NegocioException {
-        // 1. Recuperar la URL almacenada en la membresía
         MembresiaDTO m = membresiaBO.buscarPorId(idMembresia);
         String contenido = (m != null && m.getCodigoQR() != null)
                 ? m.getCodigoQR()
                 : "https://steelcorefitness.com/acceso?id=" + idMembresia;
 
         try {
-            // 2. Configurar hints para QR de máxima calidad
             Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
-            // H = 30% de corrección de errores: sigue siendo legible parcialmente tapado
             hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-            // Margen reducido a 2 para que el QR ocupe más espacio en el panel
             hints.put(EncodeHintType.MARGIN, 2);
-            // Codificación UTF-8 explícita
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
 
-            // 3. Generar la matriz
             QRCodeWriter writer = new QRCodeWriter();
-            // 400x400 en lugar de 300x300 para mejor resolución al escanear
             BitMatrix matrix = writer.encode(contenido, BarcodeFormat.QR_CODE, 400, 400, hints);
 
-            // 4. Renderizar: negro sobre fondo BLANCO (contraste máximo)
-            //    MatrixToImageConfig(onColor, offColor) — ARGB
-            MatrixToImageConfig config = new MatrixToImageConfig(
-                    0xFF000000,  // módulos negros
-                    0xFFFFFFFF   // fondo blanco
-            );
+            MatrixToImageConfig config = new MatrixToImageConfig(0xFF000000, 0xFFFFFFFF);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             MatrixToImageWriter.writeToStream(matrix, "PNG", out, config);
@@ -219,7 +184,6 @@ public class ControlComprarMembresia {
         }
     }
 
-    //aqui sigue hablandole al bo, pero las capas de negocio y persistenvcia ya cambiaron y (se supone) ya quedan con mongo
     public List<EntrenadorDTO> obtenerEntrenadores(String idSucursal) throws NegocioException {
         return entrenadorBO.obtenerPorSucursal(idSucursal);
     }
@@ -231,40 +195,23 @@ public class ControlComprarMembresia {
     public CitaDTO agendarCitaBienvenida(String idCliente, String idEntrenador,
             String idSucursal, String idHorario) throws NegocioException {
 
-        ClienteDTO cliente = clienteBO.buscarPorCorreo(idCliente);
-        if (cliente.getCitaBienvenida() != null) {
-            throw new NegocioException("El cliente ya cuenta con una cita de bienvenida");
-        }
-        //Faltan más métodossssss
-        //HorarioDTO horario = horarioBO.buscarPorId(idHorario);
-        //if (!horario.isDisponible()) {
-        //    throw new NegocioException("Horario no disponible");
-        //}
-
         CitaDTO cita = new CitaDTO();
         cita.setIdCita(UUID.randomUUID().toString());
         cita.setIdCliente(idCliente);
         cita.setIdEntrenador(idEntrenador);
         cita.setIdSucursal(idSucursal);
         cita.setIdHorario(idHorario);
-        // Fecha real: se usa la hora actual como placeholder hasta que se implemente
-        // la seleccion de fecha concreta en el horario
         cita.setFechaHora(LocalDateTime.now());
         cita.setEstado(CitaDTO.EstadoCita.PENDIENTE);
-
-        // Usamos guardarCitaBienvenida en lugar de actualizar(cliente) para evitar
-        // sobreescribir el documento completo del cliente (lo que borraria membresiaActiva
-        // si la lista de membresias del DTO vino vacia desde el mapper).
         clienteBO.guardarCitaBienvenida(idCliente, cita);
 
         return cita;
     }
 
-    //Se supone que este manda a llamar un método que reocge los horarios con estado disponible
     public boolean hayHorariosDisponibles(String idEntrenador) throws NegocioException {
         return !obtenerHorarios(idEntrenador).isEmpty();
     }
-    
+
     public CitaDTO obtenerCitaBienvenida(String idCliente) throws NegocioException {
         ClienteDTO cliente = clienteBO.buscarPorCorreo(idCliente);
         if (cliente == null || cliente.getCitaBienvenida() == null) {
@@ -272,31 +219,27 @@ public class ControlComprarMembresia {
         }
         return cliente.getCitaBienvenida();
     }
-    
+
     public boolean tieneMembresiaActiva(String idCliente) throws NegocioException {
         return obtenerMembresiaActiva(idCliente) != null;
     }
 
-    /**
-     * Método que obtiene la membresía activa de un cliente
-     * @param idCliente
-     * @return
-     * @throws NegocioException 
-     */
     public MembresiaDTO obtenerMembresiaActiva(String idCliente) throws NegocioException {
-        MembresiaDTO membresiaActiva=clienteBO.obtenerMembresiaActiva(idCliente);
-        if(membresiaActiva == null){
+        MembresiaDTO membresiaActiva = clienteBO.obtenerMembresiaActiva(idCliente);
+        if (membresiaActiva == null) {
             return null;
         }
         return membresiaActiva;
     }
-    
-    //Pendiente esto
-    public List<VisitaDTO> obtenerHistorial(String idCliente) throws NegocioException {
-        return visitaBO.obtenerPorCliente(idCliente) ;
+
+    public List<VisitaDTO> obtenerHistorial(String correo) throws NegocioException {
+        ClienteDTO cliente = clienteBO.buscarPorCorreo(correo);
+        if (cliente == null) {
+            return new ArrayList<>();
+        }
+        return visitaBO.obtenerPorCliente(cliente.getIdCliente());
     }
-    
-    //Método que cancela la membresía de un cliente
+
     public void cancelarMembresia(String idCliente) throws NegocioException {
         MembresiaDTO m = obtenerMembresiaActiva(idCliente);
         if (m != null) {
