@@ -16,7 +16,8 @@
         <module>DTOInfraestructura</module>
         <module>Mapa</module>
         <module>PresentacionMapas</module>
-        <module>ControlAccesoSubsistema</module>        
+        <module>ControlAccesoSubsistema</module>
+        <module>Dominio_modulo</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
