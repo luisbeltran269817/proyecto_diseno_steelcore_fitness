@@ -151,25 +151,21 @@ public class BC_PantallaExpediente extends PantallaBase {
         // Aquí solo mostramos confirmación visual.
         btnAreaGeneral.addActionListener(e ->
             JOptionPane.showMessageDialog(this,
-                "Acceso a Área General confirmado.\n¡Échale ganas, "
-                    + cliente.getNombre() + "! 💪",
+                "Acceso a Área General confirmado.\nÉchale ganas "
+                    + cliente.getNombre() + "",
                 "Área General",
                 JOptionPane.INFORMATION_MESSAGE)
         );
 
-        btnClases.addActionListener(e ->
-            JOptionPane.showMessageDialog(this,
-                "Módulo de clases próximamente disponible.",
-                "Consultar Clases",
-                JOptionPane.INFORMATION_MESSAGE)
-        );
+        btnClases.addActionListener(e -> {
+            dispose();
+            new BC_PantallaClases(controlador, resultado).setVisible(true);
+        });
 
-        btnEntrenador.addActionListener(e ->
-            JOptionPane.showMessageDialog(this,
-                "Módulo de entrenadores próximamente disponible.",
-                "Solicitar Entrenador",
-                JOptionPane.INFORMATION_MESSAGE)
-        );
+        btnEntrenador.addActionListener(e -> {
+            dispose();
+            new BC_PantallaEntrenadores(controlador, resultado).setVisible(true);
+        });
 
         btnRegresar.addActionListener(e -> {
             dispose();
