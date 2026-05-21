@@ -51,7 +51,7 @@ public class BC_PantallaAccesoDenegado extends PantallaBase {
         // ── Estado dinámico según motivo ──────────────────────────────────
         // CORRECCIÓN: ya no muestra siempre "INACTIVO"; usa el texto del motivo
         String estadoTexto = resolverEstado(motivo);
-        JLabel lblEstado = new JLabel("● " + estadoTexto, SwingConstants.CENTER);
+        JLabel lblEstado = new JLabel("B" + estadoTexto, SwingConstants.CENTER);
         lblEstado.setFont(Colores.FUENTE_LABEL);
         lblEstado.setForeground(new Color(220, 80, 80));
         lblEstado.setAlignmentX(CENTER_ALIGNMENT);

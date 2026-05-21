@@ -29,7 +29,7 @@ import javax.swing.border.EmptyBorder;
  */
 public class PantallaInicioSesionSocios extends PantallaBase {
  
-    private CampoTexto     txtCorreo;
+    private CampoTexto      txtCorreo;
     private CampoContrasena txtContrasena;
  
     public PantallaInicioSesionSocios(IControladorAplicacion controlador) {
@@ -44,7 +44,7 @@ public class PantallaInicioSesionSocios extends PantallaBase {
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
  
-        JPanel card = crearCard(480, 580);
+        JPanel card = crearCard(480, 620);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(60, 60, 60, 60));
  
@@ -64,7 +64,7 @@ public class PantallaInicioSesionSocios extends PantallaBase {
         sub.setForeground(Colores.TEXTO_SECUNDARIO);
         sub.setAlignmentX(CENTER_ALIGNMENT);
  
-        txtCorreo    = new CampoTexto("Correo electronico", "correo@steelcore.com");
+        txtCorreo     = new CampoTexto("Correo electronico", "correo@steelcore.com");
         txtContrasena = new CampoContrasena("Contrasena");
  
         txtCorreo.setAlignmentX(CENTER_ALIGNMENT);
@@ -73,15 +73,18 @@ public class PantallaInicioSesionSocios extends PantallaBase {
         txtContrasena.setMaximumSize(new Dimension(Integer.MAX_VALUE, 72));
  
         Boton btnIngresar = crearBoton("Ingresar al modulo", Boton.Variante.PRIMARIO);
-        
+        Boton btnRegresar = crearBoton("Regresar", Boton.Variante.SECUNDARIO);
  
         btnIngresar.setAlignmentX(CENTER_ALIGNMENT);
-        ;
- 
+        btnRegresar.setAlignmentX(CENTER_ALIGNMENT);
+
         // Al presionar Enter en el campo de contrasena tambien inicia sesion
         txtContrasena.addActionListener(e -> onIngresar());
         btnIngresar.addActionListener(e -> onIngresar());
- 
+        btnRegresar.addActionListener(e -> {
+            dispose();
+            controlador.irABienvenida();
+        });
  
         card.add(lblModulo);
         card.add(Box.createVerticalStrut(4));
@@ -95,6 +98,7 @@ public class PantallaInicioSesionSocios extends PantallaBase {
         card.add(Box.createVerticalStrut(40));
         card.add(btnIngresar);
         card.add(Box.createVerticalStrut(12));
+        card.add(btnRegresar);
  
         fondo.add(card);
     }
@@ -106,7 +110,7 @@ public class PantallaInicioSesionSocios extends PantallaBase {
      * Si tiene exito, irAModuloRecepcion() abre BC_PantallaEspera (el escaner QR).
      */
     private void onIngresar() {
-        String correo = txtCorreo.getValor();
+        String correo     = txtCorreo.getValor();
         String contrasena = txtContrasena.getValor();
 
         if (correo.isBlank() || contrasena.isBlank()) {
@@ -136,5 +140,4 @@ public class PantallaInicioSesionSocios extends PantallaBase {
         JOptionPane.showMessageDialog(this, mensaje,
                 "Error de Acceso", JOptionPane.ERROR_MESSAGE);
     }
-    
 }

@@ -137,9 +137,8 @@ public class BC_PantallaExpediente extends PantallaBase {
         // Area General: registra en fachada, muestra confirmacion y vuelve al scanner
         btnAreaGeneral.addActionListener(e -> {
             try {
-                controlAcceso.registrarAreaGeneral(resultado.getIdVisita());
+                controlAcceso.registrarAreaGeneral();
             } catch (AccesoDenegadoException ex) {
-                // Fallo silencioso: el acceso ya fue concedido, solo el registro adicional fallo
                 System.err.println("[Expediente] registrarAreaGeneral: " + ex.getMotivo());
             }
             JOptionPane.showMessageDialog(this,
