@@ -7,6 +7,7 @@ package interfaces;
 import dominios.CitaPojo;
 import dominios.ClientePojo;
 import dominios.MembresiaActivaPojo;
+import dominios.RutinaPojo;
 import excepciones.PersistenciaException;
 import java.util.List;
 
@@ -25,4 +26,17 @@ public interface IClienteDAO {
 
     void guardarCitaBienvenida(String correo, CitaPojo cita) throws PersistenciaException;
     public void eliminarMembresiaActiva(String correo)throws PersistenciaException;
+    
+    //metodos de caso rutina
+    public List<RutinaPojo> obtenerRutinas(String correo) throws PersistenciaException;
+    
+    public void guardarRutina(String correo, RutinaPojo rutina) throws PersistenciaException;
+    
+    public boolean existeRutinaConNombre(String correo, String nombre) throws PersistenciaException;
+    
+    public void actualizarRutina(String correo, RutinaPojo rutina) throws PersistenciaException;
+    
+    public boolean borrarRutina(String correo, String nombre) throws PersistenciaException;
+    
+    public String obtenerIdSucursalMembresiaActiva(String correo) throws PersistenciaException;
 }

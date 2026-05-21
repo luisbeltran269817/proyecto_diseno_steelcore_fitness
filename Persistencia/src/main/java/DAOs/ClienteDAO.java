@@ -13,6 +13,7 @@ import conexion.MongoConexion;
 import dominios.CitaPojo;
 import dominios.ClientePojo;
 import dominios.MembresiaActivaPojo;
+import dominios.RutinaPojo;
 import excepciones.PersistenciaException;
 import interfaces.IClienteDAO;
 import java.util.ArrayList;
@@ -22,7 +23,9 @@ import java.util.logging.Logger;
 import mappersPersistencia.CitaPersistenciaMapper;
 import mappersPersistencia.ClientePersistenciaMapper;
 import mappersPersistencia.MembresiaActivaPersistenciaMapper;
+import mappersPersistencia.RutinaPersistenciaMapper;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 /**
  * Clase DAO para clientes
@@ -157,4 +160,98 @@ public class ClienteDAO implements IClienteDAO {
                     "Error al eliminar membresía activa");
         }
     }
+    
+    @Override
+    public List<RutinaPojo> obtenerRutinas(String correo) throws PersistenciaException {
+        try {
+            Document doc = coleccion.find(Filters.eq("usuario.correo", correo)).first();
+            if (doc == null) {
+                return new ArrayList<>();
+            }
+            List<Document> rutinasDocs = (List<Document>) doc.get("rutinas");
+            if (rutinasDocs == null) {
+                return new ArrayList<>();
+            }
+            List<RutinaPojo> rutinas = new ArrayList<>();
+            for (Document rutinaDoc : rutinasDocs) {
+            rutinas.add(RutinaPersistenciaMapper.toPojo(rutinaDoc));
+            }
+            return rutinas;
+        } catch (MongoException e) {
+            throw new PersistenciaException("Error al obtener rutinas");
+        }
+    }
+    
+    @Override
+    public void guardarRutina(String correo, RutinaPojo rutina) throws PersistenciaException {
+        try {
+            Document rutinaDoc = RutinaPersistenciaMapper.toDocument(rutina);
+            coleccion.updateOne(Filters.eq("usuario.correo", correo), Updates.push("rutinas", rutinaDoc));
+        } catch (MongoException e) {
+            throw new PersistenciaException("Error al guardar rutina");
+        }
+    }
+    
+    @Override
+    public void actualizarRutina(String correo, RutinaPojo rutina) throws PersistenciaException {
+        try {
+            Document rutinaDoc = RutinaPersistenciaMapper.toDocument(rutina);
+            coleccion.updateOne(Filters.and(Filters.eq("usuario.correo", correo), Filters.elemMatch("rutinas", Filters.eq("nombre", rutina.getNombre()))), Updates.set("rutinas.$", rutinaDoc));
+        } catch (MongoException e) {
+            throw new PersistenciaException("Error al actualizar rutina");
+        }
+    }
+    
+    @Override
+    public boolean existeRutinaConNombre(String correo, String nombre) throws PersistenciaException {
+        try {
+            Document doc = coleccion.find(Filters.and(Filters.eq("usuario.correo", correo),Filters.elemMatch("rutinas", Filters.eq("nombre", nombre)))).first();
+            return doc != null;
+        } catch (MongoException e) {
+            throw new PersistenciaException("Error al verificar nombre de rutina");
+        }
+    }
+    
+    @Override
+    public boolean borrarRutina(String correo, String nombre) throws PersistenciaException {
+        try {
+            var resultado = coleccion.updateOne(Filters.eq("usuario.correo", correo), Updates.pull("rutinas", new Document("nombre", nombre)));
+            return resultado.getModifiedCount() > 0;
+        } catch (MongoException e) {
+            throw new PersistenciaException("Error al borrar rutina");
+        }
+    }
+    
+    @Override
+    public String obtenerIdSucursalMembresiaActiva(String correo) throws PersistenciaException {
+        try {
+            Document clienteDoc = coleccion.find(Filters.eq("usuario.correo", correo)).first();
+            if (clienteDoc == null) {
+                logger.log(Level.WARNING, "No se encontró el cliente con correo: " + correo);
+                return null;
+            }
+            String idCliente = clienteDoc.getString("_id");
+            
+            //tengo que buscar en la coleccion del historial de membresias porque la membresia embebida al cliente no trae el idsucursal
+            //y ya no da el tiempo para modificar todo hasta la BD para eso :P
+            MongoCollection<Document> colHistorial = MongoConexion.obtenerBaseDatos().getCollection("membresias");
+            
+            //un filtro para que pertenezca al cliente y que este activa
+            //se supone que cliente solo tiene 1 activa a la vez asi que esto deberia funcionar siempre
+            Bson filtro = Filters.and(Filters.eq("idCliente", idCliente), Filters.eq("estado", "ACTIVA"));
+            
+            Document membresiaDoc = colHistorial.find(filtro).first();
+            if (membresiaDoc == null) {
+                logger.log(Level.WARNING, "El cliente no tiene ninguna membresía activa en el historial");
+                return null;
+            }
+            
+            logger.log(Level.INFO, "ID de sucursal de membresia activa obtenido correctamente");
+            return membresiaDoc.getString("idSucursal");
+        } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error al obtener la sucursal de la membresia activa", e);
+            throw new PersistenciaException("Error al obtener la sucursal de la membresia activa");
+        }
+    }
+    
 }

@@ -5,6 +5,8 @@
 package dominios;
 
 import java.time.LocalDate;
+import java.util.List;
+
 
 /**
  *
@@ -25,6 +27,9 @@ public class ClientePojo {
     private MembresiaActivaPojo membresiaActiva;
 
     private CitaPojo citaBienvenida;
+    
+    //atributo de mi caso de uso rutinas
+    private List<RutinaPojo> rutinas;
 
     public ClientePojo() {
     }
@@ -93,5 +98,14 @@ public class ClientePojo {
         this.citaBienvenida = citaBienvenida;
     }
 
+    public List<RutinaPojo> getRutinas() {
+        return rutinas;
+    }
+
+    public void setRutinas(List<RutinaPojo> rutinas) {
+        this.rutinas = rutinas;
+    }
+
+    
     
 }

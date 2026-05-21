@@ -9,6 +9,7 @@ import Fachada.FachadaControlAcceso;
 import ControlDeAcceso.BC_PantallaEspera;
 import Excepciones.NegocioException;
 import Fachada.FachadaInicioSesion;
+import Fachada.FachadaPlanearRutina;
 import Fachada.IInicioSesion;
 import PantallasInventarioMantenimiento.PantallaAgregarModificarInventario;
 import PantallasInventarioMantenimiento.PantallaInventarioMantenimiento;
@@ -16,6 +17,7 @@ import PantallasInventarioMantenimiento.PantallaInventarioMaquinas;
 import PantallasInventarioMantenimiento.PantallaEliminarInventario;
 import PantallasInventarioMantenimiento.PantallaProgramarMantenimiento;
 import PantallasInventarioMantenimiento.PantallaSeleccionPiezasMantenimiento;
+import Fachada.IPlanearRutina;
 import PantallasComprarMembresia.DatosBancarios;
 import PantallasComprarMembresia.PantallaBienvenida;
 import PantallasComprarMembresia.PantallaDetallePlan;
@@ -30,12 +32,19 @@ import PantallasComprarMembresia.PantallaTransaccionExitosa;
 import PantallasComprarMembresia.PantallaTransaccionFallida;
 import PantallasInicioSesion.PantallaInicioSesion;
 import PantallasInicioSesion.PantallaInicioSesionSocios;
+import PantallasRutina.PantallaBusquedaEntrenador;
+import PantallasRutina.PantallaEditorRutina;
+import PantallasRutina.PantallaMensaje;
+import PantallasRutina.PantallaSeleccionEjercicios;
+import PantallasRutina.PantallaVistaRutina;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
+import dtos.EjercicioDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
+import dtos.RutinaDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
@@ -59,6 +68,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
@@ -85,6 +95,11 @@ public class ControladorAplicacion implements IControladorAplicacion {
         private PantallaInventarioMaquinas pantallaInventarioMaquinas;
     //COSAS DE INVENTARIO MANTENIMIENTO
         
+    
+    //de rutina
+    private final IPlanearRutina rutinaFachada;
+    private RutinaDTO rutinaSeleccionada;
+ 
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
     private PantallaInicioSesionSocios pantallaInicioSesionRecepcion;
@@ -100,6 +115,12 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private PantallaQR pantallaQRSocio;
     private PantallaTransaccionFallida pantallaFallida;
     private PantallaTransaccionExitosa pantallaExitosa;
+    
+    //pantallas rutina
+    private PantallaVistaRutina pantallaVistaRutina;
+    private PantallaMensaje pantallaMensaje;
+    private PantallaEditorRutina pantallaEditorRutina;
+    private PantallaBusquedaEntrenador pantallaBusquedaEntrenador;
  
     public ControladorAplicacion() {
         this.inicioSesionFachada = new FachadaInicioSesion();
@@ -110,6 +131,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
             this.inventarioMantenimientoFachada = new FachadaInventarioMantenimiento();
             this.gestorMantenimiento= new GestorEstadosMantenimiento();
          //COSAS DE INVENTARIO MANTENIMIENTO
+        this.rutinaFachada = new FachadaPlanearRutina();
     }
  
     /**
@@ -364,7 +386,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaExitosa = new PantallaTransaccionExitosa(this);
         pantallaExitosa.setVisible(true);
     }
- 
+    
     // --- sesión ---
  
     @Override
@@ -977,5 +999,126 @@ public class ControladorAplicacion implements IControladorAplicacion {
             pantallaInventarioMaquinas.dispose();
             pantallaInventarioMaquinas = null;
         }
+        
+        if (pantallaVistaRutina != null) {
+            pantallaVistaRutina.dispose();
+            pantallaVistaRutina = null;
+        }
+        
+        if (pantallaMensaje != null) {
+            pantallaMensaje.dispose();
+            pantallaMensaje = null;
+        }
+        
+        if (pantallaEditorRutina != null) {
+            pantallaEditorRutina.dispose();
+            pantallaEditorRutina = null;
+        }
+        
+        if (pantallaBusquedaEntrenador != null) {
+            pantallaBusquedaEntrenador.dispose();
+            pantallaBusquedaEntrenador = null;
+        }
+        
     }
+    
+    //METODOS DEL CASO PLANEAR RUTINA
+    
+    @Override
+    public void irAVistaRutina() {
+        cerrarPantallas();
+        pantallaVistaRutina = new PantallaVistaRutina(this);
+        pantallaVistaRutina.setVisible(true);
+    }
+    
+    @Override
+    public void irAMensaje() {
+        cerrarPantallas();
+        pantallaMensaje = new PantallaMensaje(this);
+        pantallaMensaje.setVisible(true);
+    }
+    
+    @Override
+    public List<RutinaDTO> obtenerRutinas() throws NegocioException{
+        return rutinaFachada.obtenerRutinas(getUsuarioActual().getCorreo());
+    }
+    
+    @Override
+    public void irAEditorRutinaNueva() {
+        cerrarPantallas();
+        rutinaSeleccionada = null;
+        pantallaEditorRutina = new PantallaEditorRutina(this);
+        pantallaEditorRutina.setVisible(true);
+    }
+    
+    
+    @Override
+    public void irAEditorRutinaExistente(RutinaDTO rutina) {
+        cerrarPantallas();
+        rutinaSeleccionada = rutina;
+        pantallaEditorRutina = new PantallaEditorRutina(this);
+        pantallaEditorRutina.setVisible(true);
+    }
+    
+    
+    @Override
+    public RutinaDTO getRutinaSeleccionada() {
+        return rutinaSeleccionada;
+    }
+    
+    @Override
+    public List<EjercicioDTO> recuperarEjercicios(String grupoMuscular) throws NegocioException{
+        return rutinaFachada.recuperarEjercicios(grupoMuscular);
+    }
+    
+    @Override
+    public void abrirSeleccionEjercicios(String nombreDia, Consumer<String> callbackGrupo, Consumer<List<EjercicioDTO>> callbackEjercicios) {
+        new PantallaSeleccionEjercicios(pantallaEditorRutina, this, nombreDia, callbackGrupo, callbackEjercicios);
+    }
+    
+    @Override
+    public RutinaDTO guardarRutina(RutinaDTO rutina) throws NegocioException{
+        return rutinaFachada.guardarRutina(getUsuarioActual().getCorreo(), rutina);
+    }
+    
+    @Override
+    public boolean borrarRutina(String nombre) throws NegocioException {
+        return rutinaFachada.borrarRutina(getUsuarioActual().getCorreo(), nombre);
+    }
+    
+    @Override
+    public List<EntrenadorDTO> obtenerEntrenadoresDeSucursalActual() throws NegocioException{
+        //me tuve que echar un superrollo para conseguir la sucursal actual del usuario
+        //porque nada la referncia directamente aparte de cita bienvenida, pero el usuario puede NO asignar cita
+        //entonces tuve que consultarla hasta la coleccion membresias que ahi si tiene la referencia a la sucursal
+        //y no se porque no tiene referencia a sucursal desde la membresia embebida en cliente
+        //pero ya es muy tarde para ir a cambiar la estructura de mongo (y me estoy volviendo loco)
+        //ATTE: Luisk
+        //PD: acaben con mi sufrimiento plis :(
+        String idSucursal = rutinaFachada.obtenerIdSucursalMembresiaActiva(getUsuarioActual().getCorreo());
+        //y a este metodo pues le paso la sucursal que obtuve aprovechando que ya lo tenemos
+        return obtenerEntrenadoresDeSucursal(idSucursal);
+    }
+
+    @Override
+    public void irABusquedaEntrenador(RutinaDTO rutina, Consumer<String> callbackIdEntrenador) {
+        cerrarPantallas();
+        pantallaBusquedaEntrenador = new PantallaBusquedaEntrenador(this, rutina, callbackIdEntrenador);
+        pantallaBusquedaEntrenador.setVisible(true);
+    }
+    
+    @Override
+    public EntrenadorDTO obtenerEntrenadorPorId(String id) throws NegocioException {
+        return rutinaFachada.obtenerEntrenadorPorId(id);      
+    }
+    
+    @Override
+    public void irAEditorConPlantilla(String nombrePlantilla) throws NegocioException {
+        rutinaSeleccionada = rutinaFachada.obtenerPlantilla(nombrePlantilla);
+        cerrarPantallas();
+        pantallaEditorRutina = new PantallaEditorRutina(this);
+        pantallaEditorRutina.setVisible(true);
+    }
+    
+    
 }

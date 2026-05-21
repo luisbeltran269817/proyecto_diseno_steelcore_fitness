@@ -5,26 +5,40 @@
 package objetosnegocios;
 
 import DAOs.ClienteDAO;
+import DAOs.EjercicioDAO;
 import DAOs.MembresiaDAO;
+import DAOs.PlantillaRutinaDAO;
 import Excepciones.NegocioException;
 import dominios.CitaPojo;
 import dominios.ClientePojo;
+import dominios.DetalleRutinaPojo;
+import dominios.EjercicioPojo;
 import dominios.MembresiaActivaPojo;
 import dominios.MembresiaPojo;
+import dominios.RutinaPojo;
 import dtos.CitaDTO;
 import dtos.ClienteDTO;
+import dtos.DetalleRutinaDTO;
+import dtos.EjercicioDTO;
 import dtos.MembresiaDTO;
+import dtos.RutinaDTO;
 import excepciones.PersistenciaException;
 import interfaces.IClienteBO;
 import interfaces.IClienteDAO;
+import interfaces.IEjercicioDAO;
 import interfaces.IMembresiaDAO;
+import interfaces.IPlantillaRutinaDAO;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mappersBO.CitaMapper;
 import mappersBO.ClienteMapper;
+import mappersBO.DetalleRutinaMapper;
+import mappersBO.EjercicioMapper;
 import mappersBO.MembresiaMapper;
+import mappersBO.RutinaMapper;
 
 /**
  *
@@ -33,10 +47,14 @@ import mappersBO.MembresiaMapper;
 public class ClienteBO implements IClienteBO {
     private final IClienteDAO clienteDAO;
     private final IMembresiaDAO membresiaDAO;
+    private final IEjercicioDAO ejercicioDAO;
+    private final IPlantillaRutinaDAO plantillaDAO;
     private static final Logger logger = Logger.getLogger(ClienteBO.class.getName());
     public ClienteBO() {
         this.clienteDAO = new ClienteDAO();
         this.membresiaDAO= new MembresiaDAO();
+        this.ejercicioDAO = new EjercicioDAO();
+        this.plantillaDAO = new PlantillaRutinaDAO();
     }
     
     @Override
@@ -132,5 +150,130 @@ public class ClienteBO implements IClienteBO {
         }
     }
     
+    @Override
+    public List<RutinaDTO> obtenerRutinas(String correo) throws NegocioException {
+        try {
+            List<RutinaPojo> rutinaPojos = clienteDAO.obtenerRutinas(correo);
+            List<RutinaDTO> rutinasDTO = new ArrayList<>();
+            
+            for (RutinaPojo rutinaPojo:rutinaPojos) {
+                RutinaDTO rutinaDTO = RutinaMapper.toDTO(rutinaPojo);
+                if (rutinaPojo.getDetalles() != null) {
+                    List<DetalleRutinaDTO> detallesCompleto = new ArrayList<>();
+                    for (DetalleRutinaPojo detallePojo : rutinaPojo.getDetalles()) {
+                        DetalleRutinaDTO detalleDTO = DetalleRutinaMapper.toDTO(detallePojo);
+                        
+                        if (detallePojo.getIdsEjercicios() != null && !detallePojo.getIdsEjercicios().isEmpty()) {
+                            List<EjercicioPojo> ejercicioPojos = ejercicioDAO.obtenerPorListaIds(detallePojo.getIdsEjercicios());
+                            List<EjercicioDTO> ejerciciosDTO = new ArrayList<>();
+                            for (EjercicioPojo ejercicioPojo : ejercicioPojos) {
+                                ejerciciosDTO.add(EjercicioMapper.toDTO(ejercicioPojo));
+                            }
+                            detalleDTO.setEjercicios(ejerciciosDTO);
+                        }
+                        detallesCompleto.add(detalleDTO);
+                    }
+                    rutinaDTO.setDetalles(detallesCompleto);
+                }
+                rutinasDTO.add(rutinaDTO);
+            }
+            return rutinasDTO;
+        } catch (PersistenciaException e) {
+            throw new NegocioException("Error al obtener rutinas");
+        }
+    }
     
+    @Override
+    public RutinaDTO guardarRutina(String correo, RutinaDTO rutinaDTO) throws NegocioException {
+        try {
+            RutinaPojo pojo = RutinaMapper.toPojo(rutinaDTO);
+            clienteDAO.guardarRutina(correo, pojo);
+            return rutinaDTO;
+        } catch (PersistenciaException e) {
+            throw new NegocioException("Error al guardar rutina");
+        }
+    }
+    
+    @Override
+    public boolean existeRutinaConNombre(String correo, String nombre) throws NegocioException {
+        try {
+            return clienteDAO.existeRutinaConNombre(correo, nombre);
+        } catch (PersistenciaException e) {
+            throw new NegocioException("Error al verificar nombre de rutina");
+        }
+    }
+    
+    @Override
+    public RutinaDTO actualizarRutina(String correo, RutinaDTO rutinaDTO) throws NegocioException {
+        try {
+            RutinaPojo pojo = RutinaMapper.toPojo(rutinaDTO);
+            clienteDAO.actualizarRutina(correo, pojo);
+            return rutinaDTO;
+        } catch (PersistenciaException e) {
+            throw new NegocioException("Error al actualizar rutina");
+        }
+    }
+    
+    @Override
+    public boolean borrarRutina(String correo, String nombre) throws NegocioException {
+        try {
+            boolean borrado = clienteDAO.borrarRutina(correo, nombre);
+            return borrado;
+        } catch (PersistenciaException e) {
+            throw new NegocioException("Error al borrar rutina");
+        }
+    }
+    
+    @Override
+    public String obtenerIdSucursalMembresiaActiva(String correo) throws NegocioException {
+        try {
+            if (correo == null || correo.isBlank()) {
+                throw new NegocioException("El correo no puede estar vacío o ser nulo");
+            }
+            
+            String idSucursal = clienteDAO.obtenerIdSucursalMembresiaActiva(correo);
+            if (idSucursal == null) {
+                logger.log(Level.WARNING, "No se encontro");
+                return null;
+            }
+            
+            logger.log(Level.INFO, "Sucursal de la membresia activa obtenida correctamente");
+            return idSucursal;
+            
+        } catch (PersistenciaException e) {
+            logger.log(Level.SEVERE, "Error ayudaaaa", e);
+            throw new NegocioException("Error al obtener la sucursal de la membresia activa", e);
+        }
+    }
+    
+    @Override
+    public RutinaDTO obtenerPlantilla(String nombre) throws NegocioException {
+        try {
+            RutinaPojo plantillaPojo = plantillaDAO.obtenerPlantilla(nombre);
+            if (plantillaPojo == null) return null;
+            
+            RutinaDTO rutinaDTO = RutinaMapper.toDTO(plantillaPojo);
+            if (plantillaPojo.getDetalles() != null) {
+                List<DetalleRutinaDTO> detallesEnriquecidos = new ArrayList<>();
+                for (DetalleRutinaPojo detallePojo : plantillaPojo.getDetalles()) {
+                    DetalleRutinaDTO detalleDTO = DetalleRutinaMapper.toDTO(detallePojo);
+                    if (detallePojo.getIdsEjercicios() != null && !detallePojo.getIdsEjercicios().isEmpty()) {
+                        List<EjercicioPojo> ejercicioPojos = ejercicioDAO.obtenerPorListaIds(detallePojo.getIdsEjercicios());
+                        List<EjercicioDTO> ejerciciosDTO = new ArrayList<>();
+                        for (EjercicioPojo ep : ejercicioPojos) {
+                            ejerciciosDTO.add(EjercicioMapper.toDTO(ep));
+                        }
+                        detalleDTO.setEjercicios(ejerciciosDTO);
+                    }
+                    detallesEnriquecidos.add(detalleDTO);
+                }
+                rutinaDTO.setDetalles(detallesEnriquecidos);
+            }
+            
+            rutinaDTO.setFechaCreacion(LocalDateTime.now());
+            return rutinaDTO;
+        } catch (PersistenciaException e) {
+            throw new NegocioException("Error al obtener plantilla");
+        }
+    }
 }

@@ -7,10 +7,12 @@ package Controladores;
 import Excepciones.NegocioException;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
+import dtos.EjercicioDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
 import dtos.MembresiaDTO;
 import dtos.PlanDTO;
+import dtos.RutinaDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
@@ -22,6 +24,7 @@ import dtosInventarioMantenimiento.TecnicoDTO;
 import excepciones.InventarioMantenimientoException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.JComponent;
 
 /**
@@ -595,4 +598,32 @@ public interface IControladorAplicacion {
          * Método que viaja a la pantalla de eliminar inventario
          */
         void irAEliminarInventario();
+    //METODOS DEL CASO PLANEAR RUTINA
+    void irAVistaRutina();
+    
+    void irAMensaje();
+    
+    List<RutinaDTO> obtenerRutinas() throws NegocioException;
+    
+    public void irAEditorRutinaNueva();
+    
+    public void irAEditorRutinaExistente(RutinaDTO rutina);
+    
+    public RutinaDTO getRutinaSeleccionada();
+    
+    public List<EjercicioDTO> recuperarEjercicios(String grupoMuscular) throws NegocioException;
+    
+    void abrirSeleccionEjercicios(String nombreDia, Consumer<String> callbackGrupo, Consumer<List<EjercicioDTO>> callbackEjercicios);
+    
+    public RutinaDTO guardarRutina(RutinaDTO rutina) throws NegocioException;
+    
+    public boolean borrarRutina(String nombre) throws NegocioException;
+    
+    public List<EntrenadorDTO> obtenerEntrenadoresDeSucursalActual() throws NegocioException;
+    
+    public void irABusquedaEntrenador(RutinaDTO rutina, Consumer<String> callbackIdEntrenador);
+    
+    public EntrenadorDTO obtenerEntrenadorPorId(String id) throws NegocioException;
+    
+    public void irAEditorConPlantilla(String nombrePlantilla) throws NegocioException;
 }

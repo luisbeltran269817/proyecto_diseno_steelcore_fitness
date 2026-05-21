@@ -19,6 +19,7 @@
         <module>ControlAccesoSubsistema</module>
         <module>Dominio_modulo</module>
         <module>InventarioMantenimientoSubsistema</module>
+        <module>PlanearRutinaSubsistema</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
