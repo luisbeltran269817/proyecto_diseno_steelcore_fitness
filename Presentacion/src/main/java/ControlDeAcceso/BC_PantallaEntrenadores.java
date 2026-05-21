@@ -1,11 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ControlDeAcceso;
 
 import Controladores.IControladorAplicacion;
-import Fachada.Icontrolacceso.ResultadoAccesoDTO;
+import Fachada.FachadaControlAcceso;
+import Fachada.Icontrolacceso;
+import Fachada.Icontrolacceso.AccesoDenegadoException;
+import dtosControlDeAcceso.EntrenadorDTO;
+import dtosControlDeAcceso.EstadoEntrenador;
+import dtosControlDeAcceso.HorarioDTO;
+import dtosControlDeAcceso.ResultadoAccesoDTO;
 import Utilerias.Boton;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
@@ -15,44 +17,40 @@ import static java.awt.Component.CENTER_ALIGNMENT;
 import static java.awt.Component.LEFT_ALIGNMENT;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
  * Pantalla de entrenadores disponibles para asignacion al socio.
- * Solo presentacion: datos hardcodeados de prueba.
  *
- * Casos del storyboard:
- *   1. Entrenador LIBRE seleccionado  -> asignacion exitosa, regresa al expediente
- *   2. Entrenador OCUPADO             -> mensaje de saturacion, se queda en pantalla
- *   3. Plan no incluye entrenador     -> constructor (controlador, resultado, false)
+ * Usa dtosControlDeAcceso.EntrenadorDTO (DTO real de la fachada).
+ * EntrenadorDTO tiene: idEntrenador, nombre, estado (EstadoEntrenador), idSucursal.
+ * estaDisponible() = estado == LIBRE.
  *
- * @author julian izaguirre
+ * NOTA: EntrenadorDTO no tiene lista de horarios; la asignacion se hace
+ *       llamando a asignarEntrenador(idVisita, idCliente, idEntrenador, null)
+ *       ya que el horario lo gestiona el backend automaticamente.
  */
 public class BC_PantallaEntrenadores extends PantallaBase {
 
-    private static final Object[][] ENTRENADORES = {
-        // Nombre,      Estado,     Hora
-        {"CARLOS",   "LIBRE",   "10:00 a.m."},
-        {"FERNANDA", "LIBRE",   "11:00 a.m."},
-        {"FUJIMA",   "OCUPADO", "12:00 a.m."},
-    };
+    private static final DateTimeFormatter FMT_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    // Resultado del acceso para poder regresar al expediente con los mismos datos
     private final ResultadoAccesoDTO resultado;
     private final boolean planIncluyeEntrenador;
-    private int entrenadorSeleccionadoIndex = -1;
-    private JPanel[] filas;
+    private final Icontrolacceso controlAcceso = FachadaControlAcceso.getInstancia();
 
-    public BC_PantallaEntrenadores(IControladorAplicacion controlador, ResultadoAccesoDTO resultado) {
-        this(controlador, resultado, true);
-    }
+    private List<EntrenadorDTO> entrenadores = new ArrayList<>();
+    private EntrenadorDTO entrenadorSeleccionado = null;
+    private JPanel[] filas;
 
     public BC_PantallaEntrenadores(IControladorAplicacion controlador,
                                     ResultadoAccesoDTO resultado,
                                     boolean planIncluyeEntrenador) {
         super(controlador);
-        this.resultado = resultado;
+        this.resultado             = resultado;
         this.planIncluyeEntrenador = planIncluyeEntrenador;
         setTitle("SteelCore Fitness - Entrenadores Disponibles");
         inicializarComponentes();
@@ -64,7 +62,7 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
 
-        JPanel card = crearCard(620, 560);
+        JPanel card = crearCard(640, 600);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(36, 48, 36, 48));
 
@@ -83,92 +81,94 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         sep.setAlignmentX(LEFT_ALIGNMENT);
 
-        // Regresar al expediente del socio
         Boton btnRegresar = crearBoton("Regresar", Boton.Variante.SECUNDARIO);
         btnRegresar.addActionListener(e -> {
             dispose();
             new BC_PantallaExpediente(controlador, resultado).setVisible(true);
         });
 
-        // Caso: plan no incluye servicio de entrenador
+        // ── Caso 1: plan no incluye entrenador ────────────────────────────────
         if (!planIncluyeEntrenador) {
-            JLabel lblLinea1 = new JLabel("Tu membresia actual no incluye apoyo de entrenador.", SwingConstants.CENTER);
-            lblLinea1.setFont(Colores.FUENTE_LABEL);
-            lblLinea1.setForeground(new Color(220, 150, 50));
-            lblLinea1.setAlignmentX(CENTER_ALIGNMENT);
-
-            JLabel lblLinea2 = new JLabel("Pasa a recepcion o usa tu app para mejorar tu plan.", SwingConstants.CENTER);
-            lblLinea2.setFont(Colores.FUENTE_LABEL);
-            lblLinea2.setForeground(new Color(220, 150, 50));
-            lblLinea2.setAlignmentX(CENTER_ALIGNMENT);
-
             card.add(logo);
             card.add(Box.createVerticalStrut(6));
             card.add(titulo);
             card.add(Box.createVerticalStrut(14));
             card.add(sep);
             card.add(Box.createVerticalStrut(30));
-            card.add(lblLinea1);
+
+            JLabel l1 = new JLabel("Tu membresia actual no incluye apoyo de entrenador.", SwingConstants.CENTER);
+            l1.setFont(Colores.FUENTE_LABEL);
+            l1.setForeground(new Color(220, 150, 50));
+            l1.setAlignmentX(CENTER_ALIGNMENT);
+
+            JLabel l2 = new JLabel("Pasa a recepcion o usa tu app para mejorar tu plan.", SwingConstants.CENTER);
+            l2.setFont(Colores.FUENTE_LABEL);
+            l2.setForeground(new Color(220, 150, 50));
+            l2.setAlignmentX(CENTER_ALIGNMENT);
+
+            card.add(l1);
             card.add(Box.createVerticalStrut(4));
-            card.add(lblLinea2);
+            card.add(l2);
             card.add(Box.createVerticalStrut(30));
             card.add(btnRegresar);
             fondo.add(card);
             return;
         }
 
-        // Filtros visuales (sin funcionalidad real en esta version de presentacion)
-        JPanel panelFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        panelFiltros.setOpaque(false);
-        panelFiltros.setAlignmentX(LEFT_ALIGNMENT);
-        panelFiltros.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        // Cargar entrenadores de la fachada
+        cargarEntrenadores();
 
-        JLabel lblFiltrarPor = new JLabel("Filtrar por:");
-        lblFiltrarPor.setFont(Colores.FUENTE_LABEL);
-        lblFiltrarPor.setForeground(Colores.TEXTO_SECUNDARIO);
+        // Filtrar solo los LIBRES para mostrar en la lista
+        List<EntrenadorDTO> libres = new ArrayList<>();
+        for (EntrenadorDTO e : entrenadores) {
+            if (e.estaDisponible()) libres.add(e);
+        }
 
-        JComboBox<String> cmbEstado = new JComboBox<>(new String[]{"ESTADO", "LIBRE", "OCUPADO"});
-        cmbEstado.setFont(Colores.FUENTE_LABEL);
-        cmbEstado.setBackground(Colores.FONDO_CAMPO);
-        cmbEstado.setForeground(Colores.TEXTO_PRINCIPAL);
-        cmbEstado.setPreferredSize(new Dimension(110, 30));
+        // ── Caso 2: todos ocupados ────────────────────────────────────────────
+        if (libres.isEmpty()) {
+            card.add(logo);
+            card.add(Box.createVerticalStrut(6));
+            card.add(titulo);
+            card.add(Box.createVerticalStrut(14));
+            card.add(sep);
+            card.add(Box.createVerticalStrut(30));
 
-        JComboBox<String> cmbHorario = new JComboBox<>(
-                new String[]{"HORARIO", "10:00 a.m.", "11:00 a.m.", "12:00 a.m."});
-        cmbHorario.setFont(Colores.FUENTE_LABEL);
-        cmbHorario.setBackground(Colores.FONDO_CAMPO);
-        cmbHorario.setForeground(Colores.TEXTO_PRINCIPAL);
-        cmbHorario.setPreferredSize(new Dimension(120, 30));
+            JLabel lblSaturado = new JLabel(
+                    "Lo sentimos, todos los entrenadores estan ocupados en este momento.",
+                    SwingConstants.CENTER);
+            lblSaturado.setFont(Colores.FUENTE_LABEL);
+            lblSaturado.setForeground(new Color(220, 150, 50));
+            lblSaturado.setAlignmentX(CENTER_ALIGNMENT);
 
-        panelFiltros.add(lblFiltrarPor);
-        panelFiltros.add(cmbEstado);
-        panelFiltros.add(cmbHorario);
+            card.add(lblSaturado);
+            card.add(Box.createVerticalStrut(30));
+            card.add(btnRegresar);
+            fondo.add(card);
+            return;
+        }
 
-        // Encabezado de la tabla
-        JPanel encabezado = new JPanel(new GridLayout(1, 3, 0, 0));
+        // ── Caso 3: hay entrenadores libres ───────────────────────────────────
+        JPanel encabezado = new JPanel(new GridLayout(1, 2, 0, 0));
         encabezado.setOpaque(false);
         encabezado.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
         encabezado.setAlignmentX(LEFT_ALIGNMENT);
-        for (String col : new String[]{"NAME", "ESTADO", "Hora"}) {
+        for (String col : new String[]{"ENTRENADOR", "ESTADO"}) {
             JLabel lbl = new JLabel(col, SwingConstants.LEFT);
             lbl.setFont(new Font("Segoe UI", Font.BOLD, 12));
             lbl.setForeground(Colores.TEXTO_SECUNDARIO);
             encabezado.add(lbl);
         }
 
-        // Filas de entrenadores
         JPanel listaEntrenadores = new JPanel();
         listaEntrenadores.setLayout(new BoxLayout(listaEntrenadores, BoxLayout.Y_AXIS));
         listaEntrenadores.setOpaque(false);
-        listaEntrenadores.setAlignmentX(LEFT_ALIGNMENT);
 
-        filas = new JPanel[ENTRENADORES.length];
-        for (int i = 0; i < ENTRENADORES.length; i++) {
-            final int idx = i;
-            Object[] ent = ENTRENADORES[i];
-            boolean ocupado = "OCUPADO".equals(ent[1]);
+        filas = new JPanel[libres.size()];
+        for (int i = 0; i < libres.size(); i++) {
+            final int idx     = i;
+            EntrenadorDTO ent = libres.get(i);
 
-            JPanel fila = new JPanel(new GridLayout(1, 3, 0, 0));
+            JPanel fila = new JPanel(new GridLayout(1, 2, 0, 0));
             fila.setOpaque(true);
             fila.setBackground(Colores.FONDO_CAMPO);
             fila.setBorder(BorderFactory.createCompoundBorder(
@@ -176,57 +176,57 @@ public class BC_PantallaEntrenadores extends PantallaBase {
                     new EmptyBorder(10, 14, 10, 14)));
             fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
             fila.setAlignmentX(LEFT_ALIGNMENT);
-            fila.setCursor(Cursor.getPredefinedCursor(
-                    ocupado ? Cursor.DEFAULT_CURSOR : Cursor.HAND_CURSOR));
+            fila.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-            JLabel lblNombre = new JLabel((String) ent[0]);
+            JLabel lblNombre = new JLabel(ent.getNombre().toUpperCase());
             lblNombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
             lblNombre.setForeground(Colores.TEXTO_PRINCIPAL);
 
-            JLabel lblEstado = new JLabel((String) ent[1]);
+            JLabel lblEstado = new JLabel("LIBRE");
             lblEstado.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            lblEstado.setForeground(ocupado ? new Color(200, 100, 80) : new Color(100, 220, 140));
-
-            JLabel lblHora = new JLabel((String) ent[2]);
-            lblHora.setFont(Colores.FUENTE_LABEL);
-            lblHora.setForeground(Colores.TEXTO_SECUNDARIO);
+            lblEstado.setForeground(new Color(100, 220, 140));
 
             fila.add(lblNombre);
             fila.add(lblEstado);
-            fila.add(lblHora);
 
-            if (!ocupado) {
-                fila.addMouseListener(new MouseAdapter() {
-                    @Override public void mouseClicked(MouseEvent e)  { seleccionarFila(idx); }
-                    @Override public void mouseEntered(MouseEvent e)  {
-                        if (entrenadorSeleccionadoIndex != idx)
-                            fila.setBackground(Colores.ACENTO_PRESS);
-                    }
-                    @Override public void mouseExited(MouseEvent e)   {
-                        if (entrenadorSeleccionadoIndex != idx)
-                            fila.setBackground(Colores.FONDO_CAMPO);
-                    }
-                });
-            }
+            fila.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e)  { seleccionarFila(idx, ent); }
+                @Override public void mouseEntered(MouseEvent e)  {
+                    if (entrenadorSeleccionado != ent) fila.setBackground(Colores.ACENTO_PRESS);
+                }
+                @Override public void mouseExited(MouseEvent e)   {
+                    if (entrenadorSeleccionado != ent) fila.setBackground(Colores.FONDO_CAMPO);
+                }
+            });
 
             filas[i] = fila;
             listaEntrenadores.add(fila);
             listaEntrenadores.add(Box.createVerticalStrut(6));
         }
 
-        JLabel lblTotal = new JLabel("Total de Entrenadores: 20");
+        JScrollPane scrollLista = new JScrollPane(listaEntrenadores);
+        scrollLista.setOpaque(false);
+        scrollLista.getViewport().setOpaque(false);
+        scrollLista.setBorder(null);
+        scrollLista.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollLista.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollLista.setPreferredSize(new Dimension(544, 280));
+        scrollLista.setMaximumSize(new Dimension(Integer.MAX_VALUE, 280));
+        scrollLista.setAlignmentX(LEFT_ALIGNMENT);
+        scrollLista.getVerticalScrollBar().setUnitIncrement(16);
+
+        JLabel lblTotal = new JLabel("Total de entrenadores disponibles: " + libres.size());
         lblTotal.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblTotal.setForeground(Colores.TEXTO_SECUNDARIO);
         lblTotal.setAlignmentX(LEFT_ALIGNMENT);
 
-        // Panel de botones en la parte inferior
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 0));
         panelBotones.setOpaque(false);
         panelBotones.setAlignmentX(CENTER_ALIGNMENT);
         panelBotones.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
         Boton btnSolicitar = crearBoton("SOLICITAR", Boton.Variante.PRIMARIO);
-        btnSolicitar.addActionListener(e -> procesarSolicitud());
+        btnSolicitar.addActionListener(e -> procesarSolicitud(libres));
 
         panelBotones.add(btnRegresar);
         panelBotones.add(btnSolicitar);
@@ -237,11 +237,9 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         card.add(Box.createVerticalStrut(14));
         card.add(sep);
         card.add(Box.createVerticalStrut(14));
-        card.add(panelFiltros);
-        card.add(Box.createVerticalStrut(12));
         card.add(encabezado);
         card.add(Box.createVerticalStrut(8));
-        card.add(listaEntrenadores);
+        card.add(scrollLista);
         card.add(Box.createVerticalStrut(8));
         card.add(lblTotal);
         card.add(Box.createVerticalStrut(20));
@@ -250,36 +248,57 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         fondo.add(card);
     }
 
-    private void seleccionarFila(int index) {
-        if (entrenadorSeleccionadoIndex >= 0 && entrenadorSeleccionadoIndex < filas.length)
-            filas[entrenadorSeleccionadoIndex].setBackground(Colores.FONDO_CAMPO);
-        entrenadorSeleccionadoIndex = index;
+    // -----------------------------------------------------------------
+
+    private void cargarEntrenadores() {
+        try {
+            // Usa la sucursal que viene en el resultado del acceso
+            entrenadores = controlAcceso.obtenerEntrenadoresDisponibles(resultado.getIdSucursal());
+        } catch (AccesoDenegadoException ex) {
+            entrenadores = new ArrayList<>();
+        }
+    }
+
+    private void seleccionarFila(int index, EntrenadorDTO ent) {
+        for (JPanel fila : filas) {
+            if (fila != null) fila.setBackground(Colores.FONDO_CAMPO);
+        }
+        entrenadorSeleccionado = ent;
         filas[index].setBackground(new Color(80, 60, 160));
     }
 
-    private void procesarSolicitud() {
-        if (entrenadorSeleccionadoIndex < 0) {
+    private void procesarSolicitud(List<EntrenadorDTO> libres) {
+        if (entrenadorSeleccionado == null) {
             JOptionPane.showMessageDialog(this,
                     "Por favor selecciona un entrenador.",
                     "Sin seleccion", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        Object[] ent = ENTRENADORES[entrenadorSeleccionadoIndex];
+        try {
+            // asignarEntrenador(idVisita, idCliente, idEntrenador, idHorario)
+            // idHorario = null; el backend asigna el horario disponible automaticamente
+            controlAcceso.asignarEntrenador(
+                    resultado.getIdVisita(),
+                    resultado.getIdCliente(),
+                    entrenadorSeleccionado.getIdEntrenador(),
+                    null);
 
-        // Caso: entrenador saturado, se queda en pantalla para elegir otro
-        if ("OCUPADO".equals(ent[1])) {
             JOptionPane.showMessageDialog(this,
-                    "Lo sentimos, la base de datos del Entrenador devuelve un estado de saturado.",
-                    "Entrenador no disponible", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+                    "Entrenador asignado con exito:\n"
+                    + entrenadorSeleccionado.getNombre().toUpperCase(),
+                    "Asignacion exitosa", JOptionPane.INFORMATION_MESSAGE);
 
-        // Caso: asignacion exitosa, regresa al expediente del socio
-        JOptionPane.showMessageDialog(this,
-                "Entrenador asignado con exito: " + ent[0] + " - " + ent[2],
-                "Entrenador asignado", JOptionPane.INFORMATION_MESSAGE);
-        dispose();
-        new BC_PantallaExpediente(controlador, resultado).setVisible(true);
+            dispose();
+            new BC_PantallaEspera(controlador).setVisible(true);
+
+        } catch (AccesoDenegadoException ex) {
+            JOptionPane.showMessageDialog(this,
+                    ex.getMotivo(),
+                    "No disponible", JOptionPane.WARNING_MESSAGE);
+            entrenadorSeleccionado = null;
+            dispose();
+            new BC_PantallaEntrenadores(controlador, resultado, true).setVisible(true);
+        }
     }
 }

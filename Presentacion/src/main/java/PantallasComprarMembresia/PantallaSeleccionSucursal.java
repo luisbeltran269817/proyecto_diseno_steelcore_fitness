@@ -18,8 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * Pantalla para que el usuario seleccione una sucursal del gimnasio.
- * Se comunica únicamente con IControladorAplicacion — no conoce
- * ControlMapaSucursal ni ningún componente de infraestructura directamente.
+ * Se comunica únicamente con IControladorAplicacion.
  *
  * @author julian izaguirre
  */
@@ -28,11 +27,14 @@ public class PantallaSeleccionSucursal extends PantallaBase {
     private ButtonGroup grupoBotones;
     private JPanel panelSucursales;
     private SucursalDTO sucursalSeleccionada = null;
- 
+
     private JWindow popupWindow;
     private JLabel  popupNombre, popupDireccion;
     private JButton popupBtn;
- 
+
+    // Panel central que contiene el mapa (o el placeholder si falla)
+    private JPanel panelCentro;
+
     public PantallaSeleccionSucursal(IControladorAplicacion controlador) {
         super(controlador);
         setTitle("Seleccionar Sucursal - SteelCore Fitness");
@@ -42,19 +44,69 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         controlador.ubicarUsuarioAutomaticamente();
         setVisible(true);
     }
- 
+
     @Override
     protected void inicializarComponentes() {
         JPanel fondo = new JPanel(new BorderLayout());
         fondo.setBackground(Colores.FONDO_PRINCIPAL);
         setContentPane(fondo);
- 
+
         fondo.add(crearPanelIzquierdo(), BorderLayout.WEST);
 
-        fondo.add(controlador.getComponenteMapa(), BorderLayout.CENTER);
+        // Panel central con placeholder por si el mapa aun no esta listo
+        panelCentro = new JPanel(new BorderLayout());
+        panelCentro.setBackground(Colores.FONDO_PRINCIPAL);
+        fondo.add(panelCentro, BorderLayout.CENTER);
+
+        // Intentar agregar el mapa — si es null se muestra placeholder
+        agregarComponenteMapa();
+
         crearPopup();
     }
- 
+
+    /**
+     * Intenta obtener el widget del mapa y agregarlo al panel central.
+     * Si el mapa aun no esta registrado muestra un placeholder y reintenta
+     * en un segundo plano para no bloquear la UI.
+     */
+    private void agregarComponenteMapa() {
+        JComponent mapa = null;
+        try {
+            mapa = controlador.getComponenteMapa();
+        } catch (Exception ex) {
+            System.getLogger(getClass().getName()).log(
+                System.Logger.Level.WARNING, "Mapa no disponible aun: {0}", ex.getMessage());
+        }
+
+        if (mapa != null) {
+            panelCentro.add(mapa, BorderLayout.CENTER);
+        } else {
+            // Placeholder visual mientras el mapa carga
+            JLabel cargando = new JLabel("Cargando mapa...", SwingConstants.CENTER);
+            cargando.setForeground(Colores.TEXTO_SECUNDARIO);
+            cargando.setFont(Colores.FUENTE_SUBTITULO);
+            panelCentro.add(cargando, BorderLayout.CENTER);
+
+            // Reintentar en 500ms sin bloquear el hilo de Swing
+            Timer timer = new Timer(500, null);
+            timer.addActionListener(e -> {
+                JComponent mapaReintentar = null;
+                try {
+                    mapaReintentar = controlador.getComponenteMapa();
+                } catch (Exception ex) { /* sigue esperando */ }
+
+                if (mapaReintentar != null) {
+                    timer.stop();
+                    panelCentro.removeAll();
+                    panelCentro.add(mapaReintentar, BorderLayout.CENTER);
+                    panelCentro.revalidate();
+                    panelCentro.repaint();
+                }
+            });
+            timer.start();
+        }
+    }
+
     private void registrarListenerMarcadores() {
         controlador.setOnMarcadorClickListener(idSucursal -> {
             SucursalDTO s = controlador.onMarcadorClickeado(idSucursal);
@@ -65,7 +117,7 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             });
         });
     }
- 
+
     private void cargarSucursales() {
         try {
             List<SucursalDTO> lista = controlador.iniciarMapa();
@@ -78,46 +130,46 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             panelSucursales.revalidate();
             panelSucursales.repaint();
         } catch (NegocioException ex) {
-            System.getLogger(PantallaSeleccionSucursal.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(PantallaSeleccionSucursal.class.getName())
+                .log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
 
- 
     private JPanel crearPanelIzquierdo() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(36, 32, 36, 20));
         panel.setPreferredSize(new Dimension(300, 0));
- 
+
         JLabel titulo = new JLabel("<html>Selecciona<br>tu Sucursal</html>");
         titulo.setFont(Colores.FUENTE_TITULO);
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
         titulo.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         JLabel sub = new JLabel("Elige el gimnasio más cercano");
         sub.setFont(Colores.FUENTE_SUBTITULO);
         sub.setForeground(Colores.TEXTO_SECUNDARIO);
         sub.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         panelSucursales = new JPanel();
         panelSucursales.setLayout(new BoxLayout(panelSucursales, BoxLayout.Y_AXIS));
         panelSucursales.setOpaque(false);
         panelSucursales.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         JScrollPane scroll = new JScrollPane(panelSucursales);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(null);
         scroll.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         Boton btnContinuar = crearBoton("Continuar", Boton.Variante.PRIMARIO);
         Boton btnRegresar  = crearBoton("Regresar",  Boton.Variante.SECUNDARIO);
         btnContinuar.setAlignmentX(LEFT_ALIGNMENT);
         btnRegresar.setAlignmentX(LEFT_ALIGNMENT);
         btnContinuar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
         btnRegresar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
- 
+
         btnRegresar.addActionListener(e -> controlador.irAPerfilUsuario());
         btnContinuar.addActionListener(e -> {
             if (sucursalSeleccionada == null) {
@@ -129,7 +181,7 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             controlador.setSucursalSeleccionada(sucursalSeleccionada);
             controlador.irASeleccionPlan();
         });
- 
+
         panel.add(titulo);       panel.add(Box.createVerticalStrut(6));
         panel.add(sub);          panel.add(Box.createVerticalStrut(24));
         panel.add(scroll);       panel.add(Box.createVerticalStrut(24));
@@ -137,9 +189,7 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         panel.add(btnRegresar);
         return panel;
     }
- 
-    // ── Card de sucursal ──────────────────────────────────────────────────────
- 
+
     private JPanel crearCard(SucursalDTO s) {
         JPanel card = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
@@ -159,22 +209,22 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         card.setBorder(new EmptyBorder(12, 14, 12, 14));
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 72));
         card.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         JLabel nombre = new JLabel(s.getNombre());
         nombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
         nombre.setForeground(Colores.TEXTO_PRINCIPAL);
- 
+
         JLabel dir = new JLabel(s.getColonia() + ", " + s.getCiudad());
         dir.setFont(Colores.FUENTE_LABEL);
         dir.setForeground(Colores.TEXTO_SECUNDARIO);
- 
+
         JPanel info = new JPanel();
         info.setOpaque(false);
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
         info.add(nombre);
         info.add(Box.createVerticalStrut(3));
         info.add(dir);
- 
+
         JRadioButton radio = new JRadioButton("Elegir");
         radio.setFont(Colores.FUENTE_BOTON_SM);
         radio.setForeground(Colores.TEXTO_PRINCIPAL);
@@ -184,17 +234,17 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             controlador.onMarcadorClickeado(s.getIdSucursal());
             controlador.centrarMapaEn(s.getLatitud(), s.getLongitud());
         });
- 
+
         grupoBotones.add(radio);
         card.add(info,  BorderLayout.CENTER);
         card.add(radio, BorderLayout.EAST);
         return card;
     }
- 
+
     private void crearPopup() {
         popupWindow = new JWindow(this);
         popupWindow.setAlwaysOnTop(true);
- 
+
         JPanel card = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -211,17 +261,17 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         card.setOpaque(false);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(12, 14, 12, 14));
- 
+
         popupNombre = new JLabel();
         popupNombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
         popupNombre.setForeground(new Color(255, 215, 0));
         popupNombre.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         popupDireccion = new JLabel();
         popupDireccion.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         popupDireccion.setForeground(new Color(170, 170, 204));
         popupDireccion.setAlignmentX(LEFT_ALIGNMENT);
- 
+
         popupBtn = new JButton("✓ Seleccionar");
         popupBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         popupBtn.setForeground(Color.WHITE);
@@ -235,23 +285,29 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             @Override public void mouseEntered(MouseEvent e) { popupBtn.setBackground(new Color(139, 47, 201)); }
             @Override public void mouseExited (MouseEvent e) { popupBtn.setBackground(new Color(106, 13, 173)); }
         });
- 
+
         card.add(popupNombre);
         card.add(Box.createVerticalStrut(3));
         card.add(popupDireccion);
         card.add(Box.createVerticalStrut(8));
         card.add(popupBtn);
         popupWindow.setContentPane(card);
- 
+
         // Cerrar popup al hacer clic en cualquier parte del mapa
-        controlador.getComponenteMapa().addMouseListener(new MouseAdapter() {
-            @Override public void mousePressed(MouseEvent e) { popupWindow.setVisible(false); }
-        });
+        // Solo si el componente ya existe en ese momento
+        JComponent compMapa = null;
+        try { compMapa = controlador.getComponenteMapa(); } catch (Exception ignored) {}
+        if (compMapa != null) {
+            final JComponent mapaFinal = compMapa;
+            mapaFinal.addMouseListener(new MouseAdapter() {
+                @Override public void mousePressed(MouseEvent e) { popupWindow.setVisible(false); }
+            });
+        }
     }
- 
+
     private void mostrarPopup(SucursalDTO s) {
         popupNombre.setText(s.getNombre());
- 
+
         StringBuilder dir = new StringBuilder("<html>");
         if (s.getCalle()   != null && !s.getCalle().isBlank())   dir.append(s.getCalle()).append(", ");
         if (s.getColonia() != null && !s.getColonia().isBlank()) dir.append(s.getColonia());
@@ -259,11 +315,10 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         if (s.getCiudad()  != null && !s.getCiudad().isBlank())  dir.append(s.getCiudad());
         dir.append("</html>");
         popupDireccion.setText(dir.toString());
- 
-        // Limpiar listeners anteriores antes de añadir el nuevo
+
         for (ActionListener al : popupBtn.getActionListeners())
             popupBtn.removeActionListener(al);
- 
+
         popupBtn.addActionListener(e -> {
             sucursalSeleccionada = s;
             controlador.onMarcadorClickeado(s.getIdSucursal());
@@ -271,8 +326,11 @@ public class PantallaSeleccionSucursal extends PantallaBase {
             popupWindow.setVisible(false);
             sincronizarRadio(s);
         });
- 
-        JComponent mv = controlador.getComponenteMapa();
+
+        JComponent mv = null;
+        try { mv = controlador.getComponenteMapa(); } catch (Exception ignored) {}
+        if (mv == null) return; // si el mapa no está listo no mostrar popup
+
         Point p = mv.getLocationOnScreen();
         popupWindow.setLocation(
             p.x + mv.getWidth()  / 2 - 105,
@@ -281,7 +339,7 @@ public class PantallaSeleccionSucursal extends PantallaBase {
         popupWindow.pack();
         popupWindow.setVisible(true);
     }
- 
+
     private void sincronizarRadio(SucursalDTO s) {
         for (Component comp : panelSucursales.getComponents()) {
             if (!(comp instanceof JPanel card)) continue;

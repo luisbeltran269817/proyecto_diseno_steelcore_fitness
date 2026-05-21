@@ -231,12 +231,11 @@ public class PantallaPerfilUsuario extends PantallaBase {
         panel.add(Box.createVerticalGlue());
         panel.add(btnQr);
         panel.add(Box.createVerticalStrut(14));
-        panel.add(btnRecepcion);
+//        panel.add(btnRecepcion);
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnMembresia);
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnCita);
-        // ← Botón "Actualizar" eliminado intencionalmente
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnSalir);
         panel.add(Box.createVerticalGlue());

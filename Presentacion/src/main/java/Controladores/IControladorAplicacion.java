@@ -169,9 +169,15 @@ public interface IControladorAplicacion {
      */
     void irASeleccionHorario() throws NegocioException;
  
-    /** Muestra la pantalla con el código QR del socio. */
+    /** Muestra la pantalla con el código QR del socio (flujo normal/app). */
+
+    /** Desde recepción: al regresar vuelve a BC_PantallaEspera. */
+    void irAQRDesdeRecepcion();
     void irAQR();
  
+    /** Abre el login de recepcionista (PantallaInicioSesionSocios). */
+    void irAInicioSesionRecepcion();
+
     /** Abre el módulo de recepción que escanea QR. */
     void irAModuloRecepcion();
  

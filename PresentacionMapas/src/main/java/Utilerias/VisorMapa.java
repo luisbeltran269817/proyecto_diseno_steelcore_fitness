@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package fachada;
+package Utilerias;
 
 import java.util.Set;
 import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 
 /**
@@ -15,8 +16,19 @@ import org.jxmapviewer.viewer.GeoPosition;
 public class VisorMapa {
     private final JXMapViewer mapViewer;
 
-    public VisorMapa() {
+    /**
+     * Crea el visor y aplica de inmediato el proveedor de tiles.
+     * Sin esta llamada el mapa queda en blanco porque JXMapViewer
+     * no tiene un TileFactory predeterminado.
+     *
+     * @param factory fábrica de tiles lista para usarse 
+     */
+    public VisorMapa(DefaultTileFactory factory) {
         mapViewer = new JXMapViewer();
+
+        // *** CORRECCIÓN: conectar el proveedor de tiles ***
+        mapViewer.setTileFactory(factory);
+
         mapViewer.addMouseWheelListener(
             new org.jxmapviewer.input.ZoomMouseWheelListenerCenter(mapViewer));
         org.jxmapviewer.input.PanMouseInputListener pan =

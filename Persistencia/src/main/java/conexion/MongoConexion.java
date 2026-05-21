@@ -21,7 +21,8 @@ import org.bson.codecs.pojo.PojoCodecProvider;
  */
 public class MongoConexion {
     
-    private static final String URL ="mongodb+srv://urogallo27:NorbkJmXDpsc9JeF@menchacabd.oepyw00.mongodb.net/?appName=MenchacaBD";
+    //private static final String URL ="mongodb+srv://urogallo27:NorbkJmXDpsc9JeF@menchacabd.oepyw00.mongodb.net/?appName=MenchacaBD";
+    private static final String URL ="mongodb://localhost:27017";
     
     private static final String NOMBRE_BASE_DATOS ="steelcorefitness";
 

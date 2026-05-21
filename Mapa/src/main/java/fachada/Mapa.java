@@ -4,22 +4,26 @@
  */
 package fachada;
 
-import control.ControlMapa;
 import dtos.SucursalDTO;
-import org.jxmapviewer.JXMapViewer;
 import java.util.List;
+import javax.swing.JComponent;
 
 /**
  * 
  * @author julian izaguirre
  */
 public class Mapa implements IMapa {
+
     private static Mapa instancia;
-    private final ControlMapa control;
  
-    private Mapa() {
-        this.control = new ControlMapa();
-    }
+    private java.util.function.Supplier<JComponent>              fnGetComponente;
+    private java.util.function.Consumer<List<SucursalDTO>>       fnColocarMarcadores;
+    private java.util.function.Consumer<String>                  fnResaltarMarcador;
+    private IMapa.CoordConsumer                                  fnCentrarEn;
+    private IMapa.CoordConsumer                                  fnMostrarUsuario;
+    private java.util.function.Consumer<OnMarcadorClickListener> fnSetListener;
+ 
+    private Mapa() { }
  
     public static Mapa getInstancia() {
         if (instancia == null) instancia = new Mapa();
@@ -27,32 +31,49 @@ public class Mapa implements IMapa {
     }
  
     @Override
-    public JXMapViewer getComponente() {
-        return control.getComponente();
+    public void registrar(
+            java.util.function.Supplier<JComponent>              getComponente,
+            java.util.function.Consumer<List<SucursalDTO>>       colocarMarcadores,
+            java.util.function.Consumer<String>                  resaltarMarcador,
+            IMapa.CoordConsumer                                  centrarEn,
+            IMapa.CoordConsumer                                  mostrarUsuario,
+            java.util.function.Consumer<OnMarcadorClickListener> setListener) {
+ 
+        this.fnGetComponente     = getComponente;
+        this.fnColocarMarcadores = colocarMarcadores;
+        this.fnResaltarMarcador  = resaltarMarcador;
+        this.fnCentrarEn         = centrarEn;
+        this.fnMostrarUsuario    = mostrarUsuario;
+        this.fnSetListener       = setListener;
+    }
+ 
+    @Override
+    public JComponent getComponente() {
+        return fnGetComponente != null ? fnGetComponente.get() : null;
     }
  
     @Override
     public void colocarMarcadores(List<SucursalDTO> sucursales) {
-        control.colocarMarcadores(sucursales);
+        if (fnColocarMarcadores != null) fnColocarMarcadores.accept(sucursales);
     }
  
     @Override
     public void resaltarMarcador(String idSucursal) {
-        control.resaltarMarcador(idSucursal);
+        if (fnResaltarMarcador != null) fnResaltarMarcador.accept(idSucursal);
     }
  
     @Override
     public void centrarEn(double lat, double lng) {
-        control.centrarEn(lat, lng);
+        if (fnCentrarEn != null) fnCentrarEn.accept(lat, lng);
     }
  
     @Override
     public void mostrarUbicacionUsuario(double lat, double lng) {
-        control.mostrarUbicacionUsuario(lat, lng);
+        if (fnMostrarUsuario != null) fnMostrarUsuario.accept(lat, lng);
     }
  
     @Override
     public void setOnMarcadorClickListener(OnMarcadorClickListener listener) {
-        control.setOnMarcadorClickListener(listener);
+        if (fnSetListener != null) fnSetListener.accept(listener);
     }
 }

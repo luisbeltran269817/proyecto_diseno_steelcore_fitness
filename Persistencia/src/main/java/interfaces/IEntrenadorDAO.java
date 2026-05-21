@@ -17,4 +17,5 @@ public interface IEntrenadorDAO {
     public EntrenadorPojo buscarPorId(String idEntrenador) throws PersistenciaException;
     public List<EntrenadorPojo> obtenerPorSucursal(String idSucursal) throws PersistenciaException;
     public List<HorarioPojo>obtenerHorariosEntrenador(String idEntrenador)throws PersistenciaException;
+    void actualizarDisponibilidadHorario(String idEntrenador, String idHorario, boolean disponible) throws PersistenciaException;
 }

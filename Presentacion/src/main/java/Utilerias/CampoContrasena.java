@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -80,6 +81,14 @@ public class CampoContrasena extends JPanel {
         campo.setEchoChar(visible ? (char) 0 : '●');
         btnToggle.setText(visible ? "Ocultar" : "Ver");
         btnToggle.setForeground(visible ? Colores.ACENTO : Colores.TEXTO_PLACEHOLDER);
+    }
+
+    /**
+     * Delega el ActionListener al JPasswordField interno,
+     * permitiendo disparar una accion al presionar Enter.
+     */
+    public void addActionListener(ActionListener listener) {
+        campo.addActionListener(listener);
     }
 
     public String getValor() {

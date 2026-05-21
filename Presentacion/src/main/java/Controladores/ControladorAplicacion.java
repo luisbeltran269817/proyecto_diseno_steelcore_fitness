@@ -23,6 +23,7 @@ import PantallasComprarMembresia.PantallaTerminosCondiciones;
 import PantallasComprarMembresia.PantallaTransaccionExitosa;
 import PantallasComprarMembresia.PantallaTransaccionFallida;
 import PantallasInicioSesion.PantallaInicioSesion;
+import PantallasInicioSesion.PantallaInicioSesionSocios;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
 import dtos.EntrenadorDTO;
@@ -58,6 +59,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
  
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
+    private PantallaInicioSesionSocios pantallaInicioSesionRecepcion;
     private PantallaPerfilUsuario pantallaPerfil;
     private PantallaSeleccionSucursal pantallaSucursal;
     private PantallaSeleccionPlan pantallaPlan;
@@ -71,7 +73,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private PantallaTransaccionFallida pantallaFallida;
     private PantallaTransaccionExitosa pantallaExitosa;
  
-    private ControladorAplicacion() {
+    public ControladorAplicacion() {
         this.inicioSesionFachada = new FachadaInicioSesion();
         this.compraFachada = new FachadaComprarMembresia();
         this.infraMapa = new PresentacionInfra();
@@ -295,7 +297,21 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaQRSocio = new PantallaQR(this);
         pantallaQRSocio.setVisible(true);
     }
+
+    @Override
+    public void irAQRDesdeRecepcion() {
+        cerrarPantallas();
+        pantallaQRSocio = new PantallaQR(this, true);
+        pantallaQRSocio.setVisible(true);
+    }
  
+    @Override
+    public void irAInicioSesionRecepcion() {
+        cerrarPantallas();
+        pantallaInicioSesionRecepcion = new PantallaInicioSesionSocios(this);
+        pantallaInicioSesionRecepcion.setVisible(true);
+    }
+
     @Override
     public void irAModuloRecepcion() {
         cerrarPantallas();
@@ -582,6 +598,10 @@ public class ControladorAplicacion implements IControladorAplicacion {
         if (pantallaInicioSesion != null) {
             pantallaInicioSesion.dispose();
             pantallaInicioSesion = null;
+        }
+        if (pantallaInicioSesionRecepcion != null) {
+            pantallaInicioSesionRecepcion.dispose();
+            pantallaInicioSesionRecepcion = null;
         }
         if (pantallaPerfil != null) {
             pantallaPerfil.dispose();
