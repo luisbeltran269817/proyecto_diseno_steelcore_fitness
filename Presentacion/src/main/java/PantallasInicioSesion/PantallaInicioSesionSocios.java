@@ -10,6 +10,7 @@ import Utilerias.CampoContrasena;
 import Utilerias.CampoTexto;
 import Utilerias.Colores;
 import Utilerias.PantallaBase;
+import dtos.UsuarioDTO;
 import static java.awt.Component.CENTER_ALIGNMENT;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -105,32 +106,35 @@ public class PantallaInicioSesionSocios extends PantallaBase {
      * Si tiene exito, irAModuloRecepcion() abre BC_PantallaEspera (el escaner QR).
      */
     private void onIngresar() {
-        String correo    = txtCorreo.getValor();
+        String correo = txtCorreo.getValor();
         String contrasena = txtContrasena.getValor();
- 
+
         if (correo.isBlank() || contrasena.isBlank()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Completa todos los campos antes de continuar.",
-                    "Campos requeridos",
-                    JOptionPane.WARNING_MESSAGE);
+            mostrarError("Por favor completa todos los campos.");
             return;
         }
- 
+
         try {
             controlador.iniciarSesion(correo, contrasena);
- 
+
+            UsuarioDTO usuarioLogueado = controlador.getUsuarioActual();
+
             dispose();
-            controlador.irAModuloRecepcion();
- 
+
+            switch (usuarioLogueado.getRol()) {
+                case ADMIN -> controlador.irAInventarioMaquinas();
+                case CLIENTE -> controlador.irAModuloRecepcion();
+                default -> mostrarError("Rol desconocido. Contacta al administrador.");
+            }
+
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    ex.getMessage() != null
-                        ? ex.getMessage()
-                        : "Credenciales incorrectas. Intenta de nuevo.",
-                    "Error de acceso",
-                    JOptionPane.ERROR_MESSAGE);
+            mostrarError(ex.getMessage());
         }
     }
+
+    public void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje,
+                "Error de Acceso", JOptionPane.ERROR_MESSAGE);
+    }
+    
 }

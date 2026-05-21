@@ -7,6 +7,8 @@ package Clase_Control;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import dtos.ClienteDTO;
 import dtos.UsuarioDTO;
+import dtosInventarioMantenimiento.AdminMantenimientoDTO;
+import objetosNegocioMantenimiento.AdminMantenimientoBO;
 import objetosnegocios.ClienteBO;
 
 /**
@@ -15,8 +17,10 @@ import objetosnegocios.ClienteBO;
  */
 public class ControlInicioSesion {
     private final ClienteBO clienteBO;
+    private final AdminMantenimientoBO adminMantenimientoBO;
     public ControlInicioSesion() {
         this.clienteBO = new ClienteBO();
+        this.adminMantenimientoBO = new AdminMantenimientoBO();
     }
     
     /**
@@ -28,18 +32,29 @@ public class ControlInicioSesion {
      * @throws Exception si el correo no existe o la contraseña es incorrecta
      */
     public UsuarioDTO iniciarSesion(String correo, String contraseña) throws Exception {
+        
+        AdminMantenimientoDTO admin = adminMantenimientoBO.buscarPorCorreo(correo);
+        if (admin != null) {
+            BCrypt.Result resultado = BCrypt.verifyer().verify(
+                    contraseña.toCharArray(),
+                    admin.getContraseña()
+            );
+            if (!resultado.verified) {
+                throw new Exception("Correo o contraseña incorrectos.");
+            }
+            return admin;
+        }
         ClienteDTO cliente = clienteBO.buscarPorCorreo(correo);
-        if (cliente == null) {
-            throw new Exception("Correo o contraseña incorrectos.");
+        if (cliente != null) {
+            BCrypt.Result resultado = BCrypt.verifyer().verify(
+                    contraseña.toCharArray(),
+                    cliente.getContraseña()
+            );
+            if (!resultado.verified) {
+                throw new Exception("Correo o contraseña incorrectos.");
+            }
+            return cliente;
         }
- 
-        BCrypt.Result resultado = BCrypt.verifyer()
-                .verify(contraseña.toCharArray(), cliente.getContraseña());
- 
-        if (!resultado.verified) {
-            throw new Exception("Correo o contraseña incorrectos.");
-        }
- 
-        return cliente;
+        throw new Exception("Correo o contraseña incorrectos.");
     }
 }
