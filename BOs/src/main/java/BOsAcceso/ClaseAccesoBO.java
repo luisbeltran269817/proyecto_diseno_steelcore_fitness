@@ -14,87 +14,81 @@ import interfacesAcceso.IClaseDAO;
 import java.util.List;
 import java.util.logging.Logger;
 import mappersBO.ClaseAccesoMapper;
- 
+
 /**
- * Objeto de negocio para clases del caso individual Control de Acceso.
- *
- * Validaciones de negocio que aplica:
- *  - Si el plan no incluye clases (idPlan null o vacío) no consulta la BD
- *    y lanza NegocioException con mensaje para la pantalla.
- *  - Filtra la lista eliminando clases donde el socio ya está inscrito
- *    (doble validación: la primera la hace el DAO con la consulta Mongo).
- *  - Delega la validación de cupo a la capa de persistencia (DAO atómico).
+ * Logica de negocio para las clases en el control de acceso
  *
  * @author julian izaguirre
  */
 public class ClaseAccesoBO implements IClaseAccesoBO {
- 
+
     private static final Logger LOG = Logger.getLogger(ClaseAccesoBO.class.getName());
     private final IClaseDAO claseDAO;
- 
+
     public ClaseAccesoBO() {
         this.claseDAO = new ClaseDAO();
     }
- 
+
     /**
-     * {@inheritDoc}
+     * Busca las clases disponibles para el socio y quita en las que ya esta inscrito
      *
-     * Si idPlan es null o vacío asume que el plan no incluye clases y lanza
-     * NegocioException — la pantalla debe mostrar el mensaje de plan sin clases.
+     * @param idSucursal La sucursal donde esta el socio
+     * @param idPlan El plan de su membresia
+     * @param idCliente El identificador del socio
+     * @return Lista de clases disponibles
+     * @throws NegocioException Si falta la sucursal o falla la consulta
      */
     @Override
     public List<ClaseDTO> obtenerClasesPorPlan(String idSucursal, String idPlan,
                                                 String idCliente)
             throws NegocioException {
- 
+
         if (idSucursal == null || idSucursal.isBlank()) {
-            throw new NegocioException("No se puede consultar clases: sucursal no definida.");
+            throw new NegocioException("No se puede consultar clases: sucursal no definida");
         }
- 
+
         try {
             List<ClasePojo> pojos = claseDAO.obtenerPorSucursalYPlan(idSucursal, idPlan);
- 
-            // Filtrar clases donde el socio ya está inscrito (segunda capa de seguridad)
+
             List<ClaseDTO> resultado = new java.util.ArrayList<>();
             for (ClasePojo pojo : pojos) {
                 if (!pojo.estaInscrito(idCliente)) {
                     resultado.add(ClaseAccesoMapper.toDTO(pojo));
                 }
             }
- 
+
             if (resultado.isEmpty()) {
                 LOG.info("No hay clases disponibles para sucursal=" + idSucursal
                         + " plan=" + idPlan);
             }
             return resultado;
- 
+
         } catch (PersistenciaException ex) {
             LOG.severe("Error al obtener clases: " + ex.getMessage());
-            throw new NegocioException("No se pudieron obtener las clases disponibles.", ex);
+            throw new NegocioException("No se pudieron obtener las clases disponibles", ex);
         }
     }
- 
+
     /**
-     * {@inheritDoc}
+     * Manda al DAO la instruccion para meter al socio a la clase
      *
-     * Delega la validación de cupo y duplicados al DAO (operación atómica en Mongo).
-     * Transforma el PersistenciaException en NegocioException con el mismo mensaje
-     * para que la pantalla lo muestre directamente.
+     * @param idClase Clase a la que va a entrar
+     * @param idCliente Socio que se inscribe
+     * @throws NegocioException Si faltan datos o la clase ya esta llena
      */
     @Override
     public void inscribirSocio(String idClase, String idCliente) throws NegocioException {
         if (idClase == null || idClase.isBlank()) {
-            throw new NegocioException("Debe seleccionar una clase.");
+            throw new NegocioException("Debe seleccionar una clase");
         }
         if (idCliente == null || idCliente.isBlank()) {
-            throw new NegocioException("El socio no está identificado.");
+            throw new NegocioException("El socio no esta identificado");
         }
- 
+
         try {
             claseDAO.inscribirSocio(idClase, idCliente);
             LOG.info("Socio " + idCliente + " inscrito en clase " + idClase);
         } catch (PersistenciaException ex) {
-            // El mensaje de PersistenciaException ya es legible para el usuario
             throw new NegocioException(ex.getMessage(), ex);
         }
     }

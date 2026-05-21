@@ -8,20 +8,23 @@ import dominioAcceso.ClasePojo;
 import dtosControlDeAcceso.ClaseDTO;
 import java.util.ArrayList;
 import java.util.List;
- 
+
 /**
- * Mapper entre ClasePojo (dominio) y ClaseDTO (caso individual de acceso).
- *
- * ClasePojo tiene horaInicio (LocalTime) y el DTO también, así que
- * la conversión es directa.  cupoDisponible = cupoMaximo - cupoActual.
+ * Pasa los datos de la clase de dominio a DTO
  *
  * @author julian izaguirre
  */
 public class ClaseAccesoMapper {
- 
+
+    /**
+     * Convierte un objeto de clase a DTO calculando el cupo disponible
+     * 
+     * @param pojo Clase de la base de datos
+     * @return DTO para la pantalla
+     */
     public static ClaseDTO toDTO(ClasePojo pojo) {
         if (pojo == null) return null;
- 
+
         ClaseDTO dto = new ClaseDTO();
         dto.setIdClase(pojo.getIdClase());
         dto.setNombre(pojo.getNombre());
@@ -32,7 +35,13 @@ public class ClaseAccesoMapper {
         dto.setCupoDisponible(pojo.getCupoMaximo() - pojo.getCupoActual());
         return dto;
     }
- 
+
+    /**
+     * Convierte una lista completa de clases a DTOs
+     * 
+     * @param pojos Lista de clases de base de datos
+     * @return Lista de DTOs lista para la vista
+     */
     public static List<ClaseDTO> toDTOList(List<ClasePojo> pojos) {
         List<ClaseDTO> lista = new ArrayList<>();
         if (pojos != null) {

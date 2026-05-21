@@ -1,26 +1,35 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package interfacesAcceso;
 
 import dominioAcceso.VisitaAccesoPojo;
 import excepciones.PersistenciaException;
 
 /**
- * Contrato de acceso a datos para visitas enriquecidas del caso individual.
+ * Interfaz para las operaciones de base de datos del control de visitas
  *
  * @author julian izaguirre
  */
 public interface IVisitaAccesoDAO {
 
     /**
-     * Guarda la visita con todos los datos de acceso.
+     * Guarda el registro de una visita nueva
+     * 
+     * @param visita Objeto visita a guardar
+     * @return La visita recien creada
+     * @throws PersistenciaException Si falla la operacion
      */
     VisitaAccesoPojo guardar(VisitaAccesoPojo visita) throws PersistenciaException;
 
     /**
-     * Actualiza el tipo de servicio y el recurso asignado de una visita ya registrada.
+     * Actualiza el servicio que solicito la visita
      *
-     * @param tipoServicio      "AREA_GENERAL", "CLASE" o "ENTRENADOR"
-     * @param idRecursoAsignado id de la clase o entrenador; null si es AREA_GENERAL
+     * @param idVisita ID de la visita a modificar
+     * @param tipoServicio Categoria del servicio nuevo
+     * @param idRecursoAsignado Recurso especifico asignado
+     * @throws PersistenciaException Si falla la base de datos
      */
-    void actualizarServicio(String idVisita, String tipoServicio,
-                             String idRecursoAsignado) throws PersistenciaException;
+    void actualizarServicio(String idVisita, String tipoServicio, String idRecursoAsignado) throws PersistenciaException;
 }

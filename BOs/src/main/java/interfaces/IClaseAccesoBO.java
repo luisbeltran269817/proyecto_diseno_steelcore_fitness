@@ -7,34 +7,32 @@ package interfaces;
 import Excepciones.NegocioException;
 import dtosControlDeAcceso.ClaseDTO;
 import java.util.List;
- 
+
 /**
- * Contrato de negocio para el manejo de clases en el módulo de Control de Acceso.
+ * Interfaz para las reglas de negocio de las clases
  *
  * @author julian izaguirre
  */
 public interface IClaseAccesoBO {
- 
+
     /**
-     * Obtiene las clases disponibles para el plan del socio en la sucursal.
-     * Excluye clases donde el socio ya está inscrito.
+     * Trae las clases que el socio puede tomar con su membresia
      *
-     * @param idSucursal sucursal donde opera la recepción
-     * @param idPlan     plan de la membresía del socio
-     * @param idCliente  id del socio (para excluir clases ya inscritas)
-     * @return lista de ClaseDTO; nunca null
-     * @throws NegocioException si el plan no incluye clases o falla la consulta
+     * @param idSucursal Sucursal a consultar
+     * @param idPlan Plan del socio
+     * @param idCliente Identificador del socio para filtrar
+     * @return Lista de clases permitidas
+     * @throws NegocioException Si algo sale mal en la consulta
      */
     List<ClaseDTO> obtenerClasesPorPlan(String idSucursal, String idPlan, String idCliente)
             throws NegocioException;
- 
+
     /**
-     * Inscribe al socio en la clase seleccionada.
-     * Valida que el plan incluya clases y que haya cupo.
+     * Valida y mete al socio a una clase
      *
-     * @param idClase   id de la clase
-     * @param idCliente id del socio
-     * @throws NegocioException si cupo lleno, ya inscrito, o plan no incluye clases
+     * @param idClase Identificador de la clase
+     * @param idCliente Identificador del socio
+     * @throws NegocioException Si la clase se lleno o ya estaba apuntado
      */
     void inscribirSocio(String idClase, String idCliente) throws NegocioException;
 }

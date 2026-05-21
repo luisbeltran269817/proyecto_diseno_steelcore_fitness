@@ -61,7 +61,7 @@ public class VisitaDAO implements IVisitaDAO {
     /**
      * Metodo para obtener visitas de un cliente
      * @param idCliente el cliente del que se quieren obtener las visitas
-     * @return List<VisitaPojo> las visitas del cliente
+     * @return List VisitaPojo las visitas del cliente
      * @throws PersistenciaException 
      */
     @Override

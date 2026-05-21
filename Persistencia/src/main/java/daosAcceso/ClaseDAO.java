@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package daosAcceso;
 
 import com.mongodb.MongoException;
@@ -16,11 +20,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 /**
- * DAO para la colección "clases".
- *
- * Reglas de negocio aplicadas en persistencia:
- *   - inscribirSocio() es atómico: si cupo lleno o ya inscrito lanza excepción.
- *   - obtenerPorSucursalYPlan() incluye clases sin restricción de plan (idPlan null).
+ * DAO que maneja las operaciones de las clases del gimnasio
  *
  * @author julian izaguirre
  */
@@ -34,10 +34,12 @@ public class ClaseDAO implements IClaseDAO {
     }
 
     /**
-     * {@inheritDoc}
+     * Trae las clases de una sucursal filtrando por el plan del socio
      *
-     * Filtra clases donde idSucursal coincide Y
-     * (idPlan == idPlan del socio OR idPlan no existe / es null en el documento).
+     * @param idSucursal La sucursal donde esta el socio
+     * @param idPlan El plan que tiene pagado
+     * @return Lista con las clases que el socio puede tomar
+     * @throws PersistenciaException Si ocurre un error al buscar
      */
     @Override
     public List<ClasePojo> obtenerPorSucursalYPlan(String idSucursal, String idPlan)
@@ -67,7 +69,13 @@ public class ClaseDAO implements IClaseDAO {
         }
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * Busca los datos completos de una clase usando su ID
+     * 
+     * @param idClase Identificador unico de la clase
+     * @return El objeto de la clase o null si no se encuentra
+     * @throws PersistenciaException Si falla la consulta a Mongo
+     */
     @Override
     public ClasePojo buscarPorId(String idClase) throws PersistenciaException {
         try {
@@ -84,10 +92,11 @@ public class ClaseDAO implements IClaseDAO {
     }
 
     /**
-     * {@inheritDoc}
+     * Metodo para inscribir un socio a una clase validando espacios
      *
-     * Verificación de cupo y duplicados ANTES de la actualización atómica.
-     * Lanza PersistenciaException con mensaje específico para cada caso.
+     * @param idClase Clase a la que quiere entrar
+     * @param idCliente Socio que se va a inscribir
+     * @throws PersistenciaException Si la clase esta llena o el socio ya esta registrado
      */
     @Override
     public void inscribirSocio(String idClase, String idCliente)
@@ -99,11 +108,11 @@ public class ClaseDAO implements IClaseDAO {
             }
             if (clase.estaLlena()) {
                 throw new PersistenciaException(
-                        "Lo sentimos, el cupo para esta clase ya está lleno.\n"
-                        + "Por favor selecciona otro horario.");
+                        "Lo sentimos, el cupo para esta clase ya esta lleno\n"
+                        + "Por favor selecciona otro horario");
             }
             if (clase.estaInscrito(idCliente)) {
-                throw new PersistenciaException("El socio ya está inscrito en esta clase.");
+                throw new PersistenciaException("El socio ya esta inscrito en esta clase");
             }
 
             coleccion.updateOne(

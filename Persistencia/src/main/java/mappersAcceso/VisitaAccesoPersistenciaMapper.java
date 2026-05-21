@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package mappersAcceso;
 
 import dominioAcceso.VisitaAccesoPojo;
@@ -6,14 +10,18 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 /**
- * Convierte entre Document (Mongo, colección "visitas") y VisitaAccesoPojo.
- * Compatible con la colección "visitas" existente; solo añade campos extra
- * (tipoServicio, idRecursoAsignado) al documento.
+ * Encargado de transformar visitas entre codigo Java y la base de datos Mongo
  *
  * @author julian izaguirre
  */
 public class VisitaAccesoPersistenciaMapper {
 
+    /**
+     * Transforma una visita a formato de documento de MongoDB
+     * 
+     * @param pojo El objeto de visita
+     * @return Documento generado con sus llaves
+     */
     public static Document toDocument(VisitaAccesoPojo pojo) {
         if (pojo == null) return null;
 
@@ -37,6 +45,12 @@ public class VisitaAccesoPersistenciaMapper {
         return doc;
     }
 
+    /**
+     * Convierte los datos que vienen de la base a un objeto de visita
+     * 
+     * @param doc Datos en crudo desde Mongo
+     * @return La visita estructurada para Java
+     */
     public static VisitaAccesoPojo toPojo(Document doc) {
         if (doc == null) return null;
 
