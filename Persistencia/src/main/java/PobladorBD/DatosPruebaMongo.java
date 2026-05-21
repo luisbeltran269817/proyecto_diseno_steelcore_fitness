@@ -574,6 +574,87 @@ public class DatosPruebaMongo {
         MongoCollection<Document> colClientes = bd.getCollection("clientes");
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente1));
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente2));
+        colMembresias.insertOne(MembresiaPersistenciaMapper.toDocument(membresia));
+
+        /*
+         * =========================
+         * CITA BIENVENIDA (ID con UUID real)
+         * =========================
+         */
+        CitaPojo cita = new CitaPojo();
+        cita.setIdCita(UUID.randomUUID().toString());
+        cita.setIdCliente("CL001");
+        cita.setIdEntrenador("E001");
+        cita.setIdSucursal("S001");
+        cita.setIdHorario("H001");
+        cita.setFechaHora(LocalDateTime.now().plusDays(1));
+        cita.setEstado(EstadoCitaPojo.CONFIRMADA);
+        cita.setNotas("Primera cita de bienvenida");
+
+        /*
+         * =========================
+         * CLIENTE (contraseña hasheada con BCrypt)
+         * =========================
+         */
+        // Hash de la contraseña "123" — el login comparará con BCrypt.verify()
+        String contrasenhaHasheada = BCrypt.withDefaults()
+                .hashToString(12, "123".toCharArray());
+
+        String contraseniaReporte = BCrypt.withDefaults().hashToString(12, "2711".toCharArray());
+
+        UsuarioPojo usuario = new UsuarioPojo();
+        usuario.setCorreo("cliente@gmail.com");
+        usuario.setNombre("Juan Leonel");
+        usuario.setContraseña(contrasenhaHasheada);   // ← ya hasheada
+        usuario.setRol(RolUsuarioPojo.CLIENTE);
+
+        // reportes
+        UsuarioPojo usuarioReporte = new UsuarioPojo();
+        usuarioReporte.setNombre("Noelia Encinas");
+        usuarioReporte.setCorreo("reportes@gmail.com");
+        usuarioReporte.setContraseña(contraseniaReporte);
+        usuarioReporte.setRol(RolUsuarioPojo.ADMIN);
+
+        ClientePojo clienteReporte = new ClientePojo();
+        clienteReporte.setIdCliente("ADMIN_REPORTES_001");
+        clienteReporte.setUsuario(usuarioReporte);
+        clienteReporte.setApellidoPaterno("Encinas");
+        clienteReporte.setApellidoMaterno("Noriega");
+        clienteReporte.setFechaNacimiento(LocalDate.of(2003, 11, 27));
+        clienteReporte.setCurp("EENN031127MSRXXX01");
+        clienteReporte.setMembresiaActiva(null);
+        clienteReporte.setCitaBienvenida(null);
+
+        MembresiaActivaPojo snapshot = new MembresiaActivaPojo();
+        snapshot.setIdMembresia(idMembresia);
+        snapshot.setIdPlan("P001");
+        snapshot.setFechaCaducidad(membresia.getFechaCaducidad());
+        snapshot.setEstado(EstadoMembresiaPojo.ACTIVA);
+
+        ClientePojo cliente = new ClientePojo();
+        cliente.setIdCliente("CL001");
+        cliente.setUsuario(usuario);
+        cliente.setApellidoPaterno("Bojorquez");
+        cliente.setApellidoMaterno("Terán");
+        cliente.setFechaNacimiento(LocalDate.of(2003, 5, 10));
+        cliente.setCurp("LELJ030510HSRXXX01");
+        cliente.setMembresiaActiva(snapshot);
+        cliente.setCitaBienvenida(cita);   // ← cita guardada en el cliente
+
+        MongoCollection<Document> colClientes = bd.getCollection("clientes");
+        colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente));
+
+        colClientes.insertOne(ClientePersistenciaMapper.toDocument(clienteReporte));
+        /*
+         * =========================
+         * VISITAS
+         * =========================
+         */
+        VisitaPojo visita = new VisitaPojo();
+        visita.setIdVisita("V001");
+        visita.setIdCliente("CL001");
+        visita.setIdSucursal("S001");
+        visita.setFechaHora(LocalDateTime.now().minusDays(1));
 
         // ── Visitas históricas ────────────────────────────────────────────────
         MongoCollection<Document> colVisitas = bd.getCollection("visitas");

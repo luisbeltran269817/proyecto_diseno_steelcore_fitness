@@ -72,6 +72,9 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import ControladoresReportes.ControlReportes;
+import dtos.ClienteDTO;
+
 /**
  *
  * @author luiscarlosbeltran
@@ -79,7 +82,7 @@ import javax.swing.SwingUtilities;
 public class ControladorAplicacion implements IControladorAplicacion {
 
     private static ControladorAplicacion instancia;
- 
+
     private final IInicioSesion inicioSesionFachada;
     private final IComprarMembresia compraFachada;
     private final PresentacionInfra infraMapa;
@@ -100,6 +103,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private final IPlanearRutina rutinaFachada;
     private RutinaDTO rutinaSeleccionada;
  
+
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
     private PantallaInicioSesionSocios pantallaInicioSesionRecepcion;
@@ -122,7 +126,9 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private PantallaEditorRutina pantallaEditorRutina;
     private PantallaBusquedaEntrenador pantallaBusquedaEntrenador;
  
-    public ControladorAplicacion() {
+    private final ControlReportes controlReportes;
+
+    private ControladorAplicacion() {
         this.inicioSesionFachada = new FachadaInicioSesion();
         this.compraFachada = new FachadaComprarMembresia();
         this.infraMapa = new PresentacionInfra();
@@ -132,8 +138,10 @@ public class ControladorAplicacion implements IControladorAplicacion {
             this.gestorMantenimiento= new GestorEstadosMantenimiento();
          //COSAS DE INVENTARIO MANTENIMIENTO
         this.rutinaFachada = new FachadaPlanearRutina();
+
+        this.controlReportes = new ControlReportes(this);
     }
- 
+
     /**
      * Regresa la única instancia del controlador (singleton).
      *
@@ -145,7 +153,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
         return instancia;
     }
- 
+
     /**
      * Arranca la aplicación mostrando la pantalla de bienvenida.
      */
@@ -157,95 +165,94 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public UsuarioDTO getUsuarioActual() {
         return gestor.getUsuarioActual();
     }
- 
+
     @Override
     public void setSucursalSeleccionada(SucursalDTO sucursal) {
         gestor.setSucursalSeleccionada(sucursal);
     }
- 
+
     @Override
     public SucursalDTO getSucursalSeleccionada() {
         return gestor.getSucursalSeleccionada();
     }
- 
+
     @Override
     public void setPlanSeleccionado(PlanDTO plan) {
         gestor.setPlanSeleccionado(plan);
     }
- 
+
     @Override
     public PlanDTO getPlanSeleccionado() {
         return gestor.getPlanSeleccionado();
     }
- 
+
     @Override
     public void setExtrasSeleccionados(List<AmenidadDTO> extras) {
         gestor.setExtrasSeleccionados(extras);
     }
- 
+
     @Override
     public List<AmenidadDTO> getExtrasSeleccionados() {
         return gestor.getExtrasSeleccionados();
     }
- 
+
     @Override
     public void setEntrenadorSeleccionado(EntrenadorDTO entrenador) {
         gestor.setEntrenadorSeleccionado(entrenador);
     }
- 
+
     @Override
     public EntrenadorDTO getEntrenadorSeleccionado() {
         return gestor.getEntrenadorSeleccionado();
     }
- 
+
     @Override
     public void setHorarioSeleccionado(HorarioDTO horario) {
         gestor.setHorarioSeleccionado(horario);
     }
- 
+
     @Override
     public HorarioDTO getHorarioSeleccionado() {
         return gestor.getHorarioSeleccionado();
     }
- 
+
     @Override
     public MembresiaDTO getMembresiaRecienCreada() {
         return gestor.getMembresiaRecienCreada();
     }
- 
+
     @Override
     public void setTokenTarjeta(String token) {
         gestor.setTokenTarjeta(token);
     }
- 
+
     @Override
     public String getTokenTarjeta() {
         return gestor.getTokenTarjeta();
     }
- 
+
     // --- navegación ---
- 
     @Override
     public void irABienvenida() {
         cerrarPantallas();
         pantallaBienvenida = new PantallaBienvenida(this);
         pantallaBienvenida.setVisible(true);
     }
- 
+
     @Override
     public void irAInicioSesion() {
         cerrarPantallas();
         pantallaInicioSesion = new PantallaInicioSesion(this);
         pantallaInicioSesion.setVisible(true);
     }
- 
+
     @Override
     public void irAPerfilUsuario() {
         cerrarPantallas();
         pantallaPerfil = new PantallaPerfilUsuario(this);
         pantallaPerfil.setVisible(true);
     }
- 
+
     @Override
     public void iniciarCompraMembresia() {
         // Limpiar TODO el estado de compra antes de un flujo nuevo
@@ -261,10 +268,10 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     /**
-     * Inicia el flujo de agendar cita desde el perfil de usuario.
-     * El cliente ya tiene membresia, asi que NO se llama a limpiar().
-     * Solo se resetean entrenador y horario; la sucursal se toma de
-     * la membresia activa si el gestor no la tiene ya guardada.
+     * Inicia el flujo de agendar cita desde el perfil de usuario. El cliente ya
+     * tiene membresia, asi que NO se llama a limpiar(). Solo se resetean
+     * entrenador y horario; la sucursal se toma de la membresia activa si el
+     * gestor no la tiene ya guardada.
      */
     @Override
     public void irAAgendarCitaDesdePerfil() {
@@ -287,7 +294,8 @@ public class ControladorAplicacion implements IControladorAplicacion {
                                 break;
                             }
                         }
-                    } catch (NegocioException ignored) { }
+                    } catch (NegocioException ignored) {
+                    }
                     // Fallback: construir con solo el id si no encontramos el objeto completo
                     if (sucursal == null) {
                         sucursal = new SucursalDTO();
@@ -302,49 +310,49 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
         irASeleccionInstructor();
     }
- 
+
     @Override
     public void irASeleccionPlan() {
         cerrarPantallas();
         pantallaPlan = new PantallaSeleccionPlan(this);
         pantallaPlan.setVisible(true);
     }
- 
+
     @Override
     public void irADetallePlan() {
         cerrarPantallas();
         pantallaDetalle = new PantallaDetallePlan(this);
         pantallaDetalle.setVisible(true);
     }
- 
+
     @Override
     public void irATerminosCondiciones() {
         cerrarPantallas();
         pantallaTerminos = new PantallaTerminosCondiciones(this);
         pantallaTerminos.setVisible(true);
     }
- 
+
     @Override
     public void irADatosBancarios() {
         cerrarPantallas();
         pantallaBancarios = new DatosBancarios(this);
         pantallaBancarios.setVisible(true);
     }
- 
+
     @Override
     public void irASeleccionInstructor() {
         cerrarPantallas();
         pantallaInstructor = new PantallaSeleccionInstructor(this);
         pantallaInstructor.setVisible(true);
     }
- 
+
     @Override
     public void irASeleccionHorario() throws NegocioException {
         cerrarPantallas();
         pantallaHorario = new PantallaSeleccionHorario(this);
         pantallaHorario.setVisible(true);
     }
- 
+
     @Override
     public void irAQR() {
         cerrarPantallas();
@@ -372,14 +380,14 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaRecepcion = new BC_PantallaEspera(this);
         pantallaRecepcion.setVisible(true);
     }
- 
+
     @Override
     public void irATransaccionFallida(String causa) {
         cerrarPantallas();
         pantallaFallida = new PantallaTransaccionFallida(this, causa);
         pantallaFallida.setVisible(true);
     }
- 
+
     @Override
     public void irATransaccionExitosa() {
         cerrarPantallas();
@@ -387,16 +395,22 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaExitosa.setVisible(true);
     }
     
+
     // --- sesión ---
- 
     @Override
     public void iniciarSesion(String correo, String contrasena) throws NegocioException {
         UsuarioDTO usuario;
+
         try {
             usuario = inicioSesionFachada.iniciarSesion(correo, contrasena);
         } catch (Exception ex) {
-            throw new NegocioException(ex.getMessage() != null ? ex.getMessage() : "Correo o contrasena incorrectos.");
+            throw new NegocioException(
+                    ex.getMessage() != null
+                    ? ex.getMessage()
+                    : "Correo o contraseña incorrectos."
+            );
         }
+
         gestor.setUsuarioActual(usuario);
         //Métodos de inventarioMantenimiento
             if (usuario instanceof AdminMantenimientoDTO) {
@@ -409,49 +423,65 @@ public class ControladorAplicacion implements IControladorAplicacion {
             gestor.setCitaBienvenida(cita);
         } catch (NegocioException ex) {
             // No bloquear el login si falla la consulta de cita
+
+        if (esAdminReportes(usuario)) {
+            irAAdministrarReportes();
+            return;
         }
+
+        if (usuario instanceof ClienteDTO) {
+            try {
+                CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
+                gestor.setCitaBienvenida(cita);
+            } catch (NegocioException ex) {
+                // No bloquear inicio de sesión si falla la consulta de la cita
+            }
+
+            irAPerfilUsuario();
+            return;
+        }
+
         irAPerfilUsuario();
     }
- 
+
     @Override
     public void cerrarSesion() {
         gestor.limpiarSesion();
         irABienvenida();
     }
- 
+
     // --- consultas de negocio ---
- 
     @Override
     public boolean tieneMembresiaActiva() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
         return usuario != null && compraFachada.tieneMembresiaActiva(usuario.getCorreo());
     }
- 
+
     @Override
     public boolean tieneCitaBienvenida() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
         return usuario != null
                 && compraFachada.obtenerCitaBienvenida(usuario.getCorreo()) != null;
     }
- 
+
     @Override
     public MembresiaDTO obtenerMembresiaActiva() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
         return usuario == null ? null : compraFachada.obtenerMembresiaActiva(usuario.getCorreo());
     }
- 
+
     @Override
     public CitaDTO obtenerCitaBienvenida() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
         return usuario == null ? null : compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
     }
- 
+
     @Override
     public List<VisitaDTO> obtenerHistorial() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
         return usuario == null ? new ArrayList<>() : compraFachada.obtenerHistorial(usuario.getCorreo());
     }
- 
+
     @Override
     public void cancelarMembresia() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
@@ -459,38 +489,38 @@ public class ControladorAplicacion implements IControladorAplicacion {
             compraFachada.cancelarMembresia(usuario.getCorreo());
         }
     }
- 
+
     @Override
     public List<SucursalDTO> obtenerSucursales() throws NegocioException {
         return compraFachada.obtenerSucursales();
     }
- 
+
     @Override
     public List<PlanDTO> obtenerPlanesDeSucursal(String idSucursal) throws NegocioException {
         SucursalDTO tmp = new SucursalDTO();
         tmp.setIdSucursal(idSucursal);
         return compraFachada.obtenerPlanes(tmp);
     }
- 
+
     @Override
     public List<AmenidadDTO> obtenerAmenidadesExtra() {
         return compraFachada.obtenerAmenidadesExtra();
     }
- 
+
     @Override
     public List<EntrenadorDTO> obtenerEntrenadoresDeSucursal(String idSucursal) throws NegocioException {
         SucursalDTO tmp = new SucursalDTO();
         tmp.setIdSucursal(idSucursal);
         return compraFachada.obtenerEntrenadores(tmp);
     }
- 
+
     @Override
     public List<HorarioDTO> obtenerHorariosDeEntrenador(String idEntrenador) throws NegocioException {
         EntrenadorDTO tmp = new EntrenadorDTO();
         tmp.setIdEntrenador(idEntrenador);
         return compraFachada.obtenerHorarios(tmp);
     }
- 
+
     @Override
     public void confirmarCompra() {
         try {
@@ -508,14 +538,14 @@ public class ControladorAplicacion implements IControladorAplicacion {
             irATransaccionFallida(e.getMessage());
         }
     }
- 
+
     @Override
     public double calcularTotal() throws NegocioException {
         PlanDTO plan = gestor.getPlanSeleccionado();
         return plan == null ? 0.0
                 : compraFachada.calcularTotal(plan.getIdPlan(), gestor.getExtrasSeleccionados());
     }
- 
+
     @Override
     public void confirmarCitaBienvenida() throws NegocioException {
         EntrenadorDTO entrenador = gestor.getEntrenadorSeleccionado();
@@ -536,21 +566,20 @@ public class ControladorAplicacion implements IControladorAplicacion {
         CitaDTO agendada = compraFachada.agendarCita(dto);
         gestor.setCitaBienvenida(agendada);
     }
- 
+
     // --- mapa ---
- 
     @Override
     public JComponent getComponenteMapa() {
         return infraMapa.getComponenteMapa();
     }
- 
+
     @Override
     public List<SucursalDTO> iniciarMapa() throws NegocioException {
         List<SucursalDTO> sucursales = compraFachada.obtenerSucursales();
         infraMapa.colocarMarcadores(sucursales);
         return sucursales;
     }
- 
+
     @Override
     public SucursalDTO onMarcadorClickeado(String idSucursal) {
         infraMapa.resaltarMarcador(idSucursal);
@@ -565,22 +594,22 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
         return null;
     }
- 
+
     @Override
     public void actualizarUbicacion(double lat, double lng) {
         infraMapa.actualizarUbicacion(lat, lng);
     }
- 
+
     @Override
     public void centrarMapaEn(double lat, double lng) {
         infraMapa.centrarMapaEn(lat, lng);
     }
- 
+
     @Override
     public void setOnMarcadorClickListener(IControladorAplicacion.OnMarcadorClickListener listener) {
         infraMapa.setOnMarcadorClickListener(listener::onMarcadorClick);
     }
- 
+
     @Override
     public void ubicarUsuarioAutomaticamente() {
         Thread hilo = new Thread(() -> {
@@ -607,11 +636,11 @@ public class ControladorAplicacion implements IControladorAplicacion {
         hilo.setDaemon(true);
         hilo.start();
     }
- 
+
     /**
      * Extrae un valor double de un JSON simple buscando la clave indicada.
      *
-     * @param json  cadena JSON sin parsear
+     * @param json cadena JSON sin parsear
      * @param clave nombre del campo a extraer
      * @return valor del campo, o 0 si no se encontró o falló el parseo
      */
@@ -631,17 +660,17 @@ public class ControladorAplicacion implements IControladorAplicacion {
             return 0;
         }
     }
- 
+
     @Override
     public byte[] generarQRMembresia(String idMembresia) throws NegocioException {
         return compraFachada.generarQRMembresia(idMembresia);
     }
- 
+
     @Override
     public String iniciarServidorQR(byte[] qrPng) {
         return FachadaControlAcceso.getInstancia().iniciarServidorQR(qrPng);
     }
- 
+
     @Override
     public void detenerServidorQR() {
         FachadaControlAcceso.getInstancia().detenerServidorQR();
@@ -911,6 +940,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
     //MÉTODOS DE INVENTARIO MANTENIMIENTO
         
+
     /**
      * Cierra todas las pantallas que estén abiertas antes de mostrar una nueva.
      */
@@ -1121,4 +1151,26 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
     
     
+}
+
+    @Override
+    public void irAAdministrarReportes() {
+        controlReportes.iniciarAdministrarReportes();
+    }
+
+    /**
+     * Verifica si el usuario autenticado corresponde al administrador de
+     * reportes.
+     *
+     * @param usuario usuario que inició sesión.
+     * @return true si debe entrar al módulo de reportes.
+     */
+    private boolean esAdminReportes(UsuarioDTO usuario) {
+        if (usuario == null || usuario.getCorreo() == null) {
+            return false;
+        }
+
+        return usuario.getCorreo().equalsIgnoreCase("reportes@gmail.com");
+    }
+
 }

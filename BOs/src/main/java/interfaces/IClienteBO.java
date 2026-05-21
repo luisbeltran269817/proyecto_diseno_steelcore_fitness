@@ -10,6 +10,7 @@ import dtos.ClienteDTO;
 import dtos.MembresiaDTO;
 import dtos.RutinaDTO;
 import dtos.VisitaDTO;
+import dtosReportes.FiltrosReporteDTO;
 import java.util.List;
 
 /**
@@ -17,11 +18,17 @@ import java.util.List;
  * @author Tungs
  */
 public interface IClienteBO {
+
     public List<ClienteDTO> obtenerClientes() throws NegocioException;
+
     public ClienteDTO buscarPorCorreo(String correo) throws NegocioException;
+
     public void actualizar(ClienteDTO cliente) throws NegocioException;
+
     public MembresiaDTO obtenerMembresiaActiva(String correo) throws NegocioException;
-    public void guardarCitaBienvenida(String correo, CitaDTO cita)throws NegocioException;
+
+    public void guardarCitaBienvenida(String correo, CitaDTO cita) throws NegocioException;
+
     public void eliminarMembresiaActiva(String correo) throws NegocioException;
     
     //metodos rutinass
@@ -33,4 +40,13 @@ public interface IClienteBO {
     public String obtenerIdSucursalMembresiaActiva(String correo) throws NegocioException;
     public RutinaDTO obtenerPlantilla(String nombre) throws NegocioException;
 
+    /**
+     * Consulta citas de bienvenida usando filtros de reportes.
+     *
+     * @param filtros filtros seleccionados para generar el reporte.
+     * @return lista de citas que cumplen con los filtros.
+     * @throws NegocioException si los filtros son inválidos o falla la
+     * consulta.
+     */
+    public List<CitaDTO> consultarCitasParaReportes(FiltrosReporteDTO filtros) throws NegocioException;
 }

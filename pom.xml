@@ -20,6 +20,8 @@
         <module>Dominio_modulo</module>
         <module>InventarioMantenimientoSubsistema</module>
         <module>PlanearRutinaSubsistema</module>
+        <module>AdministrarReportesSubsistema</module>
+        <module>ReportesInfraestructura</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
