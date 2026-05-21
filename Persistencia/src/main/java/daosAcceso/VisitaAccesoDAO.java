@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package daosAcceso;
 
 import com.mongodb.MongoException;
@@ -13,8 +17,7 @@ import mappersAcceso.VisitaAccesoPersistenciaMapper;
 import org.bson.Document;
 
 /**
- * DAO de visitas enriquecidas para el caso individual de Control de Acceso.
- * Usa la misma colección "visitas" que VisitaDAO.
+ * DAO encargado de gestionar las visitas en el control de acceso
  *
  * @author julian izaguirre
  */
@@ -27,7 +30,13 @@ public class VisitaAccesoDAO implements IVisitaAccesoDAO {
         this.coleccion = MongoConexion.obtenerBaseDatos().getCollection("visitas");
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * Registra una nueva visita en la base de datos
+     * 
+     * @param visita Objeto con los datos que se van a guardar
+     * @return La misma visita despues de insertarla
+     * @throws PersistenciaException Si mandan null o falla la conexion
+     */
     @Override
     public VisitaAccesoPojo guardar(VisitaAccesoPojo visita) throws PersistenciaException {
         try {
@@ -44,7 +53,14 @@ public class VisitaAccesoDAO implements IVisitaAccesoDAO {
         }
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * Actualiza el tipo de servicio que pidio el socio al entrar
+     * 
+     * @param idVisita Identificador de la visita a modificar
+     * @param tipoServicio El nombre del servicio nuevo
+     * @param idRecursoAsignado Identificador del recurso asignado
+     * @throws PersistenciaException Si no se puede actualizar en Mongo
+     */
     @Override
     public void actualizarServicio(String idVisita, String tipoServicio,
                                     String idRecursoAsignado)

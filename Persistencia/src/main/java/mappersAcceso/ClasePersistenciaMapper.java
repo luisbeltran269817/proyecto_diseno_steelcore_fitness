@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package mappersAcceso;
 
 import dominioAcceso.ClasePojo;
@@ -7,25 +11,18 @@ import java.util.List;
 import org.bson.Document;
 
 /**
- * Convierte entre Document (Mongo) y ClasePojo.
- *
- * Estructura esperada en la colección "clases":
- * {
- *   _id        : "CL001",
- *   nombre     : "Yoga",
- *   idSucursal : "S001",
- *   idPlan     : "P001",   // puede ser null
- *   diaSemana  : "Lunes",
- *   horaInicio : "10:00",
- *   cupoMaximo : 20,
- *   cupoActual : 5,
- *   inscritos  : ["correo1@x.com", ...]
- * }
+ * Convierte los objetos de clases de Java a documentos de Mongo y al reves
  *
  * @author julian izaguirre
  */
 public class ClasePersistenciaMapper {
 
+    /**
+     * Pasa un objeto pojo de clase a un documento de Mongo
+     * 
+     * @param pojo El objeto a convertir
+     * @return El documento listo para guardarse
+     */
     public static Document toDocument(ClasePojo pojo) {
         if (pojo == null) return null;
 
@@ -48,6 +45,12 @@ public class ClasePersistenciaMapper {
         return doc;
     }
 
+    /**
+     * Pasa un documento de Mongo a un objeto pojo de Java
+     * 
+     * @param doc El documento leido de la base
+     * @return Objeto poblado con los datos
+     */
     public static ClasePojo toPojo(Document doc) {
         if (doc == null) return null;
 

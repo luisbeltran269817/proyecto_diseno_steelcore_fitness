@@ -1,21 +1,20 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package Control;
 
 import Excepciones.NegocioException;
 import dtosControlDeAcceso.ClaseDTO;
 import dtosControlDeAcceso.EntrenadorDTO;
 import dtosControlDeAcceso.EstadoEntrenador;
-import dtosControlDeAcceso.EstadoMembresia;
-import dtosControlDeAcceso.MembresiaDTO;
 import dtosControlDeAcceso.ResultadoAccesoDTO;
-import dtosControlDeAcceso.SocioDTO;
 import dtosControlDeAcceso.TipoServicio;
 import dtosControlDeAcceso.VisitaDTO;
 import Fachada.Icontrolacceso.AccesoDenegadoException;
 
-// ✅ CORRECCIÓN #1: Las interfaces están en el paquete "interfaces", NO en "interfacesAcceso"
 import interfaces.IClaseAccesoBO;
 import interfaces.IVisitaAccesoBO;
-
 import interfaces.IClienteBO;
 import interfaces.IEntrenadorBO;
 import interfaces.IMembresiaBO;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-// ✅ CORRECCIÓN #2: Las clases concretas están en el paquete "BOsAcceso", NO en "objetosAcceso"
 import BOsAcceso.ClaseAccesoBO;
 import BOsAcceso.VisitaAccesoBO;
 
@@ -35,17 +33,7 @@ import objetosnegocios.MembresiaBO;
 import objetosnegocios.SucursalBO;
 
 /**
- * Clase de control del subsistema de acceso de socios.
- *
- * Toda la lógica de negocio pasa por aquí; no hay acceso directo a Mongo.
- * Cada operación usa la capa de BOs correspondiente:
- *
- *   procesarQR()                   → MembresiaBO + ClienteBO + VisitaAccesoBO
- *   obtenerEntrenadoresDisponibles()→ EntrenadorBO
- *   asignarEntrenador()            → EntrenadorBO + VisitaAccesoBO
- *   obtenerClasesPorPlan()         → ClaseAccesoBO
- *   inscribirClase()               → ClaseAccesoBO + VisitaAccesoBO
- *   registrarAreaGeneral()         → VisitaAccesoBO
+ * Controlador principal que une todas las validaciones para dar o negar el acceso
  *
  * @author julian izaguirre
  */
@@ -62,45 +50,51 @@ public class ControlAcceso {
 
     private String idSucursalLocal;
 
+    /**
+     * Inicializa todos los objetos de negocio necesarios
+     */
     public ControlAcceso() {
         this.membresiaBO  = new MembresiaBO();
         this.clienteBO    = new ClienteBO();
         this.sucursalBO   = new SucursalBO();
         this.entrenadorBO = new EntrenadorBO();
-        this.claseBO      = new ClaseAccesoBO();   // ✅ paquete correcto
-        this.visitaBO     = new VisitaAccesoBO();  // ✅ paquete correcto
+        this.claseBO      = new ClaseAccesoBO();   
+        this.visitaBO     = new VisitaAccesoBO();  
     }
 
+    /**
+     * Asigna la sucursal donde esta corriendo el sistema actualmente
+     * 
+     * @param idSucursal Identificador de la sucursal
+     */
     public void setIdSucursalLocal(String idSucursal) {
         this.idSucursalLocal = idSucursal;
     }
 
-    // -----------------------------------------------------------------
-    //  procesarQR
-    // -----------------------------------------------------------------
-
     /**
-     * Valida el QR del socio, verifica la membresía y registra la visita.
+     * Revisa el codigo QR y verifica que todo este en orden para dejar entrar al socio
+     * 
+     * @param codigoQR Texto leido del codigo
+     * @return Los datos del acceso permitido
+     * @throws AccesoDenegadoException Si el socio no tiene permiso de entrar
      */
     public ResultadoAccesoDTO procesarQR(String codigoQR) throws AccesoDenegadoException {
 
         if (codigoQR == null || codigoQR.isBlank()) {
-            throw new AccesoDenegadoException("Código QR vacío o inválido.");
+            throw new AccesoDenegadoException("Codigo QR vacio o invalido");
         }
 
-        // 1. Buscar membresía
         dtos.MembresiaDTO membresiaBase = buscarMembresiaPorQR(codigoQR);
         if (membresiaBase == null) {
             throw new AccesoDenegadoException(
-                    "El código QR no corresponde a ningún socio registrado.");
+                    "El codigo QR no corresponde a ningun socio registrado");
         }
 
-        // 2. Validar estado
         if (membresiaBase.getEstado() != dtos.MembresiaDTO.EstadoMembresia.ACTIVA) {
             String razon = switch (membresiaBase.getEstado()) {
-                case VENCIDA   -> "Membresía vencida.";
-                case CANCELADA -> "Membresía cancelada.";
-                default        -> "Membresía no activa.";
+                case VENCIDA   -> "Membresia vencida";
+                case CANCELADA -> "Membresia cancelada";
+                default        -> "Membresia no activa";
             };
             throw new AccesoDenegadoException(razon);
         }
@@ -108,21 +102,19 @@ public class ControlAcceso {
         if (membresiaBase.getFechaCaducidad() != null
                 && membresiaBase.getFechaCaducidad().isBefore(LocalDateTime.now())) {
             throw new AccesoDenegadoException(
-                    "Membresía vencida el "
-                    + membresiaBase.getFechaCaducidad().toLocalDate() + ".");
+                    "Membresia vencida el "
+                    + membresiaBase.getFechaCaducidad().toLocalDate());
         }
 
-        // 3. Validar sucursal
         if (idSucursalLocal != null
                 && membresiaBase.getIdSucursal() != null
                 && !idSucursalLocal.equals(membresiaBase.getIdSucursal())) {
             String nombreSucursal = resolverNombreSucursal(membresiaBase.getIdSucursal());
             throw new AccesoDenegadoException(
-                    "Esta membresía pertenece a la sucursal " + nombreSucursal
-                    + ".\nNo tiene acceso a esta ubicación.");
+                    "Esta membresia pertenece a la sucursal " + nombreSucursal
+                    + "\nNo tiene acceso a esta ubicacion");
         }
 
-        // 4. Buscar cliente
         dtos.ClienteDTO clienteBase;
         try {
             clienteBase = clienteBO.buscarPorCorreo(membresiaBase.getIdCliente());
@@ -130,10 +122,9 @@ public class ControlAcceso {
             throw new AccesoDenegadoException("Error al buscar el socio: " + ex.getMessage());
         }
         if (clienteBase == null) {
-            throw new AccesoDenegadoException("Socio no encontrado en el sistema.");
+            throw new AccesoDenegadoException("Socio no encontrado en el sistema");
         }
 
-        // 5. Registrar visita
         String idSucursalRegistro = (idSucursalLocal != null)
                 ? idSucursalLocal : membresiaBase.getIdSucursal();
 
@@ -146,7 +137,6 @@ public class ControlAcceso {
                     "No se pudo registrar la entrada: " + ex.getMessage());
         }
 
-        // 6. Construir y devolver ResultadoAccesoDTO con todos los campos del flujo
         return ResultadoAccesoDTO.concedido(
                 clienteBase.getNombre() + " " + clienteBase.getApellidoPaterno(),
                 visitaRegistrada.getFechaHora(),
@@ -158,23 +148,28 @@ public class ControlAcceso {
                 planIncluyeClases(membresiaBase.getIdPlan()));
     }
 
-    // -----------------------------------------------------------------
-    //  registrarAreaGeneral
-    // -----------------------------------------------------------------
-
+    /**
+     * Marca que el socio solo usara las instalaciones generales de pesas
+     * 
+     * @param idVisita Visita que se va a actualizar
+     * @throws AccesoDenegadoException Si ocurre un error al guardar
+     */
     public void registrarAreaGeneral(String idVisita) throws AccesoDenegadoException {
         try {
             visitaBO.actualizarServicio(idVisita, TipoServicio.AREA_GENERAL.name(), null);
         } catch (NegocioException ex) {
             throw new AccesoDenegadoException(
-                    "No se pudo registrar el área general: " + ex.getMessage());
+                    "No se pudo registrar el area general: " + ex.getMessage());
         }
     }
 
-    // -----------------------------------------------------------------
-    //  obtenerEntrenadoresDisponibles
-    // -----------------------------------------------------------------
-
+    /**
+     * Busca que entrenadores tienen un hueco libre en su agenda en este momento
+     * 
+     * @param idSucursal Sucursal a revisar
+     * @return Lista de entrenadores con su estado actual
+     * @throws AccesoDenegadoException Si falla la busqueda
+     */
     public List<EntrenadorDTO> obtenerEntrenadoresDisponibles(String idSucursal)
             throws AccesoDenegadoException {
         try {
@@ -200,10 +195,15 @@ public class ControlAcceso {
         }
     }
 
-    // -----------------------------------------------------------------
-    //  asignarEntrenador
-    // -----------------------------------------------------------------
-
+    /**
+     * Le aparta el entrenador al socio en su visita y ocupa el horario
+     * 
+     * @param idVisita Visita activa del socio
+     * @param idCliente Identificador del socio
+     * @param idEntrenador Entrenador seleccionado
+     * @param idHorario Horario que se aparto
+     * @throws AccesoDenegadoException Si algo sale mal al intentar apartarlo
+     */
     public void asignarEntrenador(String idVisita, String idCliente,
                                    String idEntrenador, String idHorario)
             throws AccesoDenegadoException {
@@ -215,17 +215,23 @@ public class ControlAcceso {
         }
     }
 
-    // -----------------------------------------------------------------
-    //  obtenerClasesPorPlan
-    // -----------------------------------------------------------------
-
+    /**
+     * Checa las clases a las que el socio se puede meter segun lo que paga
+     * 
+     * @param idSucursal Sucursal del gimnasio
+     * @param idPlan Plan del socio
+     * @param idCliente Identificador del socio
+     * @param incluyeClases Bandera de si su membresia le permite tomar clases
+     * @return Lista de clases permitidas
+     * @throws AccesoDenegadoException Si su plan no lo permite
+     */
     public List<ClaseDTO> obtenerClasesPorPlan(String idSucursal, String idPlan,
                                                 String idCliente, boolean incluyeClases)
             throws AccesoDenegadoException {
 
         if (!incluyeClases) {
             throw new AccesoDenegadoException(
-                    "Lo sentimos, tu plan no incluye inscripción a las clases del gimnasio.");
+                    "Lo sentimos, tu plan no incluye inscripcion a las clases del gimnasio");
         }
 
         String idSuc = (idSucursal != null && !idSucursal.isBlank())
@@ -239,10 +245,14 @@ public class ControlAcceso {
         }
     }
 
-    // -----------------------------------------------------------------
-    //  inscribirClase
-    // -----------------------------------------------------------------
-
+    /**
+     * Mete al socio a la clase elegida y lo guarda en el registro de su visita
+     * 
+     * @param idVisita Visita actual
+     * @param idClase Clase a la que se anoto
+     * @param idCliente Identificador del socio
+     * @throws AccesoDenegadoException Si ocurre un error al guardarlo
+     */
     public void inscribirClase(String idVisita, String idClase, String idCliente)
             throws AccesoDenegadoException {
         try {
@@ -253,10 +263,12 @@ public class ControlAcceso {
         }
     }
 
-    // -----------------------------------------------------------------
-    //  Métodos privados auxiliares
-    // -----------------------------------------------------------------
-
+    /**
+     * Trata de adivinar de quien es el codigo escaneado buscando en la base
+     * 
+     * @param codigoQR El texto crudo que leyo el escaner
+     * @return La membresia si la encuentra o null si no existe
+     */
     private dtos.MembresiaDTO buscarMembresiaPorQR(String codigoQR) {
         try {
             String idExtraido = extraerIdDeUrl(codigoQR);
@@ -272,6 +284,12 @@ public class ControlAcceso {
         }
     }
 
+    /**
+     * Saca el identificador limpio si el QR viene disfrazado de url
+     * 
+     * @param url La direccion completa
+     * @return Solo el identificador rescatado
+     */
     private String extraerIdDeUrl(String url) {
         if (url == null || !url.contains("?id=")) return null;
         try {
@@ -283,6 +301,12 @@ public class ControlAcceso {
         }
     }
 
+    /**
+     * Busca el nombre real de la sucursal para poder mostrarlo bonito en pantalla
+     * 
+     * @param idSucursal El identificador raro de la sucursal
+     * @return El nombre legible o el mismo id si falla
+     */
     private String resolverNombreSucursal(String idSucursal) {
         try {
             dtos.SucursalDTO s = sucursalBO.buscarPorId(idSucursal);
@@ -292,6 +316,12 @@ public class ControlAcceso {
         }
     }
 
+    /**
+     * Checa rapido si el entrenador todavia tiene espacio para atender a alguien hoy
+     * 
+     * @param e Los datos del entrenador
+     * @return True si esta libre y false si ya se lleno
+     */
     private boolean tieneHorarioLibre(dtos.EntrenadorDTO e) {
         if (e.getHorarios() == null || e.getHorarios().isEmpty()) return false;
         for (dtos.HorarioDTO h : e.getHorarios()) {
@@ -300,12 +330,24 @@ public class ControlAcceso {
         return false;
     }
 
+    /**
+     * Verifica si la membresia que pago el socio tiene derecho a pedir entrenador
+     * 
+     * @param idPlan Identificador de su plan
+     * @return True si lo incluye
+     */
     private boolean planIncluyeEntrenador(String idPlan) {
         if (idPlan == null) return false;
         String id = idPlan.toUpperCase();
         return id.contains("PREMIUM") || id.contains("GOLD") || id.contains("P002");
     }
 
+    /**
+     * Verifica si la membresia del socio cubre la entrada a clases grupales
+     * 
+     * @param idPlan Identificador de su plan
+     * @return True si se puede meter a las clases
+     */
     private boolean planIncluyeClases(String idPlan) {
         if (idPlan == null) return false;
         String id = idPlan.toUpperCase();

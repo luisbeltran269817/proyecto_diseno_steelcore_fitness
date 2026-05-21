@@ -1,102 +1,107 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package Fachada;
 
 import dtosControlDeAcceso.ClaseDTO;
 import dtosControlDeAcceso.EntrenadorDTO;
-import dtosControlDeAcceso.MembresiaDTO;
 import dtosControlDeAcceso.ResultadoAccesoDTO;
-import dtosControlDeAcceso.VisitaDTO;
 import java.util.List;
 
 /**
- * Interfaz del subsistema Control de Acceso.
- *
- * Todos los métodos usan exclusivamente DTOs del paquete dtosControlDeAcceso.*
- * La capa de presentación solo interactúa con esta interfaz.
+ * Contrato principal de la fachada para las pantallas de acceso
  *
  * @author julian izaguirre
  */
 public interface Icontrolacceso {
 
     /**
-     * Procesa el QR escaneado: valida membresía, registra visita y devuelve
-     * los datos del expediente para pintarlos en pantalla.
+     * Revisa si el codigo escaneado es valido para darle entrada al socio
      *
-     * @param codigoQR string del QR escaneado (URL o id directo)
-     * @return ResultadoAccesoDTO con nombre, estado membresía, hora de entrada e idVisita
-     * @throws AccesoDenegadoException si la membresía no es válida
+     * @param codigoQR Texto del QR escaneado
+     * @return Los datos de la visita para la pantalla
+     * @throws AccesoDenegadoException Si el acceso es rechazado por alguna regla
      */
     ResultadoAccesoDTO procesarQR(String codigoQR) throws AccesoDenegadoException;
 
     /**
-     * Registra que el socio eligió ingresar únicamente al área general (pesas).
-     * Actualiza el tipoServicio de la visita a AREA_GENERAL.
+     * Anota que el socio va a andar por su cuenta en el area comun de pesas
      *
-     * @param idVisita id de la visita activa
-     * @throws AccesoDenegadoException si falla la actualización
+     * @param idVisita Identificador de la visita que esta corriendo
+     * @throws AccesoDenegadoException Si hay problema al guardar el registro
      */
     void registrarAreaGeneral(String idVisita) throws AccesoDenegadoException;
 
     /**
-     * Devuelve los entrenadores de la sucursal con su disponibilidad en tiempo real.
-     * Si todos están OCUPADO la pantalla muestra el mensaje de saturación.
+     * Trae a los entrenadores que todavia tienen algun hueco en su agenda hoy
      *
-     * @param idSucursal id de la sucursal; puede ser null si ya se configuró en la fachada
-     * @return lista de EntrenadorDTO; puede ser vacía pero nunca null
-     * @throws AccesoDenegadoException si falla la consulta
+     * @param idSucursal Sucursal a revisar
+     * @return Lista de entrenadores listos para mandar a la pantalla
+     * @throws AccesoDenegadoException Si falla la comunicacion con la base
      */
     List<EntrenadorDTO> obtenerEntrenadoresDisponibles(String idSucursal)
             throws AccesoDenegadoException;
 
     /**
-     * Asigna un entrenador al socio para el horario elegido.
-     * Marca el horario como OCUPADO en Mongo y actualiza la visita.
+     * Separa de forma segura un horario con el entrenador seleccionado
      *
-     * @param idVisita     id de la visita activa
-     * @param idCliente    id del socio
-     * @param idEntrenador id del entrenador seleccionado
-     * @param idHorario    id del horario elegido
-     * @throws AccesoDenegadoException si el horario ya está ocupado o hay error
+     * @param idVisita Identificador de la visita
+     * @param idCliente Identificador del socio
+     * @param idEntrenador Entrenador elegido por el socio
+     * @param idHorario Horario que se ocupara
+     * @throws AccesoDenegadoException Si alguien mas se lo gano o hay algun error
      */
     void asignarEntrenador(String idVisita, String idCliente,
                             String idEntrenador, String idHorario)
             throws AccesoDenegadoException;
 
     /**
-     * Obtiene las clases disponibles para el plan del socio.
-     * Lanza excepción si el plan no incluye clases (la pantalla muestra el aviso).
+     * Muestra las clases que aplican para el nivel de membresia que tiene el socio
      *
-     * @param idSucursal    sucursal donde opera la recepción
-     * @param idPlan        id del plan de la membresía
-     * @param idCliente     id del socio (para excluir clases ya inscritas)
-     * @param incluyeClases flag del plan — si false, acceso bloqueado
-     * @return lista de ClaseDTO; puede estar vacía si la sucursal no tiene clases del plan
-     * @throws AccesoDenegadoException si plan sin clases, sucursal sin clases, o error
+     * @param idSucursal Sucursal a consultar
+     * @param idPlan Plan que paga el socio
+     * @param idCliente Identificador del socio para ver a cuales ya entro
+     * @param incluyeClases Permiso para tomar clase segun su membresia
+     * @return Lista de clases a las que se puede inscribir
+     * @throws AccesoDenegadoException Si su plan no incluye clases
      */
     List<ClaseDTO> obtenerClasesPorPlan(String idSucursal, String idPlan,
                                          String idCliente, boolean incluyeClases)
             throws AccesoDenegadoException;
 
     /**
-     * Inscribe al socio en la clase elegida y actualiza la visita.
+     * Apunta al socio en la lista de asistencia de la clase que escogio
      *
-     * @param idVisita  id de la visita activa
-     * @param idClase   id de la clase seleccionada
-     * @param idCliente id del socio
-     * @throws AccesoDenegadoException si cupo lleno, ya inscrito, o error
+     * @param idVisita Visita activa
+     * @param idClase Clase a la que quiere entrar
+     * @param idCliente Socio a inscribir
+     * @throws AccesoDenegadoException Si ya no cabe nadie mas o ya estaba registrado
      */
     void inscribirClase(String idVisita, String idClase, String idCliente)
             throws AccesoDenegadoException;
 
-    // --- Clases internas de excepción ---
-
+    /**
+     * Excepcion personalizada para cuando rebotamos a alguien en la entrada
+     */
     class AccesoDenegadoException extends Exception {
         private final String motivo;
 
+        /**
+         * Crea el error con el mensaje de rechazo
+         * 
+         * @param motivo La razon del porque no pasa
+         */
         public AccesoDenegadoException(String motivo) {
             super(motivo);
             this.motivo = motivo;
         }
 
+        /**
+         * Te regresa el texto del motivo
+         * 
+         * @return El mensaje explicando el rechazo
+         */
         public String getMotivo() { return motivo; }
     }
 }
