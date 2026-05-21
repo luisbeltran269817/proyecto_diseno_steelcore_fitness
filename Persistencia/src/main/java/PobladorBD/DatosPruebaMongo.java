@@ -6,6 +6,8 @@ import com.mongodb.client.MongoDatabase;
 import conexion.MongoConexion;
 import dominios.AmenidadPojo;
 import dominios.AmenidadPojo.TipoAmenidad;
+import dominios.CitaPojo;
+import dominios.CitaPojo.EstadoCitaPojo;
 import dominios.ClientePojo;
 import dominios.EntrenadorPojo;
 import dominios.HorarioPojo;
@@ -574,7 +576,6 @@ public class DatosPruebaMongo {
         MongoCollection<Document> colClientes = bd.getCollection("clientes");
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente1));
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente2));
-        colMembresias.insertOne(MembresiaPersistenciaMapper.toDocument(membresia));
 
         /*
          * =========================
@@ -626,9 +627,9 @@ public class DatosPruebaMongo {
         clienteReporte.setCitaBienvenida(null);
 
         MembresiaActivaPojo snapshot = new MembresiaActivaPojo();
-        snapshot.setIdMembresia(idMembresia);
+        snapshot.setIdMembresia(idMem1);
         snapshot.setIdPlan("P001");
-        snapshot.setFechaCaducidad(membresia.getFechaCaducidad());
+        snapshot.setFechaCaducidad(mem1.getFechaCaducidad());
         snapshot.setEstado(EstadoMembresiaPojo.ACTIVA);
 
         ClientePojo cliente = new ClientePojo();
@@ -641,10 +642,10 @@ public class DatosPruebaMongo {
         cliente.setMembresiaActiva(snapshot);
         cliente.setCitaBienvenida(cita);   // ← cita guardada en el cliente
 
-        MongoCollection<Document> colClientes = bd.getCollection("clientes");
-        colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente));
-
-        colClientes.insertOne(ClientePersistenciaMapper.toDocument(clienteReporte));
+//        MongoCollection<Document> colClientes = bd.getCollection("clientes");
+//        colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente));
+//
+//        colClientes.insertOne(ClientePersistenciaMapper.toDocument(clienteReporte));
         /*
          * =========================
          * VISITAS

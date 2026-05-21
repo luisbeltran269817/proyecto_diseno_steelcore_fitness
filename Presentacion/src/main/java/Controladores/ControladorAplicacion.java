@@ -5,18 +5,13 @@
 package Controladores;
 
 import Clase_Control.GestorEstadosCompra;
-import Fachada.FachadaControlAcceso;
 import ControlDeAcceso.BC_PantallaEspera;
+import ControladoresReportes.ControlReportes;
 import Excepciones.NegocioException;
+import Fachada.FachadaControlAcceso;
 import Fachada.FachadaInicioSesion;
 import Fachada.FachadaPlanearRutina;
 import Fachada.IInicioSesion;
-import PantallasInventarioMantenimiento.PantallaAgregarModificarInventario;
-import PantallasInventarioMantenimiento.PantallaInventarioMantenimiento;
-import PantallasInventarioMantenimiento.PantallaInventarioMaquinas;
-import PantallasInventarioMantenimiento.PantallaEliminarInventario;
-import PantallasInventarioMantenimiento.PantallaProgramarMantenimiento;
-import PantallasInventarioMantenimiento.PantallaSeleccionPiezasMantenimiento;
 import Fachada.IPlanearRutina;
 import PantallasComprarMembresia.DatosBancarios;
 import PantallasComprarMembresia.PantallaBienvenida;
@@ -32,6 +27,12 @@ import PantallasComprarMembresia.PantallaTransaccionExitosa;
 import PantallasComprarMembresia.PantallaTransaccionFallida;
 import PantallasInicioSesion.PantallaInicioSesion;
 import PantallasInicioSesion.PantallaInicioSesionSocios;
+import PantallasInventarioMantenimiento.PantallaAgregarModificarInventario;
+import PantallasInventarioMantenimiento.PantallaEliminarInventario;
+import PantallasInventarioMantenimiento.PantallaInventarioMantenimiento;
+import PantallasInventarioMantenimiento.PantallaInventarioMaquinas;
+import PantallasInventarioMantenimiento.PantallaProgramarMantenimiento;
+import PantallasInventarioMantenimiento.PantallaSeleccionPiezasMantenimiento;
 import PantallasRutina.PantallaBusquedaEntrenador;
 import PantallasRutina.PantallaEditorRutina;
 import PantallasRutina.PantallaMensaje;
@@ -39,6 +40,7 @@ import PantallasRutina.PantallaSeleccionEjercicios;
 import PantallasRutina.PantallaVistaRutina;
 import dtos.AmenidadDTO;
 import dtos.CitaDTO;
+import dtos.ClienteDTO;
 import dtos.EjercicioDTO;
 import dtos.EntrenadorDTO;
 import dtos.HorarioDTO;
@@ -72,9 +74,6 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import ControladoresReportes.ControlReportes;
-import dtos.ClienteDTO;
-
 /**
  *
  * @author luiscarlosbeltran
@@ -87,22 +86,20 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private final IComprarMembresia compraFachada;
     private final PresentacionInfra infraMapa;
     private final GestorEstadosCompra gestor;
-    //COSAS DE INVENTARIO MANTENIMIENTO
-        private final IInventarioMantenimiento inventarioMantenimientoFachada;
-        private PantallaInventarioMantenimiento pantallaInventarioMantenimiento;
-        private PantallaProgramarMantenimiento pantallaProgramarMantenimiento;
-        private PantallaSeleccionPiezasMantenimiento pantallaSeleccionPiezasMantenimiento;
-        private PantallaAgregarModificarInventario pantallaAgregarModificarInventario;
-        private PantallaEliminarInventario pantallaEliminarInventario;
-        private final GestorEstadosMantenimiento gestorMantenimiento;
-        private PantallaInventarioMaquinas pantallaInventarioMaquinas;
-    //COSAS DE INVENTARIO MANTENIMIENTO
-        
-    
-    //de rutina
+
+    // COSAS DE INVENTARIO MANTENIMIENTO
+    private final IInventarioMantenimiento inventarioMantenimientoFachada;
+    private PantallaInventarioMantenimiento pantallaInventarioMantenimiento;
+    private PantallaProgramarMantenimiento pantallaProgramarMantenimiento;
+    private PantallaSeleccionPiezasMantenimiento pantallaSeleccionPiezasMantenimiento;
+    private PantallaAgregarModificarInventario pantallaAgregarModificarInventario;
+    private PantallaEliminarInventario pantallaEliminarInventario;
+    private final GestorEstadosMantenimiento gestorMantenimiento;
+    private PantallaInventarioMaquinas pantallaInventarioMaquinas;
+
+    // De rutina
     private final IPlanearRutina rutinaFachada;
     private RutinaDTO rutinaSeleccionada;
- 
 
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
@@ -119,13 +116,13 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private PantallaQR pantallaQRSocio;
     private PantallaTransaccionFallida pantallaFallida;
     private PantallaTransaccionExitosa pantallaExitosa;
-    
-    //pantallas rutina
+
+    // Pantallas rutina
     private PantallaVistaRutina pantallaVistaRutina;
     private PantallaMensaje pantallaMensaje;
     private PantallaEditorRutina pantallaEditorRutina;
     private PantallaBusquedaEntrenador pantallaBusquedaEntrenador;
- 
+
     private final ControlReportes controlReportes;
 
     private ControladorAplicacion() {
@@ -133,12 +130,11 @@ public class ControladorAplicacion implements IControladorAplicacion {
         this.compraFachada = new FachadaComprarMembresia();
         this.infraMapa = new PresentacionInfra();
         this.gestor = new GestorEstadosCompra();
-        //COSAS DE INVENTARIO MANTENIMIENTO
-            this.inventarioMantenimientoFachada = new FachadaInventarioMantenimiento();
-            this.gestorMantenimiento= new GestorEstadosMantenimiento();
-         //COSAS DE INVENTARIO MANTENIMIENTO
-        this.rutinaFachada = new FachadaPlanearRutina();
 
+        this.inventarioMantenimientoFachada = new FachadaInventarioMantenimiento();
+        this.gestorMantenimiento = new GestorEstadosMantenimiento();
+
+        this.rutinaFachada = new FachadaPlanearRutina();
         this.controlReportes = new ControlReportes(this);
     }
 
@@ -231,7 +227,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         return gestor.getTokenTarjeta();
     }
 
-    // --- navegación ---
+    // --- Navegación ---
     @Override
     public void irABienvenida() {
         cerrarPantallas();
@@ -255,7 +251,6 @@ public class ControladorAplicacion implements IControladorAplicacion {
 
     @Override
     public void iniciarCompraMembresia() {
-        // Limpiar TODO el estado de compra antes de un flujo nuevo
         gestor.limpiar();
         irASeleccionSucursal();
     }
@@ -268,46 +263,44 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     /**
-     * Inicia el flujo de agendar cita desde el perfil de usuario. El cliente ya
-     * tiene membresia, asi que NO se llama a limpiar(). Solo se resetean
-     * entrenador y horario; la sucursal se toma de la membresia activa si el
-     * gestor no la tiene ya guardada.
+     * Inicia el flujo de agendar cita desde el perfil de usuario.
      */
     @Override
     public void irAAgendarCitaDesdePerfil() {
-        // Solo limpiamos las selecciones de cita, no todo el estado
         gestor.setEntrenadorSeleccionado(null);
         gestor.setHorarioSeleccionado(null);
 
-        // Si no hay sucursal en el gestor la obtenemos de la membresia activa
         if (gestor.getSucursalSeleccionada() == null) {
             try {
-                MembresiaDTO m = compraFachada.obtenerMembresiaActiva(
-                        gestor.getUsuarioActual().getCorreo());
-                if (m != null && m.getIdSucursal() != null) {
+                MembresiaDTO membresia = compraFachada.obtenerMembresiaActiva(
+                        gestor.getUsuarioActual().getCorreo()
+                );
+
+                if (membresia != null && membresia.getIdSucursal() != null) {
                     SucursalDTO sucursal = null;
-                    // Intentar encontrar el objeto SucursalDTO completo
+
                     try {
                         for (SucursalDTO s : compraFachada.obtenerSucursales()) {
-                            if (s.getIdSucursal().equals(m.getIdSucursal())) {
+                            if (s.getIdSucursal().equals(membresia.getIdSucursal())) {
                                 sucursal = s;
                                 break;
                             }
                         }
                     } catch (NegocioException ignored) {
                     }
-                    // Fallback: construir con solo el id si no encontramos el objeto completo
+
                     if (sucursal == null) {
                         sucursal = new SucursalDTO();
-                        sucursal.setIdSucursal(m.getIdSucursal());
+                        sucursal.setIdSucursal(membresia.getIdSucursal());
                     }
+
                     gestor.setSucursalSeleccionada(sucursal);
                 }
             } catch (NegocioException e) {
-                // Continuamos aunque no pudimos cargar la membresia;
-                // PantallaSeleccionInstructor mostrara "no hay instructores"
+                // Continuamos aunque no se pudo cargar la membresía.
             }
         }
+
         irASeleccionInstructor();
     }
 
@@ -366,7 +359,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaQRSocio = new PantallaQR(this, true);
         pantallaQRSocio.setVisible(true);
     }
- 
+
     @Override
     public void irAInicioSesionRecepcion() {
         cerrarPantallas();
@@ -394,9 +387,8 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaExitosa = new PantallaTransaccionExitosa(this);
         pantallaExitosa.setVisible(true);
     }
-    
 
-    // --- sesión ---
+    // --- Sesión ---
     @Override
     public void iniciarSesion(String correo, String contrasena) throws NegocioException {
         UsuarioDTO usuario;
@@ -412,17 +404,11 @@ public class ControladorAplicacion implements IControladorAplicacion {
         }
 
         gestor.setUsuarioActual(usuario);
-        //Métodos de inventarioMantenimiento
-            if (usuario instanceof AdminMantenimientoDTO) {
-                irAInventarioMantenimiento();
-                return;
-            }
-        //INVENTARIO MANTENIMIENTO
-        try {
-            CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
-            gestor.setCitaBienvenida(cita);
-        } catch (NegocioException ex) {
-            // No bloquear el login si falla la consulta de cita
+
+        if (usuario instanceof AdminMantenimientoDTO) {
+            irAInventarioMantenimiento();
+            return;
+        }
 
         if (esAdminReportes(usuario)) {
             irAAdministrarReportes();
@@ -434,7 +420,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
                 CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
                 gestor.setCitaBienvenida(cita);
             } catch (NegocioException ex) {
-                // No bloquear inicio de sesión si falla la consulta de la cita
+                // No bloquear inicio de sesión si falla la consulta de la cita.
             }
 
             irAPerfilUsuario();
@@ -450,7 +436,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         irABienvenida();
     }
 
-    // --- consultas de negocio ---
+    // --- Consultas de negocio ---
     @Override
     public boolean tieneMembresiaActiva() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
@@ -485,6 +471,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     @Override
     public void cancelarMembresia() throws NegocioException {
         UsuarioDTO usuario = gestor.getUsuarioActual();
+
         if (usuario != null) {
             compraFachada.cancelarMembresia(usuario.getCorreo());
         }
@@ -525,14 +512,18 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public void confirmarCompra() {
         try {
             UsuarioDTO usuario = gestor.getUsuarioActual();
+
             MembresiaDTO dto = new MembresiaDTO();
             dto.setIdCliente(usuario.getCorreo());
             dto.setIdPlan(gestor.getPlanSeleccionado().getIdPlan());
             dto.setIdSucursal(gestor.getSucursalSeleccionada().getIdSucursal());
             dto.setAmenidadesExtra(gestor.getExtrasSeleccionados());
+
             MembresiaDTO creada = compraFachada.comprarMembresia(dto, gestor.getTokenTarjeta());
+
             gestor.setMembresiaRecienCreada(creada);
             gestor.setTokenTarjeta(null);
+
             irATransaccionExitosa();
         } catch (NegocioException e) {
             irATransaccionFallida(e.getMessage());
@@ -542,7 +533,9 @@ public class ControladorAplicacion implements IControladorAplicacion {
     @Override
     public double calcularTotal() throws NegocioException {
         PlanDTO plan = gestor.getPlanSeleccionado();
-        return plan == null ? 0.0
+
+        return plan == null
+                ? 0.0
                 : compraFachada.calcularTotal(plan.getIdPlan(), gestor.getExtrasSeleccionados());
     }
 
@@ -550,24 +543,30 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public void confirmarCitaBienvenida() throws NegocioException {
         EntrenadorDTO entrenador = gestor.getEntrenadorSeleccionado();
         HorarioDTO horario = gestor.getHorarioSeleccionado();
+
         if (entrenador == null || horario == null) {
             throw new NegocioException("Debe seleccionar un instructor y un horario");
         }
+
         SucursalDTO sucursal = gestor.getSucursalSeleccionada();
+
         if (sucursal == null) {
             throw new NegocioException("No se encontro la sucursal; intente agendar la cita de nuevo");
         }
+
         UsuarioDTO usuario = gestor.getUsuarioActual();
+
         CitaDTO dto = new CitaDTO();
         dto.setIdCliente(usuario.getCorreo());
         dto.setIdEntrenador(entrenador.getIdEntrenador());
         dto.setIdSucursal(sucursal.getIdSucursal());
         dto.setIdHorario(horario.getIdHorario());
+
         CitaDTO agendada = compraFachada.agendarCita(dto);
         gestor.setCitaBienvenida(agendada);
     }
 
-    // --- mapa ---
+    // --- Mapa ---
     @Override
     public JComponent getComponenteMapa() {
         return infraMapa.getComponenteMapa();
@@ -583,6 +582,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
     @Override
     public SucursalDTO onMarcadorClickeado(String idSucursal) {
         infraMapa.resaltarMarcador(idSucursal);
+
         try {
             for (SucursalDTO s : compraFachada.obtenerSucursales()) {
                 if (s.getIdSucursal().equals(idSucursal)) {
@@ -590,8 +590,9 @@ public class ControladorAplicacion implements IControladorAplicacion {
                 }
             }
         } catch (NegocioException ignorada) {
-            // si falla la búsqueda simplemente se regresa null
+            // Si falla la búsqueda simplemente se regresa null.
         }
+
         return null;
     }
 
@@ -618,14 +619,18 @@ public class ControladorAplicacion implements IControladorAplicacion {
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setConnectTimeout(4_000);
                 con.setReadTimeout(4_000);
+
                 StringBuilder sb = new StringBuilder();
+
                 try (Scanner sc = new Scanner(con.getInputStream())) {
                     while (sc.hasNextLine()) {
                         sb.append(sc.nextLine());
                     }
                 }
+
                 double lat = extraerDouble(sb.toString(), "lat");
                 double lon = extraerDouble(sb.toString(), "lon");
+
                 if (lat != 0) {
                     SwingUtilities.invokeLater(() -> actualizarUbicacion(lat, lon));
                 }
@@ -633,6 +638,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
                 System.out.println("[geo] no se pudo obtener ubicación: " + e.getMessage());
             }
         }, "hilo-geo");
+
         hilo.setDaemon(true);
         hilo.start();
     }
@@ -647,14 +653,18 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private double extraerDouble(String json, String clave) {
         try {
             int idx = json.indexOf("\"" + clave + "\":");
+
             if (idx < 0) {
                 return 0;
             }
+
             int inicio = idx + clave.length() + 3;
             int fin = json.indexOf(",", inicio);
+
             if (fin < 0) {
                 fin = json.indexOf("}", inicio);
             }
+
             return Double.parseDouble(json.substring(inicio, fin).trim());
         } catch (Exception ex) {
             return 0;
@@ -675,271 +685,255 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public void detenerServidorQR() {
         FachadaControlAcceso.getInstancia().detenerServidorQR();
     }
-    
-    
-    //MÉTODOS DE INVENTARIO MANTENIMIENTO
-        /**
-         * Método que viaja a la pantalla de inventarioMantenimiento (la principal pues)
-         */
-        @Override
-        public void irAInventarioMantenimiento() {
-            cerrarPantallas();
-            pantallaInventarioMantenimiento = new PantallaInventarioMantenimiento(this);
-            pantallaInventarioMantenimiento.setVisible(true);
+
+    // --- Métodos de inventario mantenimiento ---
+    @Override
+    public void irAInventarioMantenimiento() {
+        cerrarPantallas();
+        pantallaInventarioMantenimiento = new PantallaInventarioMantenimiento(this);
+        pantallaInventarioMantenimiento.setVisible(true);
+    }
+
+    @Override
+    public void irAProgramarMantenimiento() {
+        cerrarPantallas();
+        pantallaProgramarMantenimiento = new PantallaProgramarMantenimiento(this);
+        pantallaProgramarMantenimiento.setVisible(true);
+    }
+
+    @Override
+    public List<MaquinaDTO> obtenerMaquinasMantenimiento() throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.obtenerMaquinas();
+    }
+
+    @Override
+    public void setMaquinaSeleccionada(MaquinaDTO maquina) {
+        gestorMantenimiento.setMaquinaSeleccionada(maquina);
+    }
+
+    @Override
+    public MaquinaDTO getMaquinaSeleccionada() {
+        return gestorMantenimiento.getMaquinaSeleccionada();
+    }
+
+    @Override
+    public List<TecnicoDTO> obtenerTecnicosMantenimiento() throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.obtenerTecnicos();
+    }
+
+    @Override
+    public boolean tecnicoTieneHorarioDisponible(String idTecnico, LocalDateTime fechaProgramada)
+            throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.tecnicoTieneHorarioDisponible(idTecnico, fechaProgramada);
+    }
+
+    @Override
+    public void guardarDatosProgramacionMantenimiento(
+            String descripcion,
+            LocalDateTime fechaProgramada,
+            TecnicoDTO tecnico
+    ) {
+        gestorMantenimiento.setDescripcionMantenimiento(descripcion);
+        gestorMantenimiento.setFechaProgramadaMantenimiento(fechaProgramada);
+        gestorMantenimiento.setTecnicoSeleccionado(tecnico);
+    }
+
+    @Override
+    public String getDescripcionMantenimiento() {
+        return gestorMantenimiento.getDescripcionMantenimiento();
+    }
+
+    @Override
+    public LocalDateTime getFechaProgramadaMantenimiento() {
+        return gestorMantenimiento.getFechaProgramadaMantenimiento();
+    }
+
+    @Override
+    public TecnicoDTO getTecnicoSeleccionadoMantenimiento() {
+        return gestorMantenimiento.getTecnicoSeleccionado();
+    }
+
+    @Override
+    public void irASeleccionPiezasMantenimiento() {
+        cerrarPantallas();
+        pantallaSeleccionPiezasMantenimiento = new PantallaSeleccionPiezasMantenimiento(this);
+        pantallaSeleccionPiezasMantenimiento.setVisible(true);
+    }
+
+    @Override
+    public boolean hayStockSuficientePieza(String idPieza, int cantidad)
+            throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.hayStockSuficiente(idPieza, cantidad);
+    }
+
+    @Override
+    public void agregarPiezaSeleccionadaMantenimiento(PiezaDTO pieza, int cantidad)
+            throws InventarioMantenimientoException {
+        if (cantidad <= 0) {
+            throw new InventarioMantenimientoException("La cantidad debe ser mayor a cero");
         }
 
-        /**
-         * Método que viaja a la pantalla de programar Mantenimiento
-         */
-        @Override
-        public void irAProgramarMantenimiento() {
-            cerrarPantallas();
-            pantallaProgramarMantenimiento = new PantallaProgramarMantenimiento(this);
-            pantallaProgramarMantenimiento.setVisible(true);
-        }
+        List<MantenimientoPiezaDTO> piezas = gestorMantenimiento.getPiezasSeleccionadas();
+        int cantidadTotalSolicitada = cantidad;
 
-        @Override
-        public List<MaquinaDTO> obtenerMaquinasMantenimiento() throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.obtenerMaquinas();
-        }
-        @Override
-        public void setMaquinaSeleccionada(MaquinaDTO maquina) {
-            gestorMantenimiento.setMaquinaSeleccionada(maquina);
-        }
-        
-        @Override
-        public MaquinaDTO getMaquinaSeleccionada() {
-            return gestorMantenimiento.getMaquinaSeleccionada();
-        }
-        
-        @Override
-        public List<TecnicoDTO> obtenerTecnicosMantenimiento() throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.obtenerTecnicos();
-        }
-
-        @Override
-        public boolean tecnicoTieneHorarioDisponible(String idTecnico, LocalDateTime fechaProgramada) throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.tecnicoTieneHorarioDisponible(idTecnico, fechaProgramada);
-        }
-
-        @Override
-        public void guardarDatosProgramacionMantenimiento(String descripcion, LocalDateTime fechaProgramada, TecnicoDTO tecnico) {
-            gestorMantenimiento.setDescripcionMantenimiento(descripcion);
-            gestorMantenimiento.setFechaProgramadaMantenimiento(fechaProgramada);
-            gestorMantenimiento.setTecnicoSeleccionado(tecnico);
-        }
-        
-        @Override
-        public String getDescripcionMantenimiento() {
-            return gestorMantenimiento.getDescripcionMantenimiento();
-        }
-
-        @Override
-        public LocalDateTime getFechaProgramadaMantenimiento() {
-            return gestorMantenimiento.getFechaProgramadaMantenimiento();
-        }
-
-        @Override
-        public TecnicoDTO getTecnicoSeleccionadoMantenimiento() {
-            return gestorMantenimiento.getTecnicoSeleccionado();
-        }
-        
-        @Override
-        public void irASeleccionPiezasMantenimiento() {
-            cerrarPantallas();
-            pantallaSeleccionPiezasMantenimiento = new PantallaSeleccionPiezasMantenimiento(this);
-            pantallaSeleccionPiezasMantenimiento.setVisible(true);
-        }
-        
-        
-        @Override
-        public boolean hayStockSuficientePieza(String idPieza, int cantidad) throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.hayStockSuficiente(idPieza, cantidad);
-        }
-        
-        /**
-         * Método muy gordo que se usa en la pantalla de selección de piezas para que el usuario pueda agregar piezas a una lista
-         * @param pieza la pieza que se va a agregar
-         * @param cantidad la cantidad agregada
-         * @throws InventarioMantenimientoException si ocurre un error
-         */
-        @Override
-        public void agregarPiezaSeleccionadaMantenimiento(PiezaDTO pieza, int cantidad) throws InventarioMantenimientoException {
-            if (cantidad <= 0) {
-                throw new InventarioMantenimientoException("La cantidad debe ser mayor a cero");
+        for (MantenimientoPiezaDTO mp : piezas) {
+            if (mp.getIdPieza() != null && mp.getIdPieza().equals(pieza.getIdPieza())) {
+                cantidadTotalSolicitada += mp.getCantidad();
+                break;
             }
-            //Contará esto como lógica de negocio? lo veré mañana...
-            List<MantenimientoPiezaDTO> piezas = gestorMantenimiento.getPiezasSeleccionadas();
-            int cantidadTotalSolicitada = cantidad;
-            for (MantenimientoPiezaDTO mp : piezas) {
-                if (mp.getIdPieza() != null && mp.getIdPieza().equals(pieza.getIdPieza())) {
-                    cantidadTotalSolicitada += mp.getCantidad();
-                    break;
-                }
-            }
-            boolean suficiente = inventarioMantenimientoFachada.hayStockSuficiente(pieza.getIdPieza(),cantidadTotalSolicitada);
-            if (!suficiente) {
-                throw new InventarioMantenimientoException("No hay stock suficiente para la cantidad solicitada");
-            }
-            for (MantenimientoPiezaDTO mp : piezas) {
-                if (mp.getIdPieza() != null && mp.getIdPieza().equals(pieza.getIdPieza())) {
-                    mp.setCantidad(mp.getCantidad() + cantidad);
-                    return;
-                }
-            }
-            MantenimientoPiezaDTO nueva = new MantenimientoPiezaDTO();
-            nueva.setIdMantenimientoPiezaDTO(UUID.randomUUID().toString());
-            nueva.setIdPieza(pieza.getIdPieza());
-            nueva.setCantidad(cantidad);
-            piezas.add(nueva);
-        }
-        
-        /**
-         * Método que confirma la solicitud de mantenimiento
-         * @return el mantenimientoDTO creado
-         * @throws InventarioMantenimientoException si ocurre un error al crear la solicitud de mantenimiento
-         */
-        @Override
-        public MantenimientoDTO confirmarSolicitudMantenimiento() throws InventarioMantenimientoException {
-            MaquinaDTO maquina = gestorMantenimiento.getMaquinaSeleccionada();
-            TecnicoDTO tecnico = gestorMantenimiento.getTecnicoSeleccionado();
-            String descripcion = gestorMantenimiento.getDescripcionMantenimiento();
-            LocalDateTime fecha = gestorMantenimiento.getFechaProgramadaMantenimiento();
-            List<MantenimientoPiezaDTO> piezas = gestorMantenimiento.getPiezasSeleccionadas();
-            MantenimientoDTO mantenimiento = inventarioMantenimientoFachada.registrarSolicitudMantenimiento(maquina.getIdMaquina(),tecnico.getIdTecnico(),descripcion,fecha,piezas);
-            gestorMantenimiento.limpiar();
-            return mantenimiento;
-        }
-        
-        /**
-         * Método que obtiene las piezas necesarias para un mantenimiento
-         * @return una lista de piezas
-         * @throws InventarioMantenimientoException si ocurre un error
-         */
-        @Override
-        public List<PiezaDTO> obtenerPiezasMantenimiento() throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.obtenerPiezas();
         }
 
-        /**
-         * Método que obtiene las piezas seleccionadas de un mantenimiento
-         * @return una lista con dichas piezas
-         */
-        @Override
-        public List<MantenimientoPiezaDTO> obtenerPiezasSeleccionadasMantenimiento() {
-            return gestorMantenimiento.getPiezasSeleccionadas();
+        boolean suficiente = inventarioMantenimientoFachada.hayStockSuficiente(
+                pieza.getIdPieza(),
+                cantidadTotalSolicitada
+        );
+
+        if (!suficiente) {
+            throw new InventarioMantenimientoException("No hay stock suficiente para la cantidad solicitada");
         }
 
-        /**
-         * Método que limpia las piezas seleccionadas de un mantenimiento
-         */
-        @Override
-        public void limpiarPiezasSeleccionadasMantenimiento() {
-            gestorMantenimiento.limpiarPiezasSeleccionadas();
-        }
-        /**
-         * Método que filtra las máquinas
-         * @param idSucursal filtrado por sucursal
-         * @param estado filtrado por estado
-         * @return una lista con los filtros aplicados
-         * @throws InventarioMantenimientoException si ocurre un error
-         */
-        @Override
-        public List<MaquinaDTO> filtrarMaquinasMantenimiento(String idSucursal, MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.filtrarMaquinas(idSucursal, estado);
-        }
-        
-        /**
-         * Método que prepara una máquina antes de iniciar la solicitud de mantenimiento
-         * @throws InventarioMantenimientoException si ocurre un error
-         */
-        @Override
-        public void prepararProgramacionMantenimiento() throws InventarioMantenimientoException {
-            MaquinaDTO maquina = gestorMantenimiento.getMaquinaSeleccionada();
-
-            if (maquina == null) {
-                throw new InventarioMantenimientoException("Selecciona una máquina de la tabla antes de programar mantenimiento");
+        for (MantenimientoPiezaDTO mp : piezas) {
+            if (mp.getIdPieza() != null && mp.getIdPieza().equals(pieza.getIdPieza())) {
+                mp.setCantidad(mp.getCantidad() + cantidad);
+                return;
             }
-            inventarioMantenimientoFachada.validarMaquinaParaProgramarMantenimiento(maquina.getIdMaquina());
+        }
 
-            irAProgramarMantenimiento();
-        }
-        /**
-         * Método que registra una máquina en la BD
-         * @param idSucursal la sucursal
-         * @param modelo el modelo de la máquina
-         * @param tipo el tipo de la máquina
-         * @param estado el estado de la máquina
-         * @return la máquina registrada
-         * @throws InventarioMantenimientoException si ocurre un error 
-         */
-        @Override
-        public MaquinaDTO registrarMaquinaInventario(String idSucursal,String modelo, String tipo, MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException {
-            return inventarioMantenimientoFachada.registrarMaquina(idSucursal,modelo,tipo,estado);
-        }
-        /**
-         * Método que actualiza una máquina en la BD
-         * @param idMaquina el id de la máquina
-         * @param idSucursal el id de la sucursal
-         * @param modelo el modelo
-         * @param tipo el tipo de la máquina
-         * @param estado el estado de la máquina
-         * @throws InventarioMantenimientoException si ocurre un error
-         */
-        @Override
-        public void actualizarMaquinaInventario(String idMaquina,String idSucursal,String modelo,String tipo,MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException {
-            inventarioMantenimientoFachada.actualizarMaquina(idMaquina,idSucursal,modelo,tipo,estado);
-        }
-        /**
-         * Método que da de baja una máquina en el sistema
-         * @param idMaquina el id de la máquina a dar de baja
-         * @param motivo el motivo por el que se da de baja la máquina
-         * @throws InventarioMantenimientoException si ocurre un error
-         */
-        @Override
-        public void darBajaMaquinaInventario(String idMaquina,String motivo
-        ) throws InventarioMantenimientoException {
-            inventarioMantenimientoFachada.darBajaMaquina(idMaquina,motivo
+        MantenimientoPiezaDTO nueva = new MantenimientoPiezaDTO();
+        nueva.setIdMantenimientoPiezaDTO(UUID.randomUUID().toString());
+        nueva.setIdPieza(pieza.getIdPieza());
+        nueva.setCantidad(cantidad);
+
+        piezas.add(nueva);
+    }
+
+    @Override
+    public MantenimientoDTO confirmarSolicitudMantenimiento()
+            throws InventarioMantenimientoException {
+        MaquinaDTO maquina = gestorMantenimiento.getMaquinaSeleccionada();
+        TecnicoDTO tecnico = gestorMantenimiento.getTecnicoSeleccionado();
+        String descripcion = gestorMantenimiento.getDescripcionMantenimiento();
+        LocalDateTime fecha = gestorMantenimiento.getFechaProgramadaMantenimiento();
+        List<MantenimientoPiezaDTO> piezas = gestorMantenimiento.getPiezasSeleccionadas();
+
+        MantenimientoDTO mantenimiento = inventarioMantenimientoFachada.registrarSolicitudMantenimiento(
+                maquina.getIdMaquina(),
+                tecnico.getIdTecnico(),
+                descripcion,
+                fecha,
+                piezas
+        );
+
+        gestorMantenimiento.limpiar();
+
+        return mantenimiento;
+    }
+
+    @Override
+    public List<PiezaDTO> obtenerPiezasMantenimiento() throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.obtenerPiezas();
+    }
+
+    @Override
+    public List<MantenimientoPiezaDTO> obtenerPiezasSeleccionadasMantenimiento() {
+        return gestorMantenimiento.getPiezasSeleccionadas();
+    }
+
+    @Override
+    public void limpiarPiezasSeleccionadasMantenimiento() {
+        gestorMantenimiento.limpiarPiezasSeleccionadas();
+    }
+
+    @Override
+    public List<MaquinaDTO> filtrarMaquinasMantenimiento(
+            String idSucursal,
+            MaquinaDTO.EstadoMaquinaDTO estado
+    ) throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.filtrarMaquinas(idSucursal, estado);
+    }
+
+    @Override
+    public void prepararProgramacionMantenimiento() throws InventarioMantenimientoException {
+        MaquinaDTO maquina = gestorMantenimiento.getMaquinaSeleccionada();
+
+        if (maquina == null) {
+            throw new InventarioMantenimientoException(
+                    "Selecciona una máquina de la tabla antes de programar mantenimiento"
             );
         }
-       
-        /**
-         * Método que viaja a la pantalla de agregarInventario
-         */
-        @Override
-        public void irAAgregarInventario() {
-            cerrarPantallas();
-            pantallaAgregarModificarInventario = new PantallaAgregarModificarInventario(this, false);
-            pantallaAgregarModificarInventario.setVisible(true);
-        }
 
-        /**
-         * Método que viaja a la pantalla de modificarInventario (es la misma que la de agregar pero recibiendo un true en su constructor)
-         */
-        @Override
-        public void irAModificarInventario() {
-            cerrarPantallas();
-            pantallaAgregarModificarInventario = new PantallaAgregarModificarInventario(this, true);
-        }
+        inventarioMantenimientoFachada.validarMaquinaParaProgramarMantenimiento(
+                maquina.getIdMaquina()
+        );
 
-        /**
-         * Método que viaja a la pantalla de eliminar máquina
-         */
-        @Override
-        public void irAEliminarInventario() {
-            cerrarPantallas();
-            pantallaEliminarInventario = new PantallaEliminarInventario(this);
-        }
-        /**
-         * Método que viaja a la pantalla de inventario de máquinas
-         */
-        @Override
-        public void irAInventarioMaquinas(){
-            cerrarPantallas();
-            pantallaInventarioMaquinas = new PantallaInventarioMaquinas(this);
-        }
-    //MÉTODOS DE INVENTARIO MANTENIMIENTO
-        
+        irAProgramarMantenimiento();
+    }
+
+    @Override
+    public MaquinaDTO registrarMaquinaInventario(
+            String idSucursal,
+            String modelo,
+            String tipo,
+            MaquinaDTO.EstadoMaquinaDTO estado
+    ) throws InventarioMantenimientoException {
+        return inventarioMantenimientoFachada.registrarMaquina(
+                idSucursal,
+                modelo,
+                tipo,
+                estado
+        );
+    }
+
+    @Override
+    public void actualizarMaquinaInventario(
+            String idMaquina,
+            String idSucursal,
+            String modelo,
+            String tipo,
+            MaquinaDTO.EstadoMaquinaDTO estado
+    ) throws InventarioMantenimientoException {
+        inventarioMantenimientoFachada.actualizarMaquina(
+                idMaquina,
+                idSucursal,
+                modelo,
+                tipo,
+                estado
+        );
+    }
+
+    @Override
+    public void darBajaMaquinaInventario(String idMaquina, String motivo)
+            throws InventarioMantenimientoException {
+        inventarioMantenimientoFachada.darBajaMaquina(idMaquina, motivo);
+    }
+
+    @Override
+    public void irAAgregarInventario() {
+        cerrarPantallas();
+        pantallaAgregarModificarInventario = new PantallaAgregarModificarInventario(this, false);
+        pantallaAgregarModificarInventario.setVisible(true);
+    }
+
+    @Override
+    public void irAModificarInventario() {
+        cerrarPantallas();
+        pantallaAgregarModificarInventario = new PantallaAgregarModificarInventario(this, true);
+        pantallaAgregarModificarInventario.setVisible(true);
+    }
+
+    @Override
+    public void irAEliminarInventario() {
+        cerrarPantallas();
+        pantallaEliminarInventario = new PantallaEliminarInventario(this);
+        pantallaEliminarInventario.setVisible(true);
+    }
+
+    @Override
+    public void irAInventarioMaquinas() {
+        cerrarPantallas();
+        pantallaInventarioMaquinas = new PantallaInventarioMaquinas(this);
+        pantallaInventarioMaquinas.setVisible(true);
+    }
 
     /**
      * Cierra todas las pantallas que estén abiertas antes de mostrar una nueva.
@@ -949,130 +943,148 @@ public class ControladorAplicacion implements IControladorAplicacion {
             pantallaBienvenida.dispose();
             pantallaBienvenida = null;
         }
+
         if (pantallaInicioSesion != null) {
             pantallaInicioSesion.dispose();
             pantallaInicioSesion = null;
         }
+
         if (pantallaInicioSesionRecepcion != null) {
             pantallaInicioSesionRecepcion.dispose();
             pantallaInicioSesionRecepcion = null;
         }
+
         if (pantallaPerfil != null) {
             pantallaPerfil.dispose();
             pantallaPerfil = null;
         }
+
         if (pantallaSucursal != null) {
             pantallaSucursal.dispose();
             pantallaSucursal = null;
         }
+
         if (pantallaPlan != null) {
             pantallaPlan.dispose();
             pantallaPlan = null;
         }
+
         if (pantallaDetalle != null) {
             pantallaDetalle.dispose();
             pantallaDetalle = null;
         }
+
         if (pantallaTerminos != null) {
             pantallaTerminos.dispose();
             pantallaTerminos = null;
         }
+
         if (pantallaBancarios != null) {
             pantallaBancarios.dispose();
             pantallaBancarios = null;
         }
+
         if (pantallaInstructor != null) {
             pantallaInstructor.dispose();
             pantallaInstructor = null;
         }
+
         if (pantallaHorario != null) {
             pantallaHorario.dispose();
             pantallaHorario = null;
         }
+
         if (pantallaQRSocio != null) {
             pantallaQRSocio.dispose();
             pantallaQRSocio = null;
         }
+
         if (pantallaRecepcion != null) {
             pantallaRecepcion.dispose();
             pantallaRecepcion = null;
         }
+
         if (pantallaFallida != null) {
             pantallaFallida.dispose();
             pantallaFallida = null;
         }
+
         if (pantallaExitosa != null) {
             pantallaExitosa.dispose();
             pantallaExitosa = null;
         }
-        if(pantallaInventarioMantenimiento != null){
-           pantallaInventarioMantenimiento.dispose();
-           pantallaInventarioMantenimiento = null;
+
+        if (pantallaInventarioMantenimiento != null) {
+            pantallaInventarioMantenimiento.dispose();
+            pantallaInventarioMantenimiento = null;
         }
-        if(pantallaProgramarMantenimiento!= null){
+
+        if (pantallaProgramarMantenimiento != null) {
             pantallaProgramarMantenimiento.dispose();
             pantallaProgramarMantenimiento = null;
         }
-        if(pantallaSeleccionPiezasMantenimiento !=null){
+
+        if (pantallaSeleccionPiezasMantenimiento != null) {
             pantallaSeleccionPiezasMantenimiento.dispose();
             pantallaSeleccionPiezasMantenimiento = null;
         }
-        if(pantallaAgregarModificarInventario !=null){
+
+        if (pantallaAgregarModificarInventario != null) {
             pantallaAgregarModificarInventario.dispose();
             pantallaAgregarModificarInventario = null;
         }
-        if(pantallaEliminarInventario !=null){
+
+        if (pantallaEliminarInventario != null) {
             pantallaEliminarInventario.dispose();
             pantallaEliminarInventario = null;
         }
-        if(pantallaInventarioMaquinas != null){
+
+        if (pantallaInventarioMaquinas != null) {
             pantallaInventarioMaquinas.dispose();
             pantallaInventarioMaquinas = null;
         }
-        
+
         if (pantallaVistaRutina != null) {
             pantallaVistaRutina.dispose();
             pantallaVistaRutina = null;
         }
-        
+
         if (pantallaMensaje != null) {
             pantallaMensaje.dispose();
             pantallaMensaje = null;
         }
-        
+
         if (pantallaEditorRutina != null) {
             pantallaEditorRutina.dispose();
             pantallaEditorRutina = null;
         }
-        
+
         if (pantallaBusquedaEntrenador != null) {
             pantallaBusquedaEntrenador.dispose();
             pantallaBusquedaEntrenador = null;
         }
-        
     }
-    
-    //METODOS DEL CASO PLANEAR RUTINA
-    
+
+    // --- Métodos del caso planear rutina ---
     @Override
     public void irAVistaRutina() {
         cerrarPantallas();
         pantallaVistaRutina = new PantallaVistaRutina(this);
         pantallaVistaRutina.setVisible(true);
     }
-    
+
     @Override
     public void irAMensaje() {
         cerrarPantallas();
         pantallaMensaje = new PantallaMensaje(this);
         pantallaMensaje.setVisible(true);
     }
-    
+
     @Override
-    public List<RutinaDTO> obtenerRutinas() throws NegocioException{
+    public List<RutinaDTO> obtenerRutinas() throws NegocioException {
         return rutinaFachada.obtenerRutinas(getUsuarioActual().getCorreo());
     }
-    
+
     @Override
     public void irAEditorRutinaNueva() {
         cerrarPantallas();
@@ -1080,8 +1092,7 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaEditorRutina = new PantallaEditorRutina(this);
         pantallaEditorRutina.setVisible(true);
     }
-    
-    
+
     @Override
     public void irAEditorRutinaExistente(RutinaDTO rutina) {
         cerrarPantallas();
@@ -1089,59 +1100,72 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaEditorRutina = new PantallaEditorRutina(this);
         pantallaEditorRutina.setVisible(true);
     }
-    
-    
+
     @Override
     public RutinaDTO getRutinaSeleccionada() {
         return rutinaSeleccionada;
     }
-    
+
     @Override
-    public List<EjercicioDTO> recuperarEjercicios(String grupoMuscular) throws NegocioException{
+    public List<EjercicioDTO> recuperarEjercicios(String grupoMuscular)
+            throws NegocioException {
         return rutinaFachada.recuperarEjercicios(grupoMuscular);
     }
-    
+
     @Override
-    public void abrirSeleccionEjercicios(String nombreDia, Consumer<String> callbackGrupo, Consumer<List<EjercicioDTO>> callbackEjercicios) {
-        new PantallaSeleccionEjercicios(pantallaEditorRutina, this, nombreDia, callbackGrupo, callbackEjercicios);
+    public void abrirSeleccionEjercicios(
+            String nombreDia,
+            Consumer<String> callbackGrupo,
+            Consumer<List<EjercicioDTO>> callbackEjercicios
+    ) {
+        new PantallaSeleccionEjercicios(
+                pantallaEditorRutina,
+                this,
+                nombreDia,
+                callbackGrupo,
+                callbackEjercicios
+        );
     }
-    
+
     @Override
-    public RutinaDTO guardarRutina(RutinaDTO rutina) throws NegocioException{
+    public RutinaDTO guardarRutina(RutinaDTO rutina) throws NegocioException {
         return rutinaFachada.guardarRutina(getUsuarioActual().getCorreo(), rutina);
     }
-    
+
     @Override
     public boolean borrarRutina(String nombre) throws NegocioException {
         return rutinaFachada.borrarRutina(getUsuarioActual().getCorreo(), nombre);
     }
-    
+
     @Override
-    public List<EntrenadorDTO> obtenerEntrenadoresDeSucursalActual() throws NegocioException{
-        //me tuve que echar un superrollo para conseguir la sucursal actual del usuario
-        //porque nada la referncia directamente aparte de cita bienvenida, pero el usuario puede NO asignar cita
-        //entonces tuve que consultarla hasta la coleccion membresias que ahi si tiene la referencia a la sucursal
-        //y no se porque no tiene referencia a sucursal desde la membresia embebida en cliente
-        //pero ya es muy tarde para ir a cambiar la estructura de mongo (y me estoy volviendo loco)
-        //ATTE: Luisk
-        //PD: acaben con mi sufrimiento plis :(
-        String idSucursal = rutinaFachada.obtenerIdSucursalMembresiaActiva(getUsuarioActual().getCorreo());
-        //y a este metodo pues le paso la sucursal que obtuve aprovechando que ya lo tenemos
+    public List<EntrenadorDTO> obtenerEntrenadoresDeSucursalActual()
+            throws NegocioException {
+        String idSucursal = rutinaFachada.obtenerIdSucursalMembresiaActiva(
+                getUsuarioActual().getCorreo()
+        );
+
         return obtenerEntrenadoresDeSucursal(idSucursal);
     }
 
     @Override
-    public void irABusquedaEntrenador(RutinaDTO rutina, Consumer<String> callbackIdEntrenador) {
+    public void irABusquedaEntrenador(
+            RutinaDTO rutina,
+            Consumer<String> callbackIdEntrenador
+    ) {
         cerrarPantallas();
-        pantallaBusquedaEntrenador = new PantallaBusquedaEntrenador(this, rutina, callbackIdEntrenador);
+        pantallaBusquedaEntrenador = new PantallaBusquedaEntrenador(
+                this,
+                rutina,
+                callbackIdEntrenador
+        );
         pantallaBusquedaEntrenador.setVisible(true);
     }
-    
+
     @Override
     public EntrenadorDTO obtenerEntrenadorPorId(String id) throws NegocioException {
-        return rutinaFachada.obtenerEntrenadorPorId(id);      
+        return rutinaFachada.obtenerEntrenadorPorId(id);
     }
-    
+
     @Override
     public void irAEditorConPlantilla(String nombrePlantilla) throws NegocioException {
         rutinaSeleccionada = rutinaFachada.obtenerPlantilla(nombrePlantilla);
@@ -1149,9 +1173,6 @@ public class ControladorAplicacion implements IControladorAplicacion {
         pantallaEditorRutina = new PantallaEditorRutina(this);
         pantallaEditorRutina.setVisible(true);
     }
-    
-    
-}
 
     @Override
     public void irAAdministrarReportes() {
@@ -1172,5 +1193,4 @@ public class ControladorAplicacion implements IControladorAplicacion {
 
         return usuario.getCorreo().equalsIgnoreCase("reportes@gmail.com");
     }
-
 }

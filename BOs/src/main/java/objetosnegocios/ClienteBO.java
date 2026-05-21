@@ -59,7 +59,6 @@ public class ClienteBO implements IClienteBO {
         this.membresiaDAO= new MembresiaDAO();
         this.ejercicioDAO = new EjercicioDAO();
         this.plantillaDAO = new PlantillaRutinaDAO();
-        this.membresiaDAO = new MembresiaDAO();
     }
 
     @Override
