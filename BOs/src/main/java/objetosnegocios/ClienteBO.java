@@ -14,10 +14,12 @@ import dominios.MembresiaPojo;
 import dtos.CitaDTO;
 import dtos.ClienteDTO;
 import dtos.MembresiaDTO;
+import dtosReportes.FiltrosReporteDTO;
 import excepciones.PersistenciaException;
 import interfaces.IClienteBO;
 import interfaces.IClienteDAO;
 import interfaces.IMembresiaDAO;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,40 +33,42 @@ import mappersBO.MembresiaMapper;
  * @author julian izaguirre
  */
 public class ClienteBO implements IClienteBO {
+
     private final IClienteDAO clienteDAO;
     private final IMembresiaDAO membresiaDAO;
     private static final Logger logger = Logger.getLogger(ClienteBO.class.getName());
+
     public ClienteBO() {
         this.clienteDAO = new ClienteDAO();
-        this.membresiaDAO= new MembresiaDAO();
+        this.membresiaDAO = new MembresiaDAO();
     }
-    
+
     @Override
     public List<ClienteDTO> obtenerClientes() throws NegocioException {
         try {
-            List<ClientePojo> pojos= clienteDAO.obtenerClientes();
+            List<ClientePojo> pojos = clienteDAO.obtenerClientes();
             List<ClienteDTO> clientes = new ArrayList<>();
             for (ClientePojo pojo : pojos) {
-                ClienteDTO dto= ClienteMapper.toDTO(pojo);
+                ClienteDTO dto = ClienteMapper.toDTO(pojo);
                 clientes.add(dto);
             }
             logger.log(Level.INFO, "Los clientes se obtuvieron correctamente");
             return clientes;
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al obtener clientes", e);
-            throw new NegocioException( "Error al obtener clientes");
+            throw new NegocioException("Error al obtener clientes");
         }
     }
 
     @Override
     public ClienteDTO buscarPorCorreo(String correo) throws NegocioException {
         try {
-            ClientePojo pojo= clienteDAO.buscarPorCorreo(correo);
+            ClientePojo pojo = clienteDAO.buscarPorCorreo(correo);
             logger.log(Level.INFO, "Cliente encontrado correctamente");
             return ClienteMapper.toDTO(pojo);
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al buscar cliente", e);
-            throw new NegocioException( "Error al buscar cliente");
+            throw new NegocioException("Error al buscar cliente");
         }
     }
 
@@ -72,14 +76,14 @@ public class ClienteBO implements IClienteBO {
     public void actualizar(ClienteDTO cliente) throws NegocioException {
         try {
             if (cliente == null) {
-                throw new NegocioException( "El cliente no puede ser null");
+                throw new NegocioException("El cliente no puede ser null");
             }
-            ClientePojo pojo= ClienteMapper.toPojo(cliente);
+            ClientePojo pojo = ClienteMapper.toPojo(cliente);
             clienteDAO.actualizar(pojo);
             logger.log(Level.INFO, "Cliente actualizado correctamente");
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al actualizar cliente", e);
-            throw new NegocioException( "Error al actualizar cliente");
+            throw new NegocioException("Error al actualizar cliente");
         }
     }
 
@@ -91,15 +95,15 @@ public class ClienteBO implements IClienteBO {
             if (snapshot == null) {
                 return null;
             }
-            MembresiaPojo pojo =membresiaDAO.buscarPorId(snapshot.getIdMembresia());
+            MembresiaPojo pojo = membresiaDAO.buscarPorId(snapshot.getIdMembresia());
             if (pojo == null) {
                 return null;
             }
-            logger.log(Level.INFO,"Membresía activa encontrada");
+            logger.log(Level.INFO, "Membresía activa encontrada");
             return MembresiaMapper.toDTO(pojo);
 
         } catch (PersistenciaException e) {
-            logger.log(Level.SEVERE,"Error al obtener membresía activa", e);
+            logger.log(Level.SEVERE, "Error al obtener membresía activa", e);
             throw new NegocioException(
                     "Error al obtener membresía activa");
         }
@@ -109,28 +113,78 @@ public class ClienteBO implements IClienteBO {
     public void guardarCitaBienvenida(String correo, CitaDTO cita) throws NegocioException {
         try {
             if (correo == null || correo.isBlank()) {
-                throw new NegocioException( "El correo no puede estar vacío");
+                throw new NegocioException("El correo no puede estar vacío");
             }
-            if (cita == null) {throw new NegocioException( "La cita no puede ser null");
+            if (cita == null) {
+                throw new NegocioException("La cita no puede ser null");
             }
-            CitaPojo pojo= CitaMapper.toPojo(cita);
+            CitaPojo pojo = CitaMapper.toPojo(cita);
             clienteDAO.guardarCitaBienvenida(correo, pojo);
             logger.log(Level.INFO, "Cita guardada correctamente");
         } catch (PersistenciaException e) {
             logger.log(Level.SEVERE, "Error al guardar cita", e);
-            throw new NegocioException( "Error al guardar cita");
+            throw new NegocioException("Error al guardar cita");
         }
     }
-    
+
     @Override
     public void eliminarMembresiaActiva(String correo) throws NegocioException {
         try {
             clienteDAO.eliminarMembresiaActiva(correo);
         } catch (PersistenciaException e) {
-            logger.log(Level.SEVERE, "Error al eliminar la meembresía activa",e);
+            logger.log(Level.SEVERE, "Error al eliminar la meembresía activa", e);
             throw new NegocioException("Error al eliminar membresía activa", e);
         }
     }
-    
-    
+
+    /**
+     * Consulta citas de bienvenida aplicando los filtros seleccionados para
+     * reportes.
+     *
+     * Convierte las fechas del DTO de filtros a LocalDateTime para consultar
+     * desde el inicio del día hasta el final del día. Después convierte las
+     * citas POJO a DTO para que puedan ser usadas por la capa de negocio de
+     * reportes.
+     *
+     * @param filtros filtros seleccionados por el administrador.
+     * @return lista de citas que cumplen con los filtros.
+     * @throws NegocioException si los filtros son inválidos o falla la
+     * consulta.
+     */
+    @Override
+    public List<CitaDTO> consultarCitasParaReportes(FiltrosReporteDTO filtros) throws NegocioException {
+        try {
+            if (filtros == null) {
+                throw new NegocioException("Debe ingresar filtros para consultar citas.");
+            }
+
+            if (filtros.getFechaInicio() == null || filtros.getFechaFin() == null) {
+                throw new NegocioException("Debe ingresar fecha de inicio y fecha de fin.");
+            }
+
+            if (filtros.getFechaFin().isBefore(filtros.getFechaInicio())) {
+                throw new NegocioException("La fecha final no puede ser menor que la fecha inicial.");
+            }
+
+            List<CitaPojo> pojos = clienteDAO.consultarCitasParaReportes(
+                    filtros.getFechaInicio().atStartOfDay(),
+                    filtros.getFechaFin().atTime(LocalTime.MAX),
+                    filtros.getSucursal(),
+                    filtros.getEntrenador()
+            );
+
+            List<CitaDTO> citas = new ArrayList<>();
+
+            for (CitaPojo pojo : pojos) {
+                citas.add(CitaMapper.toDTO(pojo));
+            }
+
+            return citas;
+
+        } catch (PersistenciaException e) {
+            logger.log(Level.SEVERE, "Error al consultar citas para reportes", e);
+            throw new NegocioException("Error al consultar citas para reportes", e);
+        }
+    }
+
 }

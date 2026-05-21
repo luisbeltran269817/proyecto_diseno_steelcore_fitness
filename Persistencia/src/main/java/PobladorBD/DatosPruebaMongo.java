@@ -40,7 +40,7 @@ import org.bson.Document;
 
 /**
  * Poblador de datos de prueba para MongoDB.
- * 
+ *
  * @author Tungs
  */
 public class DatosPruebaMongo {
@@ -218,11 +218,30 @@ public class DatosPruebaMongo {
         String contrasenhaHasheada = BCrypt.withDefaults()
                 .hashToString(12, "123".toCharArray());
 
+        String contraseniaReporte = BCrypt.withDefaults().hashToString(12, "2711".toCharArray());
+
         UsuarioPojo usuario = new UsuarioPojo();
         usuario.setCorreo("cliente@gmail.com");
         usuario.setNombre("Juan Leonel");
         usuario.setContraseña(contrasenhaHasheada);   // ← ya hasheada
         usuario.setRol(RolUsuarioPojo.CLIENTE);
+
+        // reportes
+        UsuarioPojo usuarioReporte = new UsuarioPojo();
+        usuarioReporte.setNombre("Noelia Encinas");
+        usuarioReporte.setCorreo("reportes@gmail.com");
+        usuarioReporte.setContraseña(contraseniaReporte);
+        usuarioReporte.setRol(RolUsuarioPojo.ADMIN);
+
+        ClientePojo clienteReporte = new ClientePojo();
+        clienteReporte.setIdCliente("ADMIN_REPORTES_001");
+        clienteReporte.setUsuario(usuarioReporte);
+        clienteReporte.setApellidoPaterno("Encinas");
+        clienteReporte.setApellidoMaterno("Noriega");
+        clienteReporte.setFechaNacimiento(LocalDate.of(2003, 11, 27));
+        clienteReporte.setCurp("EENN031127MSRXXX01");
+        clienteReporte.setMembresiaActiva(null);
+        clienteReporte.setCitaBienvenida(null);
 
         MembresiaActivaPojo snapshot = new MembresiaActivaPojo();
         snapshot.setIdMembresia(idMembresia);
@@ -242,7 +261,9 @@ public class DatosPruebaMongo {
 
         MongoCollection<Document> colClientes = bd.getCollection("clientes");
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente));
-
+       
+        
+        colClientes.insertOne(ClientePersistenciaMapper.toDocument(clienteReporte));
         /*
          * =========================
          * VISITAS

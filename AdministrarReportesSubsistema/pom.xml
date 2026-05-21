@@ -6,7 +6,7 @@
         <artifactId>GimnasioSTEELCORE_DisenoSW</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>BOs</artifactId>
+    <artifactId>AdministrarReportesSubsistema</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -16,18 +16,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>Persistencia</artifactId>
+            <artifactId>BOs</artifactId>
             <version>${project.version}</version>
         </dependency>
-            <!-- Infraestructura de reportes: PDF, impresión, correo después -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ReportesInfraestructura</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Dominio_modulo</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <properties>
-        <maven.compiler.release>23</maven.compiler.release>
-        <exec.mainClass>com.mycompany.bos.BOs</exec.mainClass>
+        <maven.compiler.release>24</maven.compiler.release>
+        <exec.mainClass>com.mycompany.administrarreportessubsistema.AdministrarReportesSubsistema</exec.mainClass>
     </properties>
 </project>

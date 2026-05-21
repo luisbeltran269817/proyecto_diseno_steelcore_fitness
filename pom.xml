@@ -18,6 +18,8 @@
         <module>PresentacionMapas</module>
         <module>ControlAccesoSubsistema</module>
         <module>Dominio_modulo</module>
+        <module>AdministrarReportesSubsistema</module>
+        <module>ReportesInfraestructura</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

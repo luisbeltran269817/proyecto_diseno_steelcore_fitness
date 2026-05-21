@@ -90,7 +90,7 @@ public class PantallaInicioSesion extends PantallaBase {
             return;
         }
         try {
-            controlador.iniciarSesion(correo, contrasena);
+            controlador.iniciarSesionConRedireccion(correo, contrasena);
 
             UsuarioDTO usuarioLogueado = controlador.getUsuarioActual();
 
