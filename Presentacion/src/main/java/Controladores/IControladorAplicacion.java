@@ -14,6 +14,13 @@ import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
+import dtosInventarioMantenimiento.MantenimientoDTO;
+import dtosInventarioMantenimiento.MantenimientoPiezaDTO;
+import dtosInventarioMantenimiento.MaquinaDTO;
+import dtosInventarioMantenimiento.PiezaDTO;
+import dtosInventarioMantenimiento.TecnicoDTO;
+import excepciones.InventarioMantenimientoException;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.swing.JComponent;
 
@@ -401,4 +408,185 @@ public interface IControladorAplicacion {
      * el mapa en la ubicación aproximada del usuario.
      */
     void ubicarUsuarioAutomaticamente();
+    
+    
+    //COSAS DE INVENTARIO MANTENIMIENTO
+        /**
+         * Método que viaja a la pantalla de inventarioMantenimiento
+         */
+        public void irAInventarioMantenimiento();
+        /**
+         * Método que viaja a la ventana de programación de mantenimiento
+         */
+        public void irAProgramarMantenimiento();
+
+        /**
+         * Método que viaja a la pantala de obtenerMaquinasMantenimiento
+         * @return una lista de máquinasDTO
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        public List<MaquinaDTO> obtenerMaquinasMantenimiento() throws InventarioMantenimientoException;
+        /**
+         * Método que cambia la máquina seleccionada (estado)
+         * @param maquina la máquina seleccionada
+         */
+        public void setMaquinaSeleccionada(MaquinaDTO maquina);
+        /**
+         * Método que obtiene la máquina seleccionada
+         * @return la máquina que se seleccionó
+         */
+        public MaquinaDTO getMaquinaSeleccionada();
+
+        /**
+         * Método que obtiene los técnicos del sistema
+         * @return una lista con todos los técnicos
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        List<TecnicoDTO> obtenerTecnicosMantenimiento() throws InventarioMantenimientoException;
+
+        /**
+         * Método que pregunta a la base de datos si un ténico tiene horario disponible
+         * @param idTecnico el id del técnico a validar
+         * @param fechaProgramada el horario a avalidar
+         * @return verdadero si tiene horario disponible, falso en caso contrario
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        boolean tecnicoTieneHorarioDisponible(String idTecnico, LocalDateTime fechaProgramada) throws InventarioMantenimientoException;
+
+        /**
+         * Método que guarda los datos de una programación de mantenimiento
+         * @param descripcion la descripción del mantenimiento
+         * @param fechaProgramada la fecha programada
+         * @param tecnico el técnico asignado al mantenimiento
+         */
+        void guardarDatosProgramacionMantenimiento(String descripcion, LocalDateTime fechaProgramada, TecnicoDTO tecnico);
+
+        /**
+         * Método que obtiene la descripción de un mantenimiento escrita (estado)
+         * @return 
+         */
+        String getDescripcionMantenimiento();
+        /**
+         * Método que obtiene la fecha programada de un mantenimiento (estado)
+         * @return la fecha programada de un mantenimiento
+         */
+        LocalDateTime getFechaProgramadaMantenimiento();
+
+        /**
+         * Método que obtiene el técnico seleccionado para un mantenimiento
+         * @return el técnico seleccionado
+         */
+        TecnicoDTO getTecnicoSeleccionadoMantenimiento();
+
+        /**
+         * Método que viaja a la pantalla de selección de plan
+         */
+        void irASeleccionPiezasMantenimiento();
+        
+        /**
+         * Método que obtiene las piezas de la BD
+         * @return una lista con todas las piezas obtenidas
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        List<PiezaDTO> obtenerPiezasMantenimiento() throws InventarioMantenimientoException;
+
+        /**
+         * Método que agrega una pieza seleccionada a un mantenimiento
+         * @param pieza las piezas seleccionadas
+         * @param cantidad la cantidad de la 
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        void agregarPiezaSeleccionadaMantenimiento(PiezaDTO pieza, int cantidad) throws InventarioMantenimientoException;
+
+        /**
+         * Método que obtiene las piezas seleccionadas de un mantenimiento (Estado)
+         * @return 
+         */
+        List<MantenimientoPiezaDTO> obtenerPiezasSeleccionadasMantenimiento();
+
+        /**
+         * Método que valida que haya stock suficiente para una 
+         * @param idPieza el id de la pieza a buscar
+         * @param cantidad la cantidad de la pieza a validar
+         * @return verdadero si hay stock suficiente, falso en caso contrario
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        boolean hayStockSuficientePieza(String idPieza, int cantidad) throws InventarioMantenimientoException;
+        
+        /**
+         * Método que confirma una solititud de mantenimiento
+         * @return el mantenimientoDTO generado
+         * @throws InventarioMantenimientoException si ocurre un erro
+         */
+        public MantenimientoDTO confirmarSolicitudMantenimiento() throws InventarioMantenimientoException;
+        
+        /**
+         * Método que limpia el estado de piezas seleccionadas
+         */
+        void limpiarPiezasSeleccionadasMantenimiento();
+        
+        /**
+         * Método que obtiene todas las máquinas de la BD según filtros
+         * @param idSucursal el id de la sucursal a filtrar
+         * @param estado el estado de la máquina a filtrar
+         * @return una lista de máquinas DTO
+         * @throws InventarioMantenimientoException si ocurre un errors
+         */
+        List<MaquinaDTO> filtrarMaquinasMantenimiento(String idSucursal, MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException;
+
+        /**
+         * Método que prepara una solicitud de mantenimiento
+         * @throws InventarioMantenimientoException si ocurre un error 
+         */
+        void prepararProgramacionMantenimiento() throws InventarioMantenimientoException;
+
+        /**
+         * Método que viaja a la pantalla de inventario de máquinas
+         */
+        void irAInventarioMaquinas();
+        
+        /**
+         * Método que registra una máquina en la bd
+         * @param idSucursal la sucursal a la que pertenece
+         * @param modelo el modelo de la máquina
+         * @param tipo el tipo de la máquina
+         * @param estado el estado de la máquina
+         * @return  la MaquinaDTO registrada
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        MaquinaDTO registrarMaquinaInventario(String idSucursal,String modelo, String tipo, MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException;
+
+        /**
+         * Método que actualiza una máquina de la BD
+         * @param idMaquina la máquina a a insertar
+         * @param idSucursal el id de la sucursal de la máquina
+         * @param modelo el modelo de la máquina
+         * @param tipo el tipo de la máquina
+         * @param estado el estado de la máquina
+         * @throws InventarioMantenimientoException  si ocurre un error
+         */
+        void actualizarMaquinaInventario(String idMaquina,String idSucursal,String modelo,String tipo,MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException;
+
+        /**
+         * Método que da de baja una máquina en la Base de Datos
+         * @param idMaquina el id de la máquina a dar de baja
+         * @param motivo el motivo de la baja
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        void darBajaMaquinaInventario(String idMaquina,String motivo) throws InventarioMantenimientoException;
+        
+        /**
+         * Método que viaja a la pantalla de agregarInventario
+         */
+        void irAAgregarInventario();
+
+        /**
+         * Método que viaja a la pantalla de modificar inventario
+         */
+        void irAModificarInventario();
+
+        /**
+         * Método que viaja a la pantalla de eliminar inventario
+         */
+        void irAEliminarInventario();
 }

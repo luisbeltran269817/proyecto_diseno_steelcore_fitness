@@ -25,12 +25,27 @@ import dominios.SucursalPojo;
 import dominios.UsuarioPojo;
 import dominios.UsuarioPojo.RolUsuarioPojo;
 import dominios.VisitaPojo;
+import dominios_mantenimiento.AdminMantenimientoPojo;
+import dominios_mantenimiento.BajaPojo;
+import dominios_mantenimiento.HorarioTecnicoPojo;
+import dominios_mantenimiento.MantenimientoPiezaPojo;
+import dominios_mantenimiento.MantenimientoPojo;
+import dominios_mantenimiento.MaquinaPojo;
+import dominios_mantenimiento.PiezaPojo;
+import dominios_mantenimiento.TecnicoPojo;
+import dominios_mantenimiento.UltimoMantenimientoPojo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import mappersMantenimientoPersistencia.AdminMantenimientoPersistenciaMapper;
+import mappersMantenimientoPersistencia.MantenimientoPersistenciaMapper;
+import mappersMantenimientoPersistencia.MaquinaPersistenciaMapper;
+import mappersMantenimientoPersistencia.PiezaPersistenciaMapper;
+import mappersMantenimientoPersistencia.TecnicoPersistenciaMapper;
 import mappersPersistencia.ClientePersistenciaMapper;
 import mappersPersistencia.EntrenadorPersistenciaMapper;
 import mappersPersistencia.MembresiaPersistenciaMapper;
@@ -61,7 +76,288 @@ public class DatosPruebaMongo {
         bd.getCollection("clientes").deleteMany(new Document());
         bd.getCollection("membresias").deleteMany(new Document());
         bd.getCollection("visitas").deleteMany(new Document());
+        bd.getCollection("adminsMantenimiento").deleteMany(new Document());
+        bd.getCollection("maquinas").deleteMany(new Document());
+        bd.getCollection("piezas").deleteMany(new Document());
+        bd.getCollection("tecnicos").deleteMany(new Document());
+        
+        bd.getCollection("mantenimientos").deleteMany(new Document());
+        AdminMantenimientoPojo admin = new AdminMantenimientoPojo();
+        admin.setIdAdminMantenimiento("ADM-MANT-001");
+        UsuarioPojo usuarioAdmin = new UsuarioPojo();
+        usuarioAdmin.setCorreo("admin.mantenimiento@gmail.com");
+        usuarioAdmin.setNombre("Administrador Mantenimiento");
+        String hash = BCrypt.withDefaults().hashToString(12, "123".toCharArray());
+        usuarioAdmin.setContraseña(hash);
+        usuarioAdmin.setRol(RolUsuarioPojo.ADMIN);
+        admin.setUsuario(usuarioAdmin);
+        MongoConexion.obtenerBaseDatos()
+                .getCollection("adminsMantenimiento")
+                .insertOne(AdminMantenimientoPersistenciaMapper.toDocument(admin));
+        /*
+        * =========================
+        * PIEZAS / REFACCIONES
+        * =========================
+        */
+       PiezaPojo polea = new PiezaPojo();
+       polea.setIdPieza("PZ001");
+       polea.setNombre("Polea");
+       polea.setStock(15);
+       polea.setEstado(PiezaPojo.EstadoPieza.ACTIVO);
 
+       PiezaPojo banda = new PiezaPojo();
+       banda.setIdPieza("PZ002");
+       banda.setNombre("Banda de caminadora");
+       banda.setStock(8);
+       banda.setEstado(PiezaPojo.EstadoPieza.ACTIVO);
+
+       PiezaPojo tornillos = new PiezaPojo();
+       tornillos.setIdPieza("PZ003");
+       tornillos.setNombre("Paquete de tornillos");
+       tornillos.setStock(40);
+       tornillos.setEstado(PiezaPojo.EstadoPieza.ACTIVO);
+
+       PiezaPojo sensor = new PiezaPojo();
+       sensor.setIdPieza("PZ004");
+       sensor.setNombre("Sensor de velocidad");
+       sensor.setStock(5);
+       sensor.setEstado(PiezaPojo.EstadoPieza.ACTIVO);
+
+       PiezaPojo motor = new PiezaPojo();
+       motor.setIdPieza("PZ005");
+       motor.setNombre("Motor eléctrico");
+       motor.setStock(2);
+       motor.setEstado(PiezaPojo.EstadoPieza.ACTIVO);
+
+       BajaPojo bajaPieza = new BajaPojo();
+       bajaPieza.setIdBaja("BJPZ001");
+       bajaPieza.setMotivo("Refacción obsoleta");
+       bajaPieza.setFechaBaja(LocalDateTime.now().minusDays(10));
+       bajaPieza.setTipo("PIEZA");
+
+       PiezaPojo pantallaVieja = new PiezaPojo();
+       pantallaVieja.setIdPieza("PZ006");
+       pantallaVieja.setNombre("Pantalla antigua");
+       pantallaVieja.setStock(0);
+       pantallaVieja.setEstado(PiezaPojo.EstadoPieza.INACTIVO);
+       pantallaVieja.setBaja(bajaPieza);
+
+       MongoCollection<Document> colPiezas = bd.getCollection("piezas");
+
+       colPiezas.insertOne(PiezaPersistenciaMapper.toDocument(polea));
+       colPiezas.insertOne(PiezaPersistenciaMapper.toDocument(banda));
+       colPiezas.insertOne(PiezaPersistenciaMapper.toDocument(tornillos));
+       colPiezas.insertOne(PiezaPersistenciaMapper.toDocument(sensor));
+       colPiezas.insertOne(PiezaPersistenciaMapper.toDocument(motor));
+       colPiezas.insertOne(PiezaPersistenciaMapper.toDocument(pantallaVieja));
+
+
+       /*
+        * =========================
+        * TÉCNICOS
+        * =========================
+        */
+       HorarioTecnicoPojo horarioLuis1 = new HorarioTecnicoPojo();
+       horarioLuis1.setIdHorario("HT001");
+       horarioLuis1.setNombreDia("Lunes");
+       horarioLuis1.setHoraInicio(LocalTime.of(8, 0));
+       horarioLuis1.setHoraFin(LocalTime.of(16, 0));
+       horarioLuis1.setDisponible(true);
+
+       HorarioTecnicoPojo horarioLuis2 = new HorarioTecnicoPojo();
+       horarioLuis2.setIdHorario("HT002");
+       horarioLuis2.setNombreDia("Miércoles");
+       horarioLuis2.setHoraInicio(LocalTime.of(8, 0));
+       horarioLuis2.setHoraFin(LocalTime.of(16, 0));
+       horarioLuis2.setDisponible(true);
+
+       TecnicoPojo tecnicoLuis = new TecnicoPojo();
+       tecnicoLuis.setIdTecnico("T001");
+       tecnicoLuis.setNombre("Luis Hernández");
+       tecnicoLuis.setHorarios(List.of(horarioLuis1, horarioLuis2));
+
+       HorarioTecnicoPojo horarioAna1 = new HorarioTecnicoPojo();
+       horarioAna1.setIdHorario("HT003");
+       horarioAna1.setNombreDia("Martes");
+       horarioAna1.setHoraInicio(LocalTime.of(10, 0));
+       horarioAna1.setHoraFin(LocalTime.of(18, 0));
+       horarioAna1.setDisponible(true);
+
+       HorarioTecnicoPojo horarioAna2 = new HorarioTecnicoPojo();
+       horarioAna2.setIdHorario("HT004");
+       horarioAna2.setNombreDia("Jueves");
+       horarioAna2.setHoraInicio(LocalTime.of(10, 0));
+       horarioAna2.setHoraFin(LocalTime.of(18, 0));
+       horarioAna2.setDisponible(true);
+
+       TecnicoPojo tecnicoAna = new TecnicoPojo();
+       tecnicoAna.setIdTecnico("T002");
+       tecnicoAna.setNombre("Ana Mendoza");
+       tecnicoAna.setHorarios(List.of(horarioAna1, horarioAna2));
+
+       HorarioTecnicoPojo horarioJulian1 = new HorarioTecnicoPojo();
+       horarioJulian1.setIdHorario("HT005");
+       horarioJulian1.setNombreDia("Viernes");
+       horarioJulian1.setHoraInicio(LocalTime.of(9, 0));
+       horarioJulian1.setHoraFin(LocalTime.of(17, 0));
+       horarioJulian1.setDisponible(true);
+
+       HorarioTecnicoPojo horarioJulian2 = new HorarioTecnicoPojo();
+       horarioJulian2.setIdHorario("HT006");
+       horarioJulian2.setNombreDia("Sábado");
+       horarioJulian2.setHoraInicio(LocalTime.of(9, 0));
+       horarioJulian2.setHoraFin(LocalTime.of(14, 0));
+       horarioJulian2.setDisponible(true);
+
+       TecnicoPojo tecnicoJulian = new TecnicoPojo();
+       tecnicoJulian.setIdTecnico("T003");
+       tecnicoJulian.setNombre("Julián Menchaca");
+       tecnicoJulian.setHorarios(List.of(horarioJulian1, horarioJulian2));
+
+       MongoCollection<Document> colTecnicos = bd.getCollection("tecnicos");
+
+       colTecnicos.insertOne(TecnicoPersistenciaMapper.toDocument(tecnicoLuis));
+       colTecnicos.insertOne(TecnicoPersistenciaMapper.toDocument(tecnicoAna));
+       colTecnicos.insertOne(TecnicoPersistenciaMapper.toDocument(tecnicoJulian));
+
+
+       /*
+        * =========================
+        * MANTENIMIENTOS
+        * =========================
+        */
+       MantenimientoPiezaPojo mp1 = new MantenimientoPiezaPojo();
+       mp1.setIdMantenimientoPieza("MP001");
+       mp1.setIdMantenimiento("MAN001");
+       mp1.setIdPieza("PZ001");
+       mp1.setCantidad(2);
+
+       MantenimientoPiezaPojo mp2 = new MantenimientoPiezaPojo();
+       mp2.setIdMantenimientoPieza("MP002");
+       mp2.setIdMantenimiento("MAN001");
+       mp2.setIdPieza("PZ003");
+       mp2.setCantidad(6);
+
+       MantenimientoPojo mantenimiento1 = new MantenimientoPojo();
+       mantenimiento1.setIdMantenimiento("MAN001");
+       mantenimiento1.setIdTecnico("T001");
+       mantenimiento1.setIdMaquina("MAQ001");
+       mantenimiento1.setDescripcion("Cambio de polea y ajuste general");
+       mantenimiento1.setFechaProgramada(LocalDateTime.of(2026, 3, 11, 10, 0));
+       mantenimiento1.setFechaInicio(LocalDateTime.of(2026, 3, 11, 10, 5));
+       mantenimiento1.setFechaFin(LocalDateTime.of(2026, 3, 11, 11, 20));
+       mantenimiento1.setEstado(MantenimientoPojo.EstadoMantenimiento.REALIZADO);
+       mantenimiento1.setPiezas(List.of(mp1, mp2));
+
+       MantenimientoPiezaPojo mp3 = new MantenimientoPiezaPojo();
+       mp3.setIdMantenimientoPieza("MP003");
+       mp3.setIdMantenimiento("MAN002");
+       mp3.setIdPieza("PZ002");
+       mp3.setCantidad(1);
+
+       MantenimientoPojo mantenimiento2 = new MantenimientoPojo();
+       mantenimiento2.setIdMantenimiento("MAN002");
+       mantenimiento2.setIdTecnico("T002");
+       mantenimiento2.setIdMaquina("MAQ002");
+       mantenimiento2.setDescripcion("Revisión de banda y sistema de resistencia");
+       mantenimiento2.setFechaProgramada(LocalDateTime.of(2026, 5, 20, 12, 0));
+       mantenimiento2.setFechaInicio(null);
+       mantenimiento2.setFechaFin(null);
+       mantenimiento2.setEstado(MantenimientoPojo.EstadoMantenimiento.PENDIENTE);
+       mantenimiento2.setPiezas(List.of(mp3));
+
+       MantenimientoPojo mantenimiento3 = new MantenimientoPojo();
+       mantenimiento3.setIdMantenimiento("MAN003");
+       mantenimiento3.setIdTecnico("T003");
+       mantenimiento3.setIdMaquina("MAQ003");
+       mantenimiento3.setDescripcion("Máquina en espera por llegada de motor");
+       mantenimiento3.setFechaProgramada(LocalDateTime.of(2026, 5, 22, 9, 30));
+       mantenimiento3.setFechaInicio(LocalDateTime.of(2026, 5, 22, 9, 40));
+       mantenimiento3.setFechaFin(null);
+       mantenimiento3.setEstado(MantenimientoPojo.EstadoMantenimiento.ESPERA);
+       mantenimiento3.setPiezas(new ArrayList<>());
+
+       MongoCollection<Document> colMantenimientos = bd.getCollection("mantenimientos");
+
+       colMantenimientos.insertOne(MantenimientoPersistenciaMapper.toDocument(mantenimiento1));
+       colMantenimientos.insertOne(MantenimientoPersistenciaMapper.toDocument(mantenimiento2));
+       colMantenimientos.insertOne(MantenimientoPersistenciaMapper.toDocument(mantenimiento3));
+
+
+       /*
+        * =========================
+        * MÁQUINAS
+        * =========================
+        */
+       UltimoMantenimientoPojo ultimo1 = new UltimoMantenimientoPojo();
+       ultimo1.setIdMantenimiento("MAN001");
+       ultimo1.setFecha(LocalDateTime.of(2026, 3, 11, 10, 0));
+       ultimo1.setEstado(UltimoMantenimientoPojo.EstadoMantenimientoSnapshot.REALIZADO);
+
+       MaquinaPojo maquina1 = new MaquinaPojo();
+       maquina1.setIdMaquina("MAQ001");
+       maquina1.setIdSucursal("S001");
+       maquina1.setModelo("Estación Multifuncional Tayga ZX200");
+       maquina1.setTipo("Resistencia");
+       maquina1.setEstado(MaquinaPojo.EstadoMaquina.BUENAS_CONDICIONES);
+       maquina1.setUltimoMantenimiento(ultimo1);
+
+       UltimoMantenimientoPojo ultimo2 = new UltimoMantenimientoPojo();
+       ultimo2.setIdMantenimiento("MAN002");
+       ultimo2.setFecha(LocalDateTime.of(2026, 5, 20, 12, 0));
+       ultimo2.setEstado(UltimoMantenimientoPojo.EstadoMantenimientoSnapshot.PENDIENTE);
+
+       MaquinaPojo maquina2 = new MaquinaPojo();
+       maquina2.setIdMaquina("MAQ002");
+       maquina2.setIdSucursal("S002");
+       maquina2.setModelo("Disco Olímpico de acero recubierto 20kg");
+       maquina2.setTipo("Fuerza libre");
+       maquina2.setEstado(MaquinaPojo.EstadoMaquina.MANTENIMIENTO_PREVENTVO);
+       maquina2.setUltimoMantenimiento(ultimo2);
+
+       UltimoMantenimientoPojo ultimo3 = new UltimoMantenimientoPojo();
+       ultimo3.setIdMantenimiento("MAN003");
+       ultimo3.setFecha(LocalDateTime.of(2026, 5, 22, 9, 30));
+       ultimo3.setEstado(UltimoMantenimientoPojo.EstadoMantenimientoSnapshot.ESPERA);
+
+       MaquinaPojo maquina3 = new MaquinaPojo();
+       maquina3.setIdMaquina("MAQ003");
+       maquina3.setIdSucursal("S001");
+       maquina3.setModelo("Caminadora ProGear199");
+       maquina3.setTipo("Cardio");
+       maquina3.setEstado(MaquinaPojo.EstadoMaquina.MANTENIMIENTO_URGENTE);
+       maquina3.setUltimoMantenimiento(ultimo3);
+
+       MaquinaPojo maquina4 = new MaquinaPojo();
+       maquina4.setIdMaquina("MAQ004");
+       maquina4.setIdSucursal("S002");
+       maquina4.setModelo("Bicicleta Spinning Xtreme");
+       maquina4.setTipo("Cardio");
+       maquina4.setEstado(MaquinaPojo.EstadoMaquina.BUENAS_CONDICIONES);
+       maquina4.setUltimoMantenimiento(null);
+
+       BajaPojo bajaMaquina = new BajaPojo();
+       bajaMaquina.setIdBaja("BJMAQ001");
+       bajaMaquina.setMotivo("Equipo dañado sin posibilidad de reparación");
+       bajaMaquina.setFechaBaja(LocalDateTime.now().minusDays(5));
+       bajaMaquina.setTipo("MAQUINA");
+
+       MaquinaPojo maquina5 = new MaquinaPojo();
+       maquina5.setIdMaquina("MAQ005");
+       maquina5.setIdSucursal("S001");
+       maquina5.setModelo("Elíptica PowerFit 3000");
+       maquina5.setTipo("Cardio");
+       maquina5.setEstado(MaquinaPojo.EstadoMaquina.INACTIVO);
+       maquina5.setUltimoMantenimiento(null);
+       maquina5.setBaja(bajaMaquina);
+
+       MongoCollection<Document> colMaquinas = bd.getCollection("maquinas");
+
+       colMaquinas.insertOne(MaquinaPersistenciaMapper.toDocument(maquina1));
+       colMaquinas.insertOne(MaquinaPersistenciaMapper.toDocument(maquina2));
+       colMaquinas.insertOne(MaquinaPersistenciaMapper.toDocument(maquina3));
+       colMaquinas.insertOne(MaquinaPersistenciaMapper.toDocument(maquina4));
+       colMaquinas.insertOne(MaquinaPersistenciaMapper.toDocument(maquina5));
         /*
          * =========================
          * AMENIDADES (solo como objetos en memoria, NO se persisten solas)

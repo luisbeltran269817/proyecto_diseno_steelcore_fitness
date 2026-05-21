@@ -10,6 +10,12 @@ import ControlDeAcceso.BC_PantallaEspera;
 import Excepciones.NegocioException;
 import Fachada.FachadaInicioSesion;
 import Fachada.IInicioSesion;
+import PantallasInventarioMantenimiento.PantallaAgregarModificarInventario;
+import PantallasInventarioMantenimiento.PantallaInventarioMantenimiento;
+import PantallasInventarioMantenimiento.PantallaInventarioMaquinas;
+import PantallasInventarioMantenimiento.PantallaEliminarInventario;
+import PantallasInventarioMantenimiento.PantallaProgramarMantenimiento;
+import PantallasInventarioMantenimiento.PantallaSeleccionPiezasMantenimiento;
 import PantallasComprarMembresia.DatosBancarios;
 import PantallasComprarMembresia.PantallaBienvenida;
 import PantallasComprarMembresia.PantallaDetallePlan;
@@ -32,14 +38,26 @@ import dtos.PlanDTO;
 import dtos.SucursalDTO;
 import dtos.UsuarioDTO;
 import dtos.VisitaDTO;
+import dtosInventarioMantenimiento.AdminMantenimientoDTO;
+import dtosInventarioMantenimiento.MantenimientoDTO;
+import dtosInventarioMantenimiento.MantenimientoPiezaDTO;
+import dtosInventarioMantenimiento.MaquinaDTO;
+import dtosInventarioMantenimiento.PiezaDTO;
+import dtosInventarioMantenimiento.TecnicoDTO;
+import excepciones.InventarioMantenimientoException;
 import fachada.FachadaComprarMembresia;
 import fachada.IComprarMembresia;
 import infraestructura.PresentacionInfra;
+import inventarioMantenimiento.FachadaInventarioMantenimiento;
+import inventarioMantenimiento.GestorEstadosMantenimiento;
+import inventarioMantenimiento.IInventarioMantenimiento;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
@@ -55,7 +73,17 @@ public class ControladorAplicacion implements IControladorAplicacion {
     private final IComprarMembresia compraFachada;
     private final PresentacionInfra infraMapa;
     private final GestorEstadosCompra gestor;
- 
+    //COSAS DE INVENTARIO MANTENIMIENTO
+        private final IInventarioMantenimiento inventarioMantenimientoFachada;
+        private PantallaInventarioMantenimiento pantallaInventarioMantenimiento;
+        private PantallaProgramarMantenimiento pantallaProgramarMantenimiento;
+        private PantallaSeleccionPiezasMantenimiento pantallaSeleccionPiezasMantenimiento;
+        private PantallaAgregarModificarInventario pantallaAgregarModificarInventario;
+        private PantallaEliminarInventario pantallaEliminarInventario;
+        private final GestorEstadosMantenimiento gestorMantenimiento;
+        private PantallaInventarioMaquinas pantallaInventarioMaquinas;
+    //COSAS DE INVENTARIO MANTENIMIENTO
+        
     private PantallaBienvenida pantallaBienvenida;
     private PantallaInicioSesion pantallaInicioSesion;
     private PantallaPerfilUsuario pantallaPerfil;
@@ -76,6 +104,10 @@ public class ControladorAplicacion implements IControladorAplicacion {
         this.compraFachada = new FachadaComprarMembresia();
         this.infraMapa = new PresentacionInfra();
         this.gestor = new GestorEstadosCompra();
+        //COSAS DE INVENTARIO MANTENIMIENTO
+            this.inventarioMantenimientoFachada = new FachadaInventarioMantenimiento();
+            this.gestorMantenimiento= new GestorEstadosMantenimiento();
+         //COSAS DE INVENTARIO MANTENIMIENTO
     }
  
     /**
@@ -328,6 +360,12 @@ public class ControladorAplicacion implements IControladorAplicacion {
             throw new NegocioException(ex.getMessage() != null ? ex.getMessage() : "Correo o contrasena incorrectos.");
         }
         gestor.setUsuarioActual(usuario);
+        //Métodos de inventarioMantenimiento
+            if (usuario instanceof AdminMantenimientoDTO) {
+                irAInventarioMantenimiento();
+                return;
+            }
+        //INVENTARIO MANTENIMIENTO
         try {
             CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
             gestor.setCitaBienvenida(cita);
@@ -570,7 +608,271 @@ public class ControladorAplicacion implements IControladorAplicacion {
     public void detenerServidorQR() {
         FachadaControlAcceso.getInstancia().detenerServidorQR();
     }
- 
+    
+    
+    //MÉTODOS DE INVENTARIO MANTENIMIENTO
+        /**
+         * Método que viaja a la pantalla de inventarioMantenimiento (la principal pues)
+         */
+        @Override
+        public void irAInventarioMantenimiento() {
+            cerrarPantallas();
+            pantallaInventarioMantenimiento = new PantallaInventarioMantenimiento(this);
+            pantallaInventarioMantenimiento.setVisible(true);
+        }
+
+        /**
+         * Método que viaja a la pantalla de programar Mantenimiento
+         */
+        @Override
+        public void irAProgramarMantenimiento() {
+            cerrarPantallas();
+            pantallaProgramarMantenimiento = new PantallaProgramarMantenimiento(this);
+            pantallaProgramarMantenimiento.setVisible(true);
+        }
+
+        @Override
+        public List<MaquinaDTO> obtenerMaquinasMantenimiento() throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.obtenerMaquinas();
+        }
+        @Override
+        public void setMaquinaSeleccionada(MaquinaDTO maquina) {
+            gestorMantenimiento.setMaquinaSeleccionada(maquina);
+        }
+        
+        @Override
+        public MaquinaDTO getMaquinaSeleccionada() {
+            return gestorMantenimiento.getMaquinaSeleccionada();
+        }
+        
+        @Override
+        public List<TecnicoDTO> obtenerTecnicosMantenimiento() throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.obtenerTecnicos();
+        }
+
+        @Override
+        public boolean tecnicoTieneHorarioDisponible(String idTecnico, LocalDateTime fechaProgramada) throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.tecnicoTieneHorarioDisponible(idTecnico, fechaProgramada);
+        }
+
+        @Override
+        public void guardarDatosProgramacionMantenimiento(String descripcion, LocalDateTime fechaProgramada, TecnicoDTO tecnico) {
+            gestorMantenimiento.setDescripcionMantenimiento(descripcion);
+            gestorMantenimiento.setFechaProgramadaMantenimiento(fechaProgramada);
+            gestorMantenimiento.setTecnicoSeleccionado(tecnico);
+        }
+        
+        @Override
+        public String getDescripcionMantenimiento() {
+            return gestorMantenimiento.getDescripcionMantenimiento();
+        }
+
+        @Override
+        public LocalDateTime getFechaProgramadaMantenimiento() {
+            return gestorMantenimiento.getFechaProgramadaMantenimiento();
+        }
+
+        @Override
+        public TecnicoDTO getTecnicoSeleccionadoMantenimiento() {
+            return gestorMantenimiento.getTecnicoSeleccionado();
+        }
+        
+        @Override
+        public void irASeleccionPiezasMantenimiento() {
+            cerrarPantallas();
+            pantallaSeleccionPiezasMantenimiento = new PantallaSeleccionPiezasMantenimiento(this);
+            pantallaSeleccionPiezasMantenimiento.setVisible(true);
+        }
+        
+        
+        @Override
+        public boolean hayStockSuficientePieza(String idPieza, int cantidad) throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.hayStockSuficiente(idPieza, cantidad);
+        }
+        
+        /**
+         * Método muy gordo que se usa en la pantalla de selección de piezas para que el usuario pueda agregar piezas a una lista
+         * @param pieza la pieza que se va a agregar
+         * @param cantidad la cantidad agregada
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        @Override
+        public void agregarPiezaSeleccionadaMantenimiento(PiezaDTO pieza, int cantidad) throws InventarioMantenimientoException {
+            if (cantidad <= 0) {
+                throw new InventarioMantenimientoException("La cantidad debe ser mayor a cero");
+            }
+            //Contará esto como lógica de negocio? lo veré mañana...
+            List<MantenimientoPiezaDTO> piezas = gestorMantenimiento.getPiezasSeleccionadas();
+            int cantidadTotalSolicitada = cantidad;
+            for (MantenimientoPiezaDTO mp : piezas) {
+                if (mp.getIdPieza() != null && mp.getIdPieza().equals(pieza.getIdPieza())) {
+                    cantidadTotalSolicitada += mp.getCantidad();
+                    break;
+                }
+            }
+            boolean suficiente = inventarioMantenimientoFachada.hayStockSuficiente(pieza.getIdPieza(),cantidadTotalSolicitada);
+            if (!suficiente) {
+                throw new InventarioMantenimientoException("No hay stock suficiente para la cantidad solicitada");
+            }
+            for (MantenimientoPiezaDTO mp : piezas) {
+                if (mp.getIdPieza() != null && mp.getIdPieza().equals(pieza.getIdPieza())) {
+                    mp.setCantidad(mp.getCantidad() + cantidad);
+                    return;
+                }
+            }
+            MantenimientoPiezaDTO nueva = new MantenimientoPiezaDTO();
+            nueva.setIdMantenimientoPiezaDTO(UUID.randomUUID().toString());
+            nueva.setIdPieza(pieza.getIdPieza());
+            nueva.setCantidad(cantidad);
+            piezas.add(nueva);
+        }
+        
+        /**
+         * Método que confirma la solicitud de mantenimiento
+         * @return el mantenimientoDTO creado
+         * @throws InventarioMantenimientoException si ocurre un error al crear la solicitud de mantenimiento
+         */
+        @Override
+        public MantenimientoDTO confirmarSolicitudMantenimiento() throws InventarioMantenimientoException {
+            MaquinaDTO maquina = gestorMantenimiento.getMaquinaSeleccionada();
+            TecnicoDTO tecnico = gestorMantenimiento.getTecnicoSeleccionado();
+            String descripcion = gestorMantenimiento.getDescripcionMantenimiento();
+            LocalDateTime fecha = gestorMantenimiento.getFechaProgramadaMantenimiento();
+            List<MantenimientoPiezaDTO> piezas = gestorMantenimiento.getPiezasSeleccionadas();
+            MantenimientoDTO mantenimiento = inventarioMantenimientoFachada.registrarSolicitudMantenimiento(maquina.getIdMaquina(),tecnico.getIdTecnico(),descripcion,fecha,piezas);
+            gestorMantenimiento.limpiar();
+            return mantenimiento;
+        }
+        
+        /**
+         * Método que obtiene las piezas necesarias para un mantenimiento
+         * @return una lista de piezas
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        @Override
+        public List<PiezaDTO> obtenerPiezasMantenimiento() throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.obtenerPiezas();
+        }
+
+        /**
+         * Método que obtiene las piezas seleccionadas de un mantenimiento
+         * @return una lista con dichas piezas
+         */
+        @Override
+        public List<MantenimientoPiezaDTO> obtenerPiezasSeleccionadasMantenimiento() {
+            return gestorMantenimiento.getPiezasSeleccionadas();
+        }
+
+        /**
+         * Método que limpia las piezas seleccionadas de un mantenimiento
+         */
+        @Override
+        public void limpiarPiezasSeleccionadasMantenimiento() {
+            gestorMantenimiento.limpiarPiezasSeleccionadas();
+        }
+        /**
+         * Método que filtra las máquinas
+         * @param idSucursal filtrado por sucursal
+         * @param estado filtrado por estado
+         * @return una lista con los filtros aplicados
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        @Override
+        public List<MaquinaDTO> filtrarMaquinasMantenimiento(String idSucursal, MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.filtrarMaquinas(idSucursal, estado);
+        }
+        
+        /**
+         * Método que prepara una máquina antes de iniciar la solicitud de mantenimiento
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        @Override
+        public void prepararProgramacionMantenimiento() throws InventarioMantenimientoException {
+            MaquinaDTO maquina = gestorMantenimiento.getMaquinaSeleccionada();
+
+            if (maquina == null) {
+                throw new InventarioMantenimientoException("Selecciona una máquina de la tabla antes de programar mantenimiento");
+            }
+            inventarioMantenimientoFachada.validarMaquinaParaProgramarMantenimiento(maquina.getIdMaquina());
+
+            irAProgramarMantenimiento();
+        }
+        /**
+         * Método que registra una máquina en la BD
+         * @param idSucursal la sucursal
+         * @param modelo el modelo de la máquina
+         * @param tipo el tipo de la máquina
+         * @param estado el estado de la máquina
+         * @return la máquina registrada
+         * @throws InventarioMantenimientoException si ocurre un error 
+         */
+        @Override
+        public MaquinaDTO registrarMaquinaInventario(String idSucursal,String modelo, String tipo, MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException {
+            return inventarioMantenimientoFachada.registrarMaquina(idSucursal,modelo,tipo,estado);
+        }
+        /**
+         * Método que actualiza una máquina en la BD
+         * @param idMaquina el id de la máquina
+         * @param idSucursal el id de la sucursal
+         * @param modelo el modelo
+         * @param tipo el tipo de la máquina
+         * @param estado el estado de la máquina
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        @Override
+        public void actualizarMaquinaInventario(String idMaquina,String idSucursal,String modelo,String tipo,MaquinaDTO.EstadoMaquinaDTO estado) throws InventarioMantenimientoException {
+            inventarioMantenimientoFachada.actualizarMaquina(idMaquina,idSucursal,modelo,tipo,estado);
+        }
+        /**
+         * Método que da de baja una máquina en el sistema
+         * @param idMaquina el id de la máquina a dar de baja
+         * @param motivo el motivo por el que se da de baja la máquina
+         * @throws InventarioMantenimientoException si ocurre un error
+         */
+        @Override
+        public void darBajaMaquinaInventario(String idMaquina,String motivo
+        ) throws InventarioMantenimientoException {
+            inventarioMantenimientoFachada.darBajaMaquina(idMaquina,motivo
+            );
+        }
+       
+        /**
+         * Método que viaja a la pantalla de agregarInventario
+         */
+        @Override
+        public void irAAgregarInventario() {
+            cerrarPantallas();
+            pantallaAgregarModificarInventario = new PantallaAgregarModificarInventario(this, false);
+            pantallaAgregarModificarInventario.setVisible(true);
+        }
+
+        /**
+         * Método que viaja a la pantalla de modificarInventario (es la misma que la de agregar pero recibiendo un true en su constructor)
+         */
+        @Override
+        public void irAModificarInventario() {
+            cerrarPantallas();
+            pantallaAgregarModificarInventario = new PantallaAgregarModificarInventario(this, true);
+        }
+
+        /**
+         * Método que viaja a la pantalla de eliminar máquina
+         */
+        @Override
+        public void irAEliminarInventario() {
+            cerrarPantallas();
+            pantallaEliminarInventario = new PantallaEliminarInventario(this);
+        }
+        /**
+         * Método que viaja a la pantalla de inventario de máquinas
+         */
+        @Override
+        public void irAInventarioMaquinas(){
+            cerrarPantallas();
+            pantallaInventarioMaquinas = new PantallaInventarioMaquinas(this);
+        }
+    //MÉTODOS DE INVENTARIO MANTENIMIENTO
+        
     /**
      * Cierra todas las pantallas que estén abiertas antes de mostrar una nueva.
      */
@@ -630,6 +932,30 @@ public class ControladorAplicacion implements IControladorAplicacion {
         if (pantallaExitosa != null) {
             pantallaExitosa.dispose();
             pantallaExitosa = null;
+        }
+        if(pantallaInventarioMantenimiento != null){
+           pantallaInventarioMantenimiento.dispose();
+           pantallaInventarioMantenimiento = null;
+        }
+        if(pantallaProgramarMantenimiento!= null){
+            pantallaProgramarMantenimiento.dispose();
+            pantallaProgramarMantenimiento = null;
+        }
+        if(pantallaSeleccionPiezasMantenimiento !=null){
+            pantallaSeleccionPiezasMantenimiento.dispose();
+            pantallaSeleccionPiezasMantenimiento = null;
+        }
+        if(pantallaAgregarModificarInventario !=null){
+            pantallaAgregarModificarInventario.dispose();
+            pantallaAgregarModificarInventario = null;
+        }
+        if(pantallaEliminarInventario !=null){
+            pantallaEliminarInventario.dispose();
+            pantallaEliminarInventario = null;
+        }
+        if(pantallaInventarioMaquinas != null){
+            pantallaInventarioMaquinas.dispose();
+            pantallaInventarioMaquinas = null;
         }
     }
 }
