@@ -59,12 +59,18 @@ public class PantallaBienvenida extends PantallaBase {
         
         Boton btnInicioSesion = crearBoton("Iniciar Sesión", Boton.Variante.PRIMARIO);
 //        Boton btnRegistro = crearBoton("Registrarse", Boton.Variante.SECUNDARIO);
+        Boton btnRecepcion = crearBoton("Recepción", Boton.Variante.SECUNDARIO);
+        btnRecepcion.setAlignmentX(CENTER_ALIGNMENT);
+        btnRecepcion.setMaximumSize(new Dimension(320, 52));
+        btnRecepcion.addActionListener(e -> controlador.irAInicioSesionRecepcion());
+
+// y en el card.add():
 
         btnInicioSesion.setAlignmentX(CENTER_ALIGNMENT);
 //        btnRegistro.setAlignmentX(CENTER_ALIGNMENT);
         btnInicioSesion.setMaximumSize(new Dimension(320, 52));
 //        btnRegistro.setMaximumSize(new Dimension(320, 52));
-
+        
         btnInicioSesion.addActionListener(e -> controlador.irAInicioSesion());
 
         card.add(icono);
@@ -77,7 +83,8 @@ public class PantallaBienvenida extends PantallaBase {
         card.add(btnInicioSesion);
         card.add(Box.createVerticalStrut(16));
 //        card.add(btnRegistro);
-        
+        card.add(btnRecepcion);
+        card.add(Box.createVerticalStrut(16));
         fondo.add(card);
     }
 }

@@ -5,8 +5,6 @@ import Fachada.FachadaControlAcceso;
 import Fachada.Icontrolacceso;
 import Fachada.Icontrolacceso.AccesoDenegadoException;
 import dtosControlDeAcceso.EntrenadorDTO;
-import dtosControlDeAcceso.EstadoEntrenador;
-import dtosControlDeAcceso.HorarioDTO;
 import dtosControlDeAcceso.ResultadoAccesoDTO;
 import Utilerias.Boton;
 import Utilerias.Colores;
@@ -17,7 +15,6 @@ import static java.awt.Component.CENTER_ALIGNMENT;
 import static java.awt.Component.LEFT_ALIGNMENT;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -30,13 +27,10 @@ import javax.swing.border.EmptyBorder;
  * EntrenadorDTO tiene: idEntrenador, nombre, estado (EstadoEntrenador), idSucursal.
  * estaDisponible() = estado == LIBRE.
  *
- * NOTA: EntrenadorDTO no tiene lista de horarios; la asignacion se hace
- *       llamando a asignarEntrenador(idVisita, idCliente, idEntrenador, null)
- *       ya que el horario lo gestiona el backend automaticamente.
+ * La fachada ya guarda el contexto de la visita activa (idVisita, idCliente).
+ * La pantalla solo pasa idEntrenador al solicitar — NO repite idVisita ni idCliente.
  */
 public class BC_PantallaEntrenadores extends PantallaBase {
-
-    private static final DateTimeFormatter FMT_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
     private final ResultadoAccesoDTO resultado;
     private final boolean planIncluyeEntrenador;
@@ -115,7 +109,7 @@ public class BC_PantallaEntrenadores extends PantallaBase {
             return;
         }
 
-        // Cargar entrenadores de la fachada
+        // Cargar entrenadores de la fachada (usa idSucursal del resultado)
         cargarEntrenadores();
 
         // Filtrar solo los LIBRES para mostrar en la lista
@@ -226,7 +220,7 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         panelBotones.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
         Boton btnSolicitar = crearBoton("SOLICITAR", Boton.Variante.PRIMARIO);
-        btnSolicitar.addActionListener(e -> procesarSolicitud(libres));
+        btnSolicitar.addActionListener(e -> procesarSolicitud());
 
         panelBotones.add(btnRegresar);
         panelBotones.add(btnSolicitar);
@@ -252,7 +246,6 @@ public class BC_PantallaEntrenadores extends PantallaBase {
 
     private void cargarEntrenadores() {
         try {
-            // Usa la sucursal que viene en el resultado del acceso
             entrenadores = controlAcceso.obtenerEntrenadoresDisponibles(resultado.getIdSucursal());
         } catch (AccesoDenegadoException ex) {
             entrenadores = new ArrayList<>();
@@ -267,7 +260,7 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         filas[index].setBackground(new Color(80, 60, 160));
     }
 
-    private void procesarSolicitud(List<EntrenadorDTO> libres) {
+    private void procesarSolicitud() {
         if (entrenadorSeleccionado == null) {
             JOptionPane.showMessageDialog(this,
                     "Por favor selecciona un entrenador.",
@@ -276,11 +269,9 @@ public class BC_PantallaEntrenadores extends PantallaBase {
         }
 
         try {
-            // asignarEntrenador(idVisita, idCliente, idEntrenador, idHorario)
-            // idHorario = null; el backend asigna el horario disponible automaticamente
+            // La fachada ya conoce idVisita e idCliente — solo pasamos idEntrenador e idHorario
+            // idHorario = null: el backend asigna el horario disponible automaticamente
             controlAcceso.asignarEntrenador(
-                    resultado.getIdVisita(),
-                    resultado.getIdCliente(),
                     entrenadorSeleccionado.getIdEntrenador(),
                     null);
 
