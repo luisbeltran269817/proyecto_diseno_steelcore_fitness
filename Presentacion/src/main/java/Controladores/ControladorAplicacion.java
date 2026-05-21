@@ -44,6 +44,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import ControladoresReportes.ControlReportes;
+import dtos.ClienteDTO;
 
 /**
  *
@@ -327,18 +328,36 @@ public class ControladorAplicacion implements IControladorAplicacion {
     @Override
     public void iniciarSesion(String correo, String contrasena) throws NegocioException {
         UsuarioDTO usuario;
+
         try {
             usuario = inicioSesionFachada.iniciarSesion(correo, contrasena);
         } catch (Exception ex) {
-            throw new NegocioException(ex.getMessage() != null ? ex.getMessage() : "Correo o contrasena incorrectos.");
+            throw new NegocioException(
+                    ex.getMessage() != null
+                    ? ex.getMessage()
+                    : "Correo o contraseña incorrectos."
+            );
         }
+
         gestor.setUsuarioActual(usuario);
-        try {
-            CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
-            gestor.setCitaBienvenida(cita);
-        } catch (NegocioException ex) {
-            // No bloquear el login si falla la consulta de cita
+
+        if (esAdminReportes(usuario)) {
+            irAAdministrarReportes();
+            return;
         }
+
+        if (usuario instanceof ClienteDTO) {
+            try {
+                CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
+                gestor.setCitaBienvenida(cita);
+            } catch (NegocioException ex) {
+                // No bloquear inicio de sesión si falla la consulta de la cita
+            }
+
+            irAPerfilUsuario();
+            return;
+        }
+
         irAPerfilUsuario();
     }
 
@@ -642,69 +661,18 @@ public class ControladorAplicacion implements IControladorAplicacion {
     }
 
     /**
-     * Verifica si el usuario que inició sesión debe entrar directamente al
-     * módulo de Administración Comercial y Reportes Financieros.
-     *
-     * En esta versión se valida por correo porque el administrador de reportes
-     * está definido en los datos mock del sistema.
+     * Verifica si el usuario autenticado corresponde al administrador de
+     * reportes.
      *
      * @param usuario usuario que inició sesión.
-     * @return true si el usuario debe entrar al módulo de reportes; false en
-     * caso contrario.
+     * @return true si debe entrar al módulo de reportes.
      */
-    private boolean esAdministradorReportes(UsuarioDTO usuario) {
+    private boolean esAdminReportes(UsuarioDTO usuario) {
         if (usuario == null || usuario.getCorreo() == null) {
             return false;
         }
 
         return usuario.getCorreo().equalsIgnoreCase("reportes@gmail.com");
-    }
-
-    /**
-     * Inicia sesión y redirige al usuario según su correo.
-     *
-     * Si el usuario corresponde al administrador de reportes, se abre
-     * directamente el módulo de Administración Comercial y Reportes
-     * Financieros. En caso contrario, se mantiene el flujo normal hacia el
-     * perfil de usuario.
-     *
-     * Este método permite agregar la redirección especial sin modificar el
-     * método iniciarSesion() original.
-     *
-     * @param correo correo ingresado por el usuario.
-     * @param contrasena contraseña ingresada por el usuario.
-     * @throws NegocioException si las credenciales son inválidas o ocurre un
-     * error al iniciar sesión.
-     */
-    @Override
-    public void iniciarSesionConRedireccion(String correo, String contrasena) throws NegocioException {
-        UsuarioDTO usuario;
-
-        try {
-            usuario = inicioSesionFachada.iniciarSesion(correo, contrasena);
-        } catch (Exception ex) {
-            throw new NegocioException(
-                    ex.getMessage() != null
-                    ? ex.getMessage()
-                    : "Correo o contraseña incorrectos."
-            );
-        }
-
-        gestor.setUsuarioActual(usuario);
-
-        if (esAdministradorReportes(usuario)) {
-            irAAdministrarReportes();
-            return;
-        }
-
-        try {
-            CitaDTO cita = compraFachada.obtenerCitaBienvenida(usuario.getCorreo());
-            gestor.setCitaBienvenida(cita);
-        } catch (NegocioException ex) {
-            // No bloquear el login si falla la consulta de cita
-        }
-
-        irAPerfilUsuario();
     }
 
 }

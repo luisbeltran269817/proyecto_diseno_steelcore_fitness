@@ -261,8 +261,7 @@ public class DatosPruebaMongo {
 
         MongoCollection<Document> colClientes = bd.getCollection("clientes");
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente));
-       
-        
+
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(clienteReporte));
         /*
          * =========================

@@ -185,10 +185,22 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
 
         agregarFila(tabla, "Fecha inicio", fechaInicio);
         agregarFila(tabla, "Fecha fin", fechaFin);
-        agregarFila(tabla, "Sucursal", filtros != null ? valor(filtros.getSucursal()) : "Todos");
-        agregarFila(tabla, "Membresía", filtros != null ? valor(filtros.getTipoMembresia()) : "Todos");
-        agregarFila(tabla, "Entrenador", filtros != null ? valor(filtros.getEntrenador()) : "Todos");
-        agregarFila(tabla, "Amenidad", filtros != null ? valor(filtros.getAmenidad()) : "Todos");
+
+        if (usaSucursal(reporte)) {
+            agregarFila(tabla, "Sucursal", filtros != null ? valor(filtros.getSucursal()) : "Todos");
+        }
+
+        if (usaTipoMembresia(reporte)) {
+            agregarFila(tabla, "Membresía", filtros != null ? valor(filtros.getTipoMembresia()) : "Todos");
+        }
+
+        if (usaEntrenador(reporte)) {
+            agregarFila(tabla, "Entrenador", filtros != null ? valor(filtros.getEntrenador()) : "Todos");
+        }
+
+        if (usaAmenidad(reporte)) {
+            agregarFila(tabla, "Amenidad", filtros != null ? valor(filtros.getAmenidad()) : "Todos");
+        }
 
         document.add(tabla);
     }
@@ -203,7 +215,7 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
     private void agregarMetricas(Document document, ReporteDTO reporte) throws Exception {
         MetricasReporteDTO metricas = obtenerMetricas(reporte);
 
-        Paragraph titulo = crearTituloSeccion("Métricas principales");
+        Paragraph titulo = crearTituloSeccion(obtenerTituloMetricas(reporte));
         titulo.setSpacingBefore(18);
         document.add(titulo);
 
@@ -211,10 +223,43 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
         tabla.setWidthPercentage(100);
         tabla.setWidths(new float[]{50, 50});
 
-        agregarFila(tabla, "Ingresos totales", "$" + metricas.getTotalIngresos());
-        agregarFila(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()));
-        agregarFila(tabla, "Renovaciones", String.valueOf(metricas.getRenovaciones()));
-        agregarFila(tabla, "Nuevos socios", String.valueOf(metricas.getNuevosSocios()));
+        switch (obtenerTipoReporte(reporte)) {
+            case VENTAS_MEMBRESIAS:
+                agregarFila(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()));
+                agregarFila(tabla, "Plan más vendido", valor(metricas.getTipoMembresiaMasVendida()));
+                agregarFila(tabla, "Sucursal con más ventas", valor(metricas.getSucursalConMasVentas()));
+                agregarFila(tabla, "Ingresos por ventas", "$" + metricas.getTotalIngresos());
+                break;
+
+            case INGRESOS:
+                agregarFila(tabla, "Ingresos totales", "$" + metricas.getTotalIngresos());
+                agregarFila(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()));
+                agregarFila(tabla, "Plan con mayor ingreso", valor(metricas.getTipoMembresiaMasVendida()));
+                agregarFila(tabla, "Amenidad destacada", valor(metricas.getAmenidadMasSolicitada()));
+                break;
+
+            case POR_SUCURSAL:
+                agregarFila(tabla, "Sucursal con más ventas", valor(metricas.getSucursalConMasVentas()));
+                agregarFila(tabla, "Ingresos generados", "$" + metricas.getTotalIngresos());
+                agregarFila(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()));
+                agregarFila(tabla, "Plan más vendido", valor(metricas.getTipoMembresiaMasVendida()));
+                break;
+
+            case DESEMPENO_ENTRENADORES:
+                agregarFila(tabla, "Entrenador destacado", valor(metricas.getEntrenadorConMasClientes()));
+                agregarFila(tabla, "Sucursal relacionada", valor(metricas.getSucursalConMasVentas()));
+                agregarFila(tabla, "Amenidad relacionada", valor(metricas.getAmenidadMasSolicitada()));
+                agregarFila(tabla, "Base de análisis", "Citas confirmadas/completadas");
+                break;
+
+            case GENERAL:
+            default:
+                agregarFila(tabla, "Ingresos totales", "$" + metricas.getTotalIngresos());
+                agregarFila(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()));
+                agregarFila(tabla, "Renovaciones", String.valueOf(metricas.getRenovaciones()));
+                agregarFila(tabla, "Nuevos socios", String.valueOf(metricas.getNuevosSocios()));
+                break;
+        }
 
         document.add(tabla);
     }
@@ -229,7 +274,7 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
     private void agregarIndicadores(Document document, ReporteDTO reporte) throws Exception {
         MetricasReporteDTO metricas = obtenerMetricas(reporte);
 
-        Paragraph titulo = crearTituloSeccion("Indicadores destacados");
+        Paragraph titulo = crearTituloSeccion("Indicadores del reporte");
         titulo.setSpacingBefore(18);
         document.add(titulo);
 
@@ -237,10 +282,37 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
         tabla.setWidthPercentage(100);
         tabla.setWidths(new float[]{45, 55});
 
-        agregarFila(tabla, "Sucursal con más ventas", valor(metricas.getSucursalConMasVentas()));
-        agregarFila(tabla, "Entrenador con más clientes", valor(metricas.getEntrenadorConMasClientes()));
-        agregarFila(tabla, "Amenidad más solicitada", valor(metricas.getAmenidadMasSolicitada()));
-        agregarFila(tabla, "Membresía más vendida", valor(metricas.getTipoMembresiaMasVendida()));
+        switch (obtenerTipoReporte(reporte)) {
+            case VENTAS_MEMBRESIAS:
+                agregarFila(tabla, "Plan más vendido", valor(metricas.getTipoMembresiaMasVendida()));
+                agregarFila(tabla, "Sucursal con más ventas", valor(metricas.getSucursalConMasVentas()));
+                break;
+
+            case INGRESOS:
+                agregarFila(tabla, "Principal fuente comercial", valor(metricas.getTipoMembresiaMasVendida()));
+                agregarFila(tabla, "Amenidad con mayor presencia", valor(metricas.getAmenidadMasSolicitada()));
+                break;
+
+            case POR_SUCURSAL:
+                agregarFila(tabla, "Sucursal mejor posicionada", valor(metricas.getSucursalConMasVentas()));
+                agregarFila(tabla, "Membresía más vendida", valor(metricas.getTipoMembresiaMasVendida()));
+                agregarFila(tabla, "Amenidad más solicitada", valor(metricas.getAmenidadMasSolicitada()));
+                break;
+
+            case DESEMPENO_ENTRENADORES:
+                agregarFila(tabla, "Entrenador con más clientes", valor(metricas.getEntrenadorConMasClientes()));
+                agregarFila(tabla, "Sucursal relacionada", valor(metricas.getSucursalConMasVentas()));
+                agregarFila(tabla, "Amenidad relacionada", valor(metricas.getAmenidadMasSolicitada()));
+                break;
+
+            case GENERAL:
+            default:
+                agregarFila(tabla, "Sucursal con más ventas", valor(metricas.getSucursalConMasVentas()));
+                agregarFila(tabla, "Entrenador con más clientes", valor(metricas.getEntrenadorConMasClientes()));
+                agregarFila(tabla, "Amenidad más solicitada", valor(metricas.getAmenidadMasSolicitada()));
+                agregarFila(tabla, "Membresía más vendida", valor(metricas.getTipoMembresiaMasVendida()));
+                break;
+        }
 
         document.add(tabla);
     }
@@ -268,12 +340,41 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
         tabla.setWidths(new float[]{40, 30, 30});
 
         agregarCeldaHeader(tabla, "Concepto");
-        agregarCeldaHeader(tabla, "Cantidad");
+        agregarCeldaHeader(tabla, "Dato");
         agregarCeldaHeader(tabla, "Resultado");
 
-        agregarFilaDetalle(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()), "$" + metricas.getTotalIngresos());
-        agregarFilaDetalle(tabla, "Renovaciones", String.valueOf(metricas.getRenovaciones()), "Registradas");
-        agregarFilaDetalle(tabla, "Nuevos socios", String.valueOf(metricas.getNuevosSocios()), "Registrados");
+        switch (obtenerTipoReporte(reporte)) {
+            case VENTAS_MEMBRESIAS:
+                agregarFilaDetalle(tabla, "Ventas de membresías", String.valueOf(metricas.getMembresiasVendidas()), "Membresías registradas");
+                agregarFilaDetalle(tabla, "Plan más vendido", valor(metricas.getTipoMembresiaMasVendida()), "Mayor demanda");
+                agregarFilaDetalle(tabla, "Sucursal destacada", valor(metricas.getSucursalConMasVentas()), "Mayor venta");
+                break;
+
+            case INGRESOS:
+                agregarFilaDetalle(tabla, "Ingresos totales", "$" + metricas.getTotalIngresos(), "Ingresos del periodo");
+                agregarFilaDetalle(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()), "Ventas asociadas");
+                agregarFilaDetalle(tabla, "Amenidad destacada", valor(metricas.getAmenidadMasSolicitada()), "Mayor presencia");
+                break;
+
+            case POR_SUCURSAL:
+                agregarFilaDetalle(tabla, "Sucursal líder", valor(metricas.getSucursalConMasVentas()), "Mejor desempeño");
+                agregarFilaDetalle(tabla, "Ingresos generados", "$" + metricas.getTotalIngresos(), "Total del periodo");
+                agregarFilaDetalle(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()), "Volumen comercial");
+                break;
+
+            case DESEMPENO_ENTRENADORES:
+                agregarFilaDetalle(tabla, "Entrenador destacado", valor(metricas.getEntrenadorConMasClientes()), "Mayor atención");
+                agregarFilaDetalle(tabla, "Sucursal relacionada", valor(metricas.getSucursalConMasVentas()), "Ubicación asociada");
+                agregarFilaDetalle(tabla, "Base de medición", "Citas", "Confirmadas/completadas");
+                break;
+
+            case GENERAL:
+            default:
+                agregarFilaDetalle(tabla, "Membresías vendidas", String.valueOf(metricas.getMembresiasVendidas()), "$" + metricas.getTotalIngresos());
+                agregarFilaDetalle(tabla, "Renovaciones", String.valueOf(metricas.getRenovaciones()), "Registradas");
+                agregarFilaDetalle(tabla, "Nuevos socios", String.valueOf(metricas.getNuevosSocios()), "Registrados");
+                break;
+        }
 
         document.add(tabla);
     }
@@ -474,6 +575,64 @@ public class GeneradorPDFReporte implements IGeneradorPDFReporte {
                 return "Reporte de Desempeño de Entrenadores";
             default:
                 return "Reporte General";
+        }
+    }
+
+    private TipoReporteDTO obtenerTipoReporte(ReporteDTO reporte) {
+        if (reporte == null || reporte.getTipoReporte() == null) {
+            return TipoReporteDTO.GENERAL;
+        }
+
+        return reporte.getTipoReporte();
+    }
+
+    private boolean usaSucursal(ReporteDTO reporte) {
+        TipoReporteDTO tipo = obtenerTipoReporte(reporte);
+
+        return tipo == TipoReporteDTO.GENERAL
+                || tipo == TipoReporteDTO.VENTAS_MEMBRESIAS
+                || tipo == TipoReporteDTO.INGRESOS
+                || tipo == TipoReporteDTO.DESEMPENO_ENTRENADORES;
+    }
+
+    private boolean usaTipoMembresia(ReporteDTO reporte) {
+        TipoReporteDTO tipo = obtenerTipoReporte(reporte);
+
+        return tipo == TipoReporteDTO.GENERAL
+                || tipo == TipoReporteDTO.VENTAS_MEMBRESIAS
+                || tipo == TipoReporteDTO.INGRESOS
+                || tipo == TipoReporteDTO.POR_SUCURSAL;
+    }
+
+    private boolean usaEntrenador(ReporteDTO reporte) {
+        TipoReporteDTO tipo = obtenerTipoReporte(reporte);
+
+        return tipo == TipoReporteDTO.GENERAL
+                || tipo == TipoReporteDTO.DESEMPENO_ENTRENADORES;
+    }
+
+    private boolean usaAmenidad(ReporteDTO reporte) {
+        TipoReporteDTO tipo = obtenerTipoReporte(reporte);
+
+        return tipo == TipoReporteDTO.GENERAL
+                || tipo == TipoReporteDTO.INGRESOS
+                || tipo == TipoReporteDTO.POR_SUCURSAL
+                || tipo == TipoReporteDTO.DESEMPENO_ENTRENADORES;
+    }
+
+    private String obtenerTituloMetricas(ReporteDTO reporte) {
+        switch (obtenerTipoReporte(reporte)) {
+            case VENTAS_MEMBRESIAS:
+                return "Métricas de ventas de membresías";
+            case INGRESOS:
+                return "Métricas de ingresos";
+            case POR_SUCURSAL:
+                return "Métricas por sucursal";
+            case DESEMPENO_ENTRENADORES:
+                return "Métricas de desempeño de entrenadores";
+            case GENERAL:
+            default:
+                return "Métricas generales";
         }
     }
 }

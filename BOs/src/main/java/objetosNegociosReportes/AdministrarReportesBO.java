@@ -558,7 +558,11 @@ public class AdministrarReportesBO implements IAdministrarReportesBO {
      * @throws NegocioException si ocurre un error al consultar información.
      */
     private MetricasReporteDTO calcularReporteIngresos(FiltrosReporteDTO filtros) throws NegocioException {
-        return calcularMetricasDesdeMembresias(filtros);
+        MetricasReporteDTO metricas = calcularMetricasDesdeMembresias(filtros);
+
+        metricas.setEntrenadorConMasClientes("No aplica");
+
+        return metricas;
     }
 
     /**
@@ -569,7 +573,11 @@ public class AdministrarReportesBO implements IAdministrarReportesBO {
      * @throws NegocioException si ocurre un error al consultar información.
      */
     private MetricasReporteDTO calcularReportePorSucursal(FiltrosReporteDTO filtros) throws NegocioException {
-        return calcularMetricasDesdeMembresias(filtros);
+        MetricasReporteDTO metricas = calcularMetricasDesdeMembresias(filtros);
+
+        metricas.setEntrenadorConMasClientes("No aplica");
+
+        return metricas;
     }
 
     /**
@@ -593,6 +601,7 @@ public class AdministrarReportesBO implements IAdministrarReportesBO {
 
         if (citas == null || citas.isEmpty()) {
             metricas.setEntrenadorConMasClientes("Sin datos");
+            metricas.setTipoMembresiaMasVendida("No aplica");
             return metricas;
         }
 
@@ -619,6 +628,7 @@ public class AdministrarReportesBO implements IAdministrarReportesBO {
 
         if (idEntrenadorMasClientes.equals("Sin datos")) {
             metricas.setEntrenadorConMasClientes("Sin datos");
+            metricas.setTipoMembresiaMasVendida("No aplica");
             return metricas;
         }
 
@@ -630,33 +640,9 @@ public class AdministrarReportesBO implements IAdministrarReportesBO {
                 nombreEntrenador + " (" + clientesAtendidos + " clientes, " + citasImpartidas + " citas)"
         );
 
+        metricas.setTipoMembresiaMasVendida("No aplica");
+
         return metricas;
-    }
-
-    /**
-     * Obtiene el id del entrenador con mayor cantidad de clientes únicos.
-     *
-     * @param clientesPorEntrenador mapa con clientes únicos por entrenador.
-     * @return id del entrenador con más clientes o "Sin datos".
-     */
-    private String obtenerEntrenadorConMasClientes(Map<String, Set<String>> clientesPorEntrenador) {
-        if (clientesPorEntrenador == null || clientesPorEntrenador.isEmpty()) {
-            return "Sin datos";
-        }
-
-        String idMayor = null;
-        int mayorCantidad = -1;
-
-        for (Map.Entry<String, Set<String>> entry : clientesPorEntrenador.entrySet()) {
-            int cantidad = entry.getValue() != null ? entry.getValue().size() : 0;
-
-            if (cantidad > mayorCantidad) {
-                mayorCantidad = cantidad;
-                idMayor = entry.getKey();
-            }
-        }
-
-        return idMayor != null ? idMayor : "Sin datos";
     }
 
     /**
@@ -784,6 +770,39 @@ public class AdministrarReportesBO implements IAdministrarReportesBO {
         filtros.setFechaFin(hoy.withDayOfMonth(hoy.lengthOfMonth()));
 
         return calcularReporteGeneral(filtros);
+    }
+
+    /**
+     * Obtiene el id del entrenador con mayor cantidad de clientes únicos.
+     *
+     * Este método recibe un mapa donde la clave es el id del entrenador y el
+     * valor es un conjunto de ids de clientes atendidos por ese entrenador. Al
+     * usar Set, se evita contar dos veces al mismo cliente.
+     *
+     * @param clientesPorEntrenador mapa con clientes únicos por entrenador.
+     * @return id del entrenador con más clientes o "Sin datos" si no hay
+     * información.
+     */
+    private String obtenerEntrenadorConMasClientes(Map<String, Set<String>> clientesPorEntrenador) {
+        if (clientesPorEntrenador == null || clientesPorEntrenador.isEmpty()) {
+            return "Sin datos";
+        }
+
+        String idEntrenadorMayor = null;
+        int mayorCantidadClientes = -1;
+
+        for (Map.Entry<String, Set<String>> entry : clientesPorEntrenador.entrySet()) {
+            Set<String> clientes = entry.getValue();
+
+            int cantidadClientes = clientes != null ? clientes.size() : 0;
+
+            if (cantidadClientes > mayorCantidadClientes) {
+                mayorCantidadClientes = cantidadClientes;
+                idEntrenadorMayor = entry.getKey();
+            }
+        }
+
+        return idEntrenadorMayor != null ? idEntrenadorMayor : "Sin datos";
     }
 
 }

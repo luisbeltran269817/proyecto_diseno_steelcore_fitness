@@ -434,5 +434,4 @@ public interface IControladorAplicacion {
      */
     void irAAdministrarReportes();
 
-    void iniciarSesionConRedireccion(String correo, String contrasena) throws NegocioException;
 }
