@@ -4,7 +4,6 @@
  */
 package objetosnegocios;
 
-import DAOs.AmenidadDAO;
 import DAOs.SucursalDAO;
 import dominios.AmenidadPojo;
 import dominios.SucursalPojo;
@@ -12,7 +11,6 @@ import dtos.AmenidadDTO;
 import excepciones.PersistenciaException;
 import interfaces.IAmenidadBO;
 import java.util.List;
-import interfaces.IAmenidadDAO;
 import interfaces.ISucursalDAO;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -1,16 +1,24 @@
 package Fachada;
 
 import Control.ControlAcceso;
-import Excepciones.NegocioException;
-import com.sun.net.httpserver.HttpServer;
+import dtosControlDeAcceso.ClaseDTO;
+import dtosControlDeAcceso.EntrenadorDTO;
+import dtosControlDeAcceso.ResultadoAccesoDTO;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.List;
+import com.sun.net.httpserver.HttpServer;
 
 /**
+ * Fachada del subsistema Control de Acceso.
+ *
+ * Es el único punto de entrada para la capa de presentación.
+ * Delega toda la lógica al ControlAcceso; solo traduce excepciones y
+ * gestiona el servidor HTTP del QR.
  *
  * @author julian izaguirre
  */
@@ -26,6 +34,7 @@ public class FachadaControlAcceso implements Icontrolacceso {
         this.control = new ControlAcceso();
     }
 
+    /** Singleton — una sola instancia por JVM (módulo de recepción). */
     public static FachadaControlAcceso getInstancia() {
         if (instancia == null) {
             instancia = new FachadaControlAcceso();
@@ -33,21 +42,68 @@ public class FachadaControlAcceso implements Icontrolacceso {
         return instancia;
     }
 
+    /**
+     * Configura la sucursal donde está instalado este módulo de recepción.
+     * Si se configura, el sistema valida que la membresía del socio
+     * pertenezca a esa sucursal antes de dar acceso.
+     *
+     * @param idSucursal id de la sucursal (ej. "S001")
+     */
     public void configurarSucursal(String idSucursal) {
         control.setIdSucursalLocal(idSucursal);
     }
-    
-    //Mnechacaaaaaaaaaaaaaaaaaa
+
+    // -----------------------------------------------------------------
+    //  Métodos de la interfaz Icontrolacceso
+    // -----------------------------------------------------------------
+
     @Override
     public ResultadoAccesoDTO procesarQR(String codigoQR) throws AccesoDenegadoException {
-        try {
-            return control.procesarQR(codigoQR);
-        } catch (NegocioException ex) {
-            System.getLogger(FachadaControlAcceso.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        }
-        return null;
+        return control.procesarQR(codigoQR);
     }
 
+    @Override
+    public void registrarAreaGeneral(String idVisita) throws AccesoDenegadoException {
+        control.registrarAreaGeneral(idVisita);
+    }
+
+    @Override
+    public List<EntrenadorDTO> obtenerEntrenadoresDisponibles(String idSucursal)
+            throws AccesoDenegadoException {
+        return control.obtenerEntrenadoresDisponibles(idSucursal);
+    }
+
+    @Override
+    public void asignarEntrenador(String idVisita, String idCliente,
+                                   String idEntrenador, String idHorario)
+            throws AccesoDenegadoException {
+        control.asignarEntrenador(idVisita, idCliente, idEntrenador, idHorario);
+    }
+
+    @Override
+    public List<ClaseDTO> obtenerClasesPorPlan(String idSucursal, String idPlan,
+                                                String idCliente, boolean incluyeClases)
+            throws AccesoDenegadoException {
+        return control.obtenerClasesPorPlan(idSucursal, idPlan, idCliente, incluyeClases);
+    }
+
+    @Override
+    public void inscribirClase(String idVisita, String idClase, String idCliente)
+            throws AccesoDenegadoException {
+        control.inscribirClase(idVisita, idClase, idCliente);
+    }
+
+    // -----------------------------------------------------------------
+    //  Servidor HTTP local para mostrar el QR en pantalla
+    // -----------------------------------------------------------------
+
+    /**
+     * Levanta un servidor HTTP en el puerto 8787 que sirve el QR como imagen PNG.
+     * El celular del socio apunta a la URL para escanear.
+     *
+     * @param qrPng bytes PNG del código QR generado
+     * @return URL completa donde se sirve el QR, o null si falló al iniciar
+     */
     public String iniciarServidorQR(byte[] qrPng) {
         detenerServidorQR();
         try {
@@ -81,7 +137,7 @@ public class FachadaControlAcceso implements Icontrolacceso {
             servidorQR.setExecutor(null);
             servidorQR.start();
 
-            String ip = obtenerIPLocal();
+            String ip  = obtenerIPLocal();
             String url = "http://" + ip + ":" + PUERTO_QR;
             System.out.println("[QR-Server] " + url);
             return url;
@@ -92,6 +148,7 @@ public class FachadaControlAcceso implements Icontrolacceso {
         }
     }
 
+    /** Detiene el servidor HTTP del QR si estaba activo. */
     public void detenerServidorQR() {
         if (servidorQR != null) {
             servidorQR.stop(0);
@@ -99,6 +156,12 @@ public class FachadaControlAcceso implements Icontrolacceso {
         }
     }
 
+    /**
+     * Intenta obtener los bytes del QR desde el servidor local.
+     * Útil cuando la pantalla de espera quiere mostrar el QR en el visor.
+     *
+     * @return bytes PNG del QR, o null si el servidor no está activo
+     */
     public byte[] obtenerQRDelServidor() {
         try {
             java.net.URL url = new java.net.URL("http://localhost:" + PUERTO_QR + "/qr");
@@ -108,10 +171,11 @@ public class FachadaControlAcceso implements Icontrolacceso {
             if (conn.getResponseCode() == 200) {
                 return conn.getInputStream().readAllBytes();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignorada) {}
         return null;
     }
 
+    /** Detecta la IP local (IPv4, ignora loopback) para construir la URL del QR. */
     private String obtenerIPLocal() {
         try {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
@@ -126,7 +190,7 @@ public class FachadaControlAcceso implements Icontrolacceso {
                     }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignorada) {}
         return "localhost";
     }
 }

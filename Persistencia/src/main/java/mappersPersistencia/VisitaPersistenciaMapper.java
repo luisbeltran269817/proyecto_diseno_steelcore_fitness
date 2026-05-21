@@ -7,6 +7,7 @@ package mappersPersistencia;
 import dominios.VisitaPojo;
 import java.time.LocalDateTime;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 /**
  *
@@ -22,7 +23,14 @@ public class VisitaPersistenciaMapper {
 
         Document doc = new Document();
 
-        doc.append("_id", pojo.getIdVisita());
+        // Si no viene EL id 
+        // generamos uno nuevo para evitar _id null duplicado en MongoDB
+        String idVisita = pojo.getIdVisita();
+        if (idVisita == null || idVisita.isBlank()) {
+            idVisita = new ObjectId().toHexString();
+            pojo.setIdVisita(idVisita);
+        }
+        doc.append("_id", idVisita);
         doc.append("idCliente", pojo.getIdCliente());
         doc.append("idSucursal", pojo.getIdSucursal());
 

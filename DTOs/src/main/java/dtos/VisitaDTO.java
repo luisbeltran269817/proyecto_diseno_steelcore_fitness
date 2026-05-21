@@ -12,19 +12,28 @@ import java.time.LocalDateTime;
  */
 public class VisitaDTO {
     private String idVisita;
-    private String gimnasio;
+    private String idSocio;  
+    private String idCliente;
     private LocalDateTime fechaHora;
+    private String idSucursal;
+    private String tipoServicio;
+    private String idRecursoAsignado;
+    private String gimnasio;
     private String calle;
     private String colonia;
     private String ciudad;
 
-    public VisitaDTO(String idVisita, String gimnasio, LocalDateTime fechaHora, String calle, String colonia, String ciudad) {
+    public VisitaDTO(String idVisita, String idSocio, String idCliente, LocalDateTime fechaHora, String idSucursal, String tipoServicio, String idRecursoAsignado) {
         this.idVisita = idVisita;
-        this.gimnasio = gimnasio;
+        this.idSocio = idSocio;
+        this.idCliente = idCliente;
         this.fechaHora = fechaHora;
-        this.calle = calle;
-        this.colonia = colonia;
-        this.ciudad = ciudad;
+        this.idSucursal = idSucursal;
+        this.tipoServicio = tipoServicio;
+        this.idRecursoAsignado = idRecursoAsignado;
+    }
+
+    public VisitaDTO() {
     }
 
     public String getIdVisita() {
@@ -34,13 +43,21 @@ public class VisitaDTO {
     public void setIdVisita(String idVisita) {
         this.idVisita = idVisita;
     }
-    
-    public String getGimnasio() {
-        return gimnasio;
+
+    public String getIdSocio() {
+        return idSocio;
     }
-    
-    public void setGimnasio(String gimnasio) {
-        this.gimnasio = gimnasio;
+
+    public void setIdSocio(String idSocio) {
+        this.idSocio = idSocio;
+    }
+
+    public String getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(String idCliente) {
+        this.idCliente = idCliente;
     }
 
     public LocalDateTime getFechaHora() {
@@ -49,6 +66,38 @@ public class VisitaDTO {
 
     public void setFechaHora(LocalDateTime fechaHora) {
         this.fechaHora = fechaHora;
+    }
+
+    public String getIdSucursal() {
+        return idSucursal;
+    }
+
+    public void setIdSucursal(String idSucursal) {
+        this.idSucursal = idSucursal;
+    }
+
+    public String getTipoServicio() {
+        return tipoServicio;
+    }
+
+    public void setTipoServicio(String tipoServicio) {
+        this.tipoServicio = tipoServicio;
+    }
+
+    public String getIdRecursoAsignado() {
+        return idRecursoAsignado;
+    }
+
+    public void setIdRecursoAsignado(String idRecursoAsignado) {
+        this.idRecursoAsignado = idRecursoAsignado;
+    }
+
+    public String getGimnasio() {
+        return gimnasio;
+    }
+
+    public void setGimnasio(String gimnasio) {
+        this.gimnasio = gimnasio;
     }
 
     public String getCalle() {
@@ -73,9 +122,6 @@ public class VisitaDTO {
 
     public void setCiudad(String ciudad) {
         this.ciudad = ciudad;
-    }
-
-    public VisitaDTO() {
     }
     
     

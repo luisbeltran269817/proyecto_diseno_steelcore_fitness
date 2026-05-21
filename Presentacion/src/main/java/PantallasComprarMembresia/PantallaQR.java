@@ -1,6 +1,11 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package PantallasComprarMembresia;
 
 import Controladores.IControladorAplicacion;
+import ControlDeAcceso.BC_PantallaEspera;
 import Excepciones.NegocioException;
 import Utilerias.Boton;
 import Utilerias.Colores;
@@ -18,18 +23,25 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Pantalla que muestra el código QR de la membresía activa del socio.
- * El socio la abre y pone la pantalla frente al scanner de recepción.
+ * Pantalla que muestra el codigo QR de la membresia activa del socio.
  * 
- * @author julian izaguirre 
+ * @author julian izaguirre
  */
 public class PantallaQR extends PantallaBase {
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private final boolean desdeRecepcion;
+
+
     public PantallaQR(IControladorAplicacion controlador) {
+        this(controlador, false);
+    }
+
+    public PantallaQR(IControladorAplicacion controlador, boolean desdeRecepcion) {
         super(controlador);
-        setTitle("Tu Membresía - SteelCore Fitness");
+        this.desdeRecepcion = desdeRecepcion;
+        setTitle("Tu Membresia - SteelCore Fitness");
         inicializarComponentes();
         setVisible(true);
     }
@@ -44,12 +56,12 @@ public class PantallaQR extends PantallaBase {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(new EmptyBorder(36, 48, 36, 48));
 
-        JLabel titulo = new JLabel("¡Escanéame!", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("Escanéame!", SwingConstants.CENTER);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 26));
         titulo.setForeground(Colores.TEXTO_PRINCIPAL);
         titulo.setAlignmentX(CENTER_ALIGNMENT);
 
-        JLabel sub = new JLabel("Usa este código para acceder al gimnasio", SwingConstants.CENTER);
+        JLabel sub = new JLabel("Usa este codigo para acceder al gimnasio", SwingConstants.CENTER);
         sub.setFont(Colores.FUENTE_LABEL);
         sub.setForeground(Colores.TEXTO_SECUNDARIO);
         sub.setAlignmentX(CENTER_ALIGNMENT);
@@ -59,8 +71,7 @@ public class PantallaQR extends PantallaBase {
         JPanel qrPanel = crearQRPanel(m);
         qrPanel.setAlignmentX(CENTER_ALIGNMENT);
 
-        // ── Código copiable ────────────────────────────────────────────────
-        // CORRECCIÓN: cambiado de JLabel (no seleccionable) a JTextField (seleccionable y copiable)
+        // Campo copiable con el codigo QR
         String codigoQR = (m != null && m.getCodigoQR() != null) ? m.getCodigoQR() : "";
 
         JTextField txtCodigo = new JTextField(codigoQR);
@@ -68,13 +79,12 @@ public class PantallaQR extends PantallaBase {
         txtCodigo.setForeground(Colores.TEXTO_SECUNDARIO);
         txtCodigo.setBackground(Colores.FONDO_CAMPO);
         txtCodigo.setCaretColor(Colores.TEXTO_SECUNDARIO);
-        txtCodigo.setEditable(false); // solo lectura, pero seleccionable
+        txtCodigo.setEditable(false);
         txtCodigo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Colores.BORDE_CAMPO, 1, true),
                 new EmptyBorder(6, 10, 6, 10)));
         txtCodigo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         txtCodigo.setAlignmentX(CENTER_ALIGNMENT);
-        // Seleccionar todo al hacer clic → facilita Ctrl+C
         txtCodigo.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -82,8 +92,7 @@ public class PantallaQR extends PantallaBase {
             }
         });
 
-        // Botón copiar
-        JButton btnCopiar = new JButton("📋 Copiar código");
+        JButton btnCopiar = new JButton("Copiar codigo");
         btnCopiar.setFont(Colores.FUENTE_LABEL);
         btnCopiar.setForeground(Colores.TEXTO_PRINCIPAL);
         btnCopiar.setBackground(new Color(60, 60, 100));
@@ -98,8 +107,8 @@ public class PantallaQR extends PantallaBase {
                 Toolkit.getDefaultToolkit()
                         .getSystemClipboard()
                         .setContents(new StringSelection(codigoQR), null);
-                btnCopiar.setText("✅ Copiado");
-                Timer t = new Timer(2000, ev -> btnCopiar.setText("📋 Copiar código"));
+                btnCopiar.setText("Copiado");
+                Timer t = new Timer(2000, ev -> btnCopiar.setText("Copiar codigo"));
                 t.setRepeats(false);
                 t.start();
             }
@@ -112,11 +121,19 @@ public class PantallaQR extends PantallaBase {
         JPanel infoPanel = crearPanelInfo(m);
         infoPanel.setAlignmentX(CENTER_ALIGNMENT);
 
-        Boton btnVolver = crearBoton("Volver al inicio", Boton.Variante.PRIMARIO);
+        String textoVolver = desdeRecepcion ? "Volver a Recepcion" : "Volver al inicio";
+        Boton btnVolver = crearBoton(textoVolver, Boton.Variante.PRIMARIO);
         btnVolver.setAlignmentX(CENTER_ALIGNMENT);
         btnVolver.addActionListener(e -> {
             controlador.detenerServidorQR();
-            controlador.irAPerfilUsuario();
+            dispose();
+            if (desdeRecepcion) {
+                // Regresa al Modulo de Recepcion para seguir atendiendo socios
+                new BC_PantallaEspera(controlador).setVisible(true);
+            } else {
+                // Regresa al perfil del socio (flujo normal de compra/app)
+                controlador.irAPerfilUsuario();
+            }
         });
 
         card.add(titulo);
@@ -155,7 +172,7 @@ public class PantallaQR extends PantallaBase {
         panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         if (m == null || m.getIdMembresia() == null) {
-            panel.add(etiquetaError("Membresía no disponible"), BorderLayout.CENTER);
+            panel.add(etiquetaError("Membresia no disponible"), BorderLayout.CENTER);
             return panel;
         }
 
@@ -165,7 +182,7 @@ public class PantallaQR extends PantallaBase {
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(
                     this,
-                    "No fue posible generar el código QR.",
+                    "No fue posible generar el codigo QR.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
             panel.add(etiquetaError("Error al generar el QR"), BorderLayout.CENTER);
@@ -191,7 +208,6 @@ public class PantallaQR extends PantallaBase {
         }
 
         controlador.iniciarServidorQR(qrBytes);
-
         return panel;
     }
 
@@ -208,12 +224,13 @@ public class PantallaQR extends PantallaBase {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
         if (m != null) {
-            String vigencia = m.getFechaCaducidad() != null ? m.getFechaCaducidad().format(FMT) : "—";
-            agregarFila(p, "Plan:", m.getIdPlan() != null ? m.getIdPlan() : "—");
-            agregarFila(p, "Sucursal:", m.getIdSucursal() != null ? m.getIdSucursal() : "—");
-            agregarFila(p, "Vigencia:", vigencia);
+            String vigencia = m.getFechaCaducidad() != null
+                    ? m.getFechaCaducidad().format(FMT) : "—";
+            agregarFila(p, "Plan:",      m.getIdPlan()      != null ? m.getIdPlan()      : "—");
+            agregarFila(p, "Sucursal:",  m.getIdSucursal()  != null ? m.getIdSucursal()  : "—");
+            agregarFila(p, "Vigencia:",  vigencia);
         } else {
-            JLabel lbl = new JLabel("Tu membresía ha sido activada correctamente");
+            JLabel lbl = new JLabel("Tu membresia ha sido activada correctamente");
             lbl.setFont(Colores.FUENTE_LABEL);
             lbl.setForeground(Colores.TEXTO_SECUNDARIO);
             lbl.setAlignmentX(CENTER_ALIGNMENT);

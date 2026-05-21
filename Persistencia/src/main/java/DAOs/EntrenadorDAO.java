@@ -8,6 +8,8 @@ import com.mongodb.MongoException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import conexion.MongoConexion;
 import dominios.EntrenadorPojo;
 import dominios.HorarioPojo;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import mappersPersistencia.EntrenadorPersistenciaMapper;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 /**
  * Clase DAO para entrenadores
@@ -26,7 +29,7 @@ import org.bson.Document;
 public class EntrenadorDAO implements IEntrenadorDAO {
 
     private MongoCollection<Document> coleccion;
-    private static final System.Logger LOG = System.getLogger(EntrenadorDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(EntrenadorDAO.class.getName());
    
     public EntrenadorDAO() {
 
@@ -95,6 +98,48 @@ public class EntrenadorDAO implements IEntrenadorDAO {
         } catch (PersistenciaException ex) {
             Logger.getLogger(EntrenadorDAO.class.getName()).severe("Error al obtener horarios");
             throw new PersistenciaException("Error al intentar obtener horarios");
+        }
+    }
+    
+    /**
+     * Actualiza el campo disponible de un horario especifico dentro del documento
+     * del entrenador usando arrayFilters de MongoDB.
+     *
+     * @param idEntrenador id del entrenador
+     * @param idHorario id del horario a modificar
+     * @param disponible nuevo valor
+     * @throws PersistenciaException si falla la operacion
+     */
+    @Override
+    public void actualizarDisponibilidadHorario(String idEntrenador,
+                                                 String idHorario,
+                                                 boolean disponible)
+            throws PersistenciaException {
+        try {
+            Bson filtro    = Filters.eq("_id", idEntrenador);
+            Bson actualizacion = Updates.set("horarios.$[h].disponible", disponible);
+ 
+            // arrayFilter: solo actualiza el sub-documento cuyo idHorario coincida
+            Document arrayFilter = new Document("h.idHorario", idHorario);
+            UpdateOptions opciones = new UpdateOptions()
+                    .arrayFilters(List.of(arrayFilter));
+ 
+            long modificados = coleccion.updateOne(filtro, actualizacion, opciones)
+                    .getModifiedCount();
+ 
+            if (modificados == 0) {
+                LOG.warning("No se modifico ningun horario. "
+                        + "idEntrenador=" + idEntrenador
+                        + " idHorario=" + idHorario);
+                // puede que ya estuviera en ese estado
+            } else {
+                LOG.info("Horario " + idHorario
+                        + " del entrenador " + idEntrenador
+                        + " actualizado a disponible=" + disponible);
+            }
+        } catch (MongoException ex) {
+            LOG.severe("Error al actualizar disponibilidad: " + ex.getMessage());
+            throw new PersistenciaException("Error al actualizar disponibilidad del horario");
         }
     }
 }
