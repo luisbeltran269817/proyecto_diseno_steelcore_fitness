@@ -27,6 +27,10 @@ import javax.swing.border.EmptyBorder;
  * Usa dtosControlDeAcceso.ClaseDTO (DTO real de la fachada).
  * ClaseDTO tiene: idClase, nombre, horario (LocalTime), cupoDisponible,
  *                 cupoMaximo, diaSemana. estaLlena() = cupoDisponible <= 0.
+ *
+ * La fachada ya guarda el contexto de la visita activa (idVisita, idCliente,
+ * idPlan, idSucursal) — las pantallas NO repiten esos IDs al llamar metodos
+ * de accion como inscribirClase().
  */
 public class BC_PantallaClases extends PantallaBase {
 
@@ -102,6 +106,7 @@ public class BC_PantallaClases extends PantallaBase {
         }
 
         // Cargar clases reales de MongoDB via fachada
+        // La fachada ya conoce idSucursal, idPlan e idCliente internamente
         cargarClases();
 
         // ── Caso 2: sucursal sin clases (lista vacia) ─────────────────────────
@@ -203,14 +208,9 @@ public class BC_PantallaClases extends PantallaBase {
 
     private void cargarClases() {
         try {
-            // Usa la sucursal que viene en el resultado del acceso
-            String idSucursal = resultado.getIdSucursal();
-            clases = controlAcceso.obtenerClasesPorPlan(
-                    idSucursal,
-                    resultado.getIdPlan(),
-                    resultado.getIdCliente(),
-                    true   // ya validamos planIncluyeClases antes de llegar aqui
-            );
+            // La fachada usa internamente idSucursal, idPlan e idCliente
+            // que guardo al procesar el QR — pasamos null para que use los suyos
+            clases = controlAcceso.obtenerClasesPorPlan(resultado.getIdSucursal());
         } catch (AccesoDenegadoException ex) {
             clases = new ArrayList<>();
         }
@@ -258,11 +258,8 @@ public class BC_PantallaClases extends PantallaBase {
         }
 
         try {
-            // inscribirClase(idVisita, idClase, idCliente)
-            controlAcceso.inscribirClase(
-                    resultado.getIdVisita(),
-                    clase.getIdClase(),
-                    resultado.getIdCliente());
+            // La fachada ya conoce idVisita e idCliente — solo pasamos idClase
+            controlAcceso.inscribirClase(clase.getIdClase());
 
             String horarioTexto = clase.getHorario() != null
                     ? " - " + clase.getHorario().format(FMT_HORA) : "";

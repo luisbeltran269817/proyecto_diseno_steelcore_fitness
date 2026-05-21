@@ -108,19 +108,21 @@ public class ClaseDAO implements IClaseDAO {
             }
             if (clase.estaLlena()) {
                 throw new PersistenciaException(
-                        "Lo sentimos, el cupo para esta clase ya esta lleno\n"
-                        + "Por favor selecciona otro horario");
+                    "El cupo para esta clase ya está lleno."
+                );
             }
             if (clase.estaInscrito(idCliente)) {
-                throw new PersistenciaException("El socio ya esta inscrito en esta clase");
+                throw new PersistenciaException(
+                    "El socio ya está inscrito en esta clase."
+                );
             }
 
             coleccion.updateOne(
-                    Filters.eq("_id", idClase),
-                    Updates.combine(
-                            Updates.inc("cupoActual", 1),
-                            Updates.push("inscritos", idCliente)
-                    )
+                Filters.eq("_id", idClase),
+                Updates.combine(
+                    Updates.inc("cupoActual", 1),
+                    Updates.push("inscritos", idCliente)
+                )
             );
             LOG.info("Socio " + idCliente + " inscrito en clase " + idClase);
 
