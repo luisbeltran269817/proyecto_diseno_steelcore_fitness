@@ -6,10 +6,17 @@
         <artifactId>GimnasioSTEELCORE_DisenoSW</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>Dominio_modulo</artifactId>
+    <artifactId>PlanearRutinaSubsistema</artifactId>
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>BOs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <properties>
         <maven.compiler.release>23</maven.compiler.release>
-        <exec.mainClass>com.mycompany.dominio_modulo.Dominio_modulo</exec.mainClass>
+        <exec.mainClass>com.mycompany.planearrutinasubsistema.PlanearRutinaSubsistema</exec.mainClass>
     </properties>
 </project>

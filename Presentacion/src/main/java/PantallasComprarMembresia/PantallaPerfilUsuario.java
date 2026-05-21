@@ -221,6 +221,12 @@ public class PantallaPerfilUsuario extends PantallaBase {
             dispose();
             controlador.irAModuloRecepcion();
         });
+        
+        Boton btnRutina = crearBoton("Ver Rutinas", Boton.Variante.SECUNDARIO);
+        btnRutina.addActionListener(e -> {
+            dispose();
+            controlador.irAVistaRutina();
+        });
  
         Boton btnSalir = crearBoton("Cerrar Sesión", Boton.Variante.SECUNDARIO);
         btnSalir.addActionListener(e -> {
@@ -236,6 +242,8 @@ public class PantallaPerfilUsuario extends PantallaBase {
         panel.add(btnMembresia);
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnCita);
+        panel.add(Box.createVerticalStrut(14));
+        panel.add(btnRutina);
         panel.add(Box.createVerticalStrut(14));
         panel.add(btnSalir);
         panel.add(Box.createVerticalGlue());
