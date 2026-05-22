@@ -1,7 +1,12 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package Fachada;
 
 import dtosControlDeAcceso.ClaseDTO;
 import dtosControlDeAcceso.EntrenadorDTO;
+import dtosControlDeAcceso.HorarioDTO;
 import dtosControlDeAcceso.ResultadoAccesoDTO;
 import java.util.List;
 
@@ -13,26 +18,15 @@ import java.util.List;
  * @author julian izaguirre
  */
 public interface Icontrolacceso {
-
-    // ── Sesión activa ────────────────────────────────────────────────────────
-    // La fachada guarda el contexto; el coordinador lo consulta cuando lo necesita
-
-    /** Regresa el id de la visita que esta corriendo en este momento. */
     String getIdVisitaActiva();
 
-    /** Regresa el id del cliente cuya visita esta activa. */
     String getIdClienteActivo();
 
-    /** Regresa el id del plan del cliente activo. */
     String getIdPlanActivo();
 
-    /** Indica si el plan activo incluye entrenador personal. */
     boolean isPlanIncluyeEntrenador();
 
-    /** Indica si el plan activo incluye acceso a clases grupales. */
     boolean isPlanIncluyeClases();
-
-    // ── Flujo de acceso ──────────────────────────────────────────────────────
 
     /**
      * Revisa si el codigo escaneado es valido para darle entrada al socio.
@@ -60,6 +54,17 @@ public interface Icontrolacceso {
      * @throws AccesoDenegadoException Si falla la comunicacion con la base
      */
     List<EntrenadorDTO> obtenerEntrenadoresDisponibles(String idSucursal)
+            throws AccesoDenegadoException;
+
+    /**
+     * Trae los horarios disponibles de un entrenador especifico.
+     * Solo devuelve los que aun no estan ocupados.
+     *
+     * @param idEntrenador Entrenador a consultar
+     * @return Lista de horarios libres listos para mostrar en pantalla
+     * @throws AccesoDenegadoException Si falla la consulta
+     */
+    List<HorarioDTO> obtenerHorariosEntrenador(String idEntrenador)
             throws AccesoDenegadoException;
 
     /**

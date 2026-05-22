@@ -1,8 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package Fachada;
 
 import Control.ControlAcceso;
 import dtosControlDeAcceso.ClaseDTO;
 import dtosControlDeAcceso.EntrenadorDTO;
+import dtosControlDeAcceso.HorarioDTO;
 import dtosControlDeAcceso.ResultadoAccesoDTO;
 
 import java.io.IOException;
@@ -94,6 +99,12 @@ public class FachadaControlAcceso implements Icontrolacceso {
     public List<EntrenadorDTO> obtenerEntrenadoresDisponibles(String idSucursal)
             throws AccesoDenegadoException {
         return control.obtenerEntrenadoresDisponibles(idSucursal);
+    }
+
+    @Override
+    public List<HorarioDTO> obtenerHorariosEntrenador(String idEntrenador)
+            throws AccesoDenegadoException {
+        return control.obtenerHorariosEntrenador(idEntrenador);
     }
 
     /**

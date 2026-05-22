@@ -196,6 +196,41 @@ public class ControlAcceso {
     }
 
     /**
+     * Trae los horarios disponibles de un entrenador concreto desde el BO.
+     * Mapea los dtos.HorarioDTO al DTO de acceso y filtra solo los libres.
+     *
+     * @param idEntrenador Entrenador a consultar
+     * @return Lista de horarios disponibles lista para la pantalla
+     * @throws AccesoDenegadoException Si falla la consulta
+     */
+    public List<dtosControlDeAcceso.HorarioDTO> obtenerHorariosEntrenador(String idEntrenador)
+            throws AccesoDenegadoException {
+        if (idEntrenador == null || idEntrenador.isBlank()) {
+            return new ArrayList<>();
+        }
+        try {
+            List<dtos.HorarioDTO> todos = entrenadorBO.obtenerHorariosEntrenador(idEntrenador);
+            List<dtosControlDeAcceso.HorarioDTO> resultado = new ArrayList<>();
+            if (todos == null) return resultado;
+            for (dtos.HorarioDTO h : todos) {
+                if (!h.isDisponible()) continue;
+                dtosControlDeAcceso.HorarioDTO dto = new dtosControlDeAcceso.HorarioDTO();
+                dto.setIdHorario(h.getIdHorario());
+                dto.setIdEntrenador(idEntrenador);
+                dto.setDisponible(true);
+                dto.setHoraInicio(h.getHoraInicio());
+                dto.setHoraFin(h.getHoraFin());
+                dto.setDiaSemana(h.getNombreDia());
+                resultado.add(dto);
+            }
+            return resultado;
+        } catch (NegocioException ex) {
+            throw new AccesoDenegadoException(
+                    "No se pudieron consultar los horarios: " + ex.getMessage());
+        }
+    }
+
+    /**
      * Le aparta el entrenador al socio en su visita y ocupa el horario
      * 
      * @param idVisita Visita activa del socio
@@ -208,7 +243,24 @@ public class ControlAcceso {
                                    String idEntrenador, String idHorario)
             throws AccesoDenegadoException {
         try {
-            entrenadorBO.actualizarDisponibilidadHorario(idEntrenador, idHorario, false);
+            // Si no se recibió un horario específico, buscar automáticamente el primero libre
+            String horarioAUsar = idHorario;
+            if (horarioAUsar == null || horarioAUsar.isBlank()) {
+                dtos.EntrenadorDTO entrenador = entrenadorBO.buscarPorId(idEntrenador);
+                if (entrenador != null && entrenador.getHorarios() != null) {
+                    for (dtos.HorarioDTO h : entrenador.getHorarios()) {
+                        if (h.isDisponible()) {
+                            horarioAUsar = h.getIdHorario();
+                            break;
+                        }
+                    }
+                }
+            }
+            if (horarioAUsar == null || horarioAUsar.isBlank()) {
+                throw new AccesoDenegadoException(
+                        "El entrenador no tiene horarios disponibles en este momento.");
+            }
+            entrenadorBO.actualizarDisponibilidadHorario(idEntrenador, horarioAUsar, false);
             visitaBO.actualizarServicio(idVisita, TipoServicio.ENTRENADOR.name(), idEntrenador);
         } catch (NegocioException ex) {
             throw new AccesoDenegadoException(ex.getMessage());
