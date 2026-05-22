@@ -1,3 +1,19 @@
+#Se supone que con estos añadidos al gitignore ya no habran errores por archivos de mac y windows
+# Ignorar todos los archivos compilados de Java
+*.class
+
+# Ignorar CUALQUIER carpeta target o build en cualquier subcarpeta
+**/target/
+**/build/
+
+# Ignorar archivos ocultos de Mac
+.DS_Store
+
+# Ignorar configuraciones privadas de NetBeans y proyectos
+**/nbproject/private/
+*.nb_id_trans
+
+
 /InicioSesionSubsistema/target/
 /Presentacion/target/
 /DTOs/target/
@@ -13,3 +29,6 @@
 /Persistencia/nbproject/
 /Dominio_modulo/target/
 /InventarioMantenimientoSubsistema/target/
+/PlanearRutinaSubsistema/target/
+/ReportesInfraestructura/target/
+/AdministrarReportesSubsistema/target/

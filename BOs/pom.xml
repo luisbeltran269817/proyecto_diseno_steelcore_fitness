@@ -24,6 +24,12 @@
             <artifactId>Dominio_modulo</artifactId>
             <version>${project.version}</version>
         </dependency>
+            <!-- pdf imprimir y correo -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ReportesInfraestructura</artifactId>
+                <version>${project.version}</version>
+            </dependency>
     </dependencies>
     <properties>
         <maven.compiler.release>23</maven.compiler.release>

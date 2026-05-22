@@ -6,6 +6,8 @@ import com.mongodb.client.MongoDatabase;
 import conexion.MongoConexion;
 import dominios.AmenidadPojo;
 import dominios.AmenidadPojo.TipoAmenidad;
+import dominios.CitaPojo;
+import dominios.CitaPojo.EstadoCitaPojo;
 import dominios.ClientePojo;
 import dominios.EntrenadorPojo;
 import dominios.HorarioPojo;
@@ -73,6 +75,8 @@ public class DatosPruebaMongo {
         bd.getCollection("membresias").deleteMany(new Document());
         bd.getCollection("visitas").deleteMany(new Document());
         bd.getCollection("clases").deleteMany(new Document());
+        bd.getCollection("ejercicios").deleteMany(new Document());
+        bd.getCollection("plantillaRutina").deleteMany(new Document());
 
 
         bd.getCollection("adminsMantenimiento").deleteMany(new Document());
@@ -573,8 +577,151 @@ public class DatosPruebaMongo {
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente1));
         colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente2));
 
+        /*
+         * =========================
+         * CITA BIENVENIDA (ID con UUID real)
+         * =========================
+         */
+        CitaPojo cita = new CitaPojo();
+        cita.setIdCita(UUID.randomUUID().toString());
+        cita.setIdCliente("CL001");
+        cita.setIdEntrenador("E001");
+        cita.setIdSucursal("S001");
+        cita.setIdHorario("H001");
+        cita.setFechaHora(LocalDateTime.now().plusDays(1));
+        cita.setEstado(EstadoCitaPojo.CONFIRMADA);
+        cita.setNotas("Primera cita de bienvenida");
+
+        /*
+         * =========================
+         * CLIENTE (contraseña hasheada con BCrypt)
+         * =========================
+         */
+        // Hash de la contraseña "123" — el login comparará con BCrypt.verify()
+        String contrasenhaHasheada = BCrypt.withDefaults()
+                .hashToString(12, "123".toCharArray());
+
+        String contraseniaReporte = BCrypt.withDefaults().hashToString(12, "2711".toCharArray());
+
+        UsuarioPojo usuario = new UsuarioPojo();
+        usuario.setCorreo("cliente@gmail.com");
+        usuario.setNombre("Juan Leonel");
+        usuario.setContraseña(contrasenhaHasheada);   // ← ya hasheada
+        usuario.setRol(RolUsuarioPojo.CLIENTE);
+
+        // reportes
+        UsuarioPojo usuarioReporte = new UsuarioPojo();
+        usuarioReporte.setNombre("Noelia Encinas");
+        usuarioReporte.setCorreo("reportes@gmail.com");
+        usuarioReporte.setContraseña(contraseniaReporte);
+        usuarioReporte.setRol(RolUsuarioPojo.ADMIN);
+
+        ClientePojo clienteReporte = new ClientePojo();
+        clienteReporte.setIdCliente("ADMIN_REPORTES_001");
+        clienteReporte.setUsuario(usuarioReporte);
+        clienteReporte.setApellidoPaterno("Encinas");
+        clienteReporte.setApellidoMaterno("Noriega");
+        clienteReporte.setFechaNacimiento(LocalDate.of(2003, 11, 27));
+        clienteReporte.setCurp("EENN031127MSRXXX01");
+        clienteReporte.setMembresiaActiva(null);
+        clienteReporte.setCitaBienvenida(null);
+
+        MembresiaActivaPojo snapshot = new MembresiaActivaPojo();
+        snapshot.setIdMembresia(idMem1);
+        snapshot.setIdPlan("P001");
+        snapshot.setFechaCaducidad(mem1.getFechaCaducidad());
+        snapshot.setEstado(EstadoMembresiaPojo.ACTIVA);
+
+        ClientePojo cliente = new ClientePojo();
+        cliente.setIdCliente("CL001");
+        cliente.setUsuario(usuario);
+        cliente.setApellidoPaterno("Bojorquez");
+        cliente.setApellidoMaterno("Terán");
+        cliente.setFechaNacimiento(LocalDate.of(2003, 5, 10));
+        cliente.setCurp("LELJ030510HSRXXX01");
+        cliente.setMembresiaActiva(snapshot);
+        cliente.setCitaBienvenida(cita);   // ← cita guardada en el cliente
+
+//        MongoCollection<Document> colClientes = bd.getCollection("clientes");
+//        colClientes.insertOne(ClientePersistenciaMapper.toDocument(cliente));
+//
+//        colClientes.insertOne(ClientePersistenciaMapper.toDocument(clienteReporte));
+        /*
+         * =========================
+         * VISITAS
+         * =========================
+         */
+        VisitaPojo visita = new VisitaPojo();
+        visita.setIdVisita("V001");
+        visita.setIdCliente("CL001");
+        visita.setIdSucursal("S001");
+        visita.setFechaHora(LocalDateTime.now().minusDays(1));
+
         // ── Visitas históricas ────────────────────────────────────────────────
         MongoCollection<Document> colVisitas = bd.getCollection("visitas");
+        
+        /*
+        * =========================
+        * EJERCICIOS
+        * =========================
+        */
+        bd.getCollection("ejercicios").deleteMany(new Document());
+        
+        MongoCollection<Document> colEjercicios = bd.getCollection("ejercicios");
+        
+        colEjercicios.insertOne(new Document("_id", "EJ001").append("nombre", "Press de Banca").append("grupoMuscular", "Pecho").append("descripcion", "Ejercicio básico multiarticular para el desarrollo del pectoral."));
+        
+        colEjercicios.insertOne(new Document("_id", "EJ002").append("nombre", "Sentadilla Libre").append("grupoMuscular", "Pierna").append("descripcion", "Sentadilla profunda con barra olímpica enfocado en cuádriceps y glúteos."));
+        
+        colEjercicios.insertOne(new Document("_id", "EJ003").append("nombre", "Dominadas").append("grupoMuscular", "Espalda").append("descripcion", "Ejercicio de autocarga ideal para la amplitud de la espalda (dorsales)."));
+        
+        colEjercicios.insertOne(new Document("_id", "EJ004").append("nombre", "Aperturas con Mancuernas").append("grupoMuscular", "Pecho").append("descripcion", "Ejercicio de aislamiento ideal para estirar y enfocar las fibras del pectoral."));
+        
+        colEjercicios.insertOne(new Document("_id", "EJ005").append("nombre", "Prensa de Piernas").append("grupoMuscular", "Pierna").append("descripcion", "Ejercicio en máquina para trabajar cuádriceps e isquiotibiales de forma segura."));
+        
+        colEjercicios.insertOne(new Document("_id", "EJ006").append("nombre", "Remo con Barra").append("grupoMuscular", "Espalda").append("descripcion", "Ejercicio constructor de densidad para trabajar la zona media y alta de la espalda."));
+        
+        /*
+        * =========================
+        * PLANTILLAS DE RUTINA
+        * =========================
+        */
+        bd.getCollection("plantillaRutina").deleteMany(new Document());
+        
+        MongoCollection<Document> colPlantillas = bd.getCollection("plantillaRutina");
+
+        colPlantillas.insertOne(new Document("nombre", "Cardio")
+            .append("detalles", List.of(
+            new Document("nombreDia", "Lunes").append("grupoMuscular", "Pecho").append("ejercicios", List.of("EJ001", "EJ004")),
+            new Document("nombreDia", "Martes").append("grupoMuscular", "Descanso").append("ejercicios", List.of()),
+            new Document("nombreDia", "Miércoles").append("grupoMuscular", "Pierna").append("ejercicios", List.of("EJ002", "EJ005")),
+            new Document("nombreDia", "Jueves").append("grupoMuscular", "Descanso").append("ejercicios", List.of()),
+            new Document("nombreDia", "Viernes").append("grupoMuscular", "Espalda").append("ejercicios", List.of("EJ003", "EJ006")),
+            new Document("nombreDia", "Sábado").append("grupoMuscular", "Descanso").append("ejercicios", List.of()),
+            new Document("nombreDia", "Domingo").append("grupoMuscular", "Descanso").append("ejercicios", List.of())
+            )));
+        
+        colPlantillas.insertOne(new Document("nombre", "Perder peso")
+            .append("detalles", List.of(
+            new Document("nombreDia", "Lunes").append("grupoMuscular", "Pierna").append("ejercicios", List.of("EJ002", "EJ005")),
+            new Document("nombreDia", "Martes").append("grupoMuscular", "Espalda").append("ejercicios", List.of("EJ003", "EJ006")),
+            new Document("nombreDia", "Miércoles").append("grupoMuscular", "Descanso").append("ejercicios", List.of()),
+            new Document("nombreDia", "Jueves").append("grupoMuscular", "Pecho").append("ejercicios", List.of("EJ001", "EJ004")),
+            new Document("nombreDia", "Viernes").append("grupoMuscular", "Pierna").append("ejercicios", List.of("EJ002")),
+            new Document("nombreDia", "Sábado").append("grupoMuscular", "Descanso").append("ejercicios", List.of()),
+            new Document("nombreDia", "Domingo").append("grupoMuscular", "Descanso").append("ejercicios", List.of())
+            )));
+
+        colPlantillas.insertOne(new Document("nombre", "Cuerpo completo")
+            .append("detalles", List.of(
+            new Document("nombreDia", "Lunes").append("grupoMuscular", "Espalda").append("ejercicios", List.of("EJ003", "EJ006")),
+            new Document("nombreDia", "Martes").append("grupoMuscular", "Pecho").append("ejercicios", List.of("EJ001", "EJ004")),
+            new Document("nombreDia", "Miércoles").append("grupoMuscular", "Pierna").append("ejercicios", List.of("EJ002", "EJ005")),
+            new Document("nombreDia", "Jueves").append("grupoMuscular", "Descanso").append("ejercicios", List.of()),
+            new Document("nombreDia", "Viernes").append("grupoMuscular", "Pecho").append("ejercicios", List.of("EJ001")),
+            new Document("nombreDia", "Sábado").append("grupoMuscular", "Espalda").append("ejercicios", List.of("EJ003")),
+            new Document("nombreDia", "Domingo").append("grupoMuscular", "Descanso").append("ejercicios", List.of())
+            )));
 
         VisitaPojo visita1 = new VisitaPojo();
         visita1.setIdVisita("V001");

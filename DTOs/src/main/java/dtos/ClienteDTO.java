@@ -22,6 +22,9 @@ public class ClienteDTO extends UsuarioDTO {
     private List<MembresiaDTO> membresias;
     private List<VisitaDTO> historialVisitas;
     private CitaDTO citaBienvenida;
+    
+    //el cliente tiene las rutinas embebidas
+    private List<RutinaDTO> rutinas;
 
     public ClienteDTO() {
     }
@@ -143,6 +146,14 @@ public class ClienteDTO extends UsuarioDTO {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public List<RutinaDTO> getRutinas() {
+        return rutinas;
+    }
+
+    public void setRutinas(List<RutinaDTO> rutinas) {
+        this.rutinas = rutinas;
     }
 
     

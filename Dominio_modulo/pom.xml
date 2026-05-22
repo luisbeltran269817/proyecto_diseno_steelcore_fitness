@@ -9,7 +9,7 @@
     <artifactId>Dominio_modulo</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.release>23</maven.compiler.release>
         <exec.mainClass>com.mycompany.dominio_modulo.Dominio_modulo</exec.mainClass>
     </properties>
 </project>
