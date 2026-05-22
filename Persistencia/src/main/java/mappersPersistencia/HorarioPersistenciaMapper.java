@@ -40,7 +40,7 @@ public class HorarioPersistenciaMapper {
 
         pojo.setHoraFin(LocalTime.parse(doc.getString("horaFin")));
 
-        pojo.setDisponible(doc.getBoolean("disponible"));
+        pojo.setDisponible(doc.getBoolean("disponible", true)); // true = libre si no existe el campo
 
         return pojo;
     }
